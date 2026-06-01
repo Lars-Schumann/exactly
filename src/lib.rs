@@ -7,9 +7,12 @@
     pattern_types,
     pattern_type_macro,
     const_ops,
-    const_trait_impl
+    const_trait_impl,
+    const_cmp
 )]
 #![allow(incomplete_features)]
+
+use core::ops::{Add, Div, Mul, Sub};
 
 macro_rules! pattern_type_at_home {
     ($($ty:ident,)*) => {$(
@@ -57,6 +60,16 @@ macro_rules! pattern_type_at_home {
             #[expect(unused)]
             type const DIV<const N: $ty, const M: $ty>: $ty = const { N / M };
 
+            #[expect(unused)]
+            type const MIN_OF_CROSS_MULS<const A: $ty, const B: $ty, const X: $ty, const Y: $ty>: $ty = const { (A * X).min(A * Y).min(B * X).min(B * Y) };
+            #[expect(unused)]
+            type const MAX_OF_CROSS_MULS<const A: $ty, const B: $ty, const X: $ty, const Y: $ty>: $ty = const { (A * X).max(A * Y).max(B * X).max(B * Y) };
+
+            #[expect(unused)]
+            type const MIN_OF_CROSS_DIVS<const A: $ty, const B: $ty, const X: $ty, const Y: $ty>: $ty = const { (A / X).min(A / Y).min(B / X).min(B / Y) };
+            #[expect(unused)]
+            type const MAX_OF_CROSS_DIVS<const A: $ty, const B: $ty, const X: $ty, const Y: $ty>: $ty = const { (A / X).max(A / Y).max(B / X).max(B / Y) };
+
             pub const fn add<const V: $ty>(&self) -> ${concat(R,$ty)}::<{Self::ADD::<LOWER, V>},{ Self::ADD::<UPPER, V>}> {
                 unsafe { ${concat(R,$ty)}::<{Self::ADD::<LOWER, V>},{ Self::ADD::<UPPER, V>}>::new_unchecked(self.inner() + V) }
             }
@@ -74,11 +87,35 @@ macro_rules! pattern_type_at_home {
             }
         }
 
-        impl<const A_LOWER: $ty, const A_UPPER: $ty, const B_LOWER: $ty, const B_UPPER: $ty> const ::core::ops::Add<${concat(R,$ty)}<{ B_LOWER }, { B_UPPER }>> for ${concat(R,$ty)}<{ A_LOWER }, { A_UPPER }>{
-            type Output = ${concat(R,$ty)}<{ Self::ADD::<A_LOWER, B_LOWER>}, { Self::ADD::<A_UPPER, B_UPPER> }>;
+        impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const Add<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
+            type Output = ${concat(R,$ty)}<{ Self::ADD::<A, X>}, { Self::ADD::<B, Y> }>;
 
-            fn add(self, rhs: ${concat(R,$ty)}<{ B_LOWER }, { B_UPPER }>) -> Self::Output {
+            fn add(self, rhs: ${concat(R,$ty)}<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() + rhs.inner()) }
+            }
+        }
+
+        impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const Sub<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
+            type Output = ${concat(R,$ty)}<{ Self::SUB::<A, Y>}, { Self::SUB::<B, X> }>;
+
+            fn sub(self, rhs: ${concat(R,$ty)}<{ X }, { Y }>) -> Self::Output {
+                unsafe { Self::Output::new_unchecked(self.inner() - rhs.inner()) }
+            }
+        }
+
+        impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const Mul<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
+            type Output = ${concat(R,$ty)}<{ Self::MIN_OF_CROSS_MULS::<A, B, X, Y> }, { Self::MAX_OF_CROSS_MULS::<A, B, X, Y> }>;
+
+            fn mul(self, rhs: ${concat(R,$ty)}<{ X }, { Y }>) -> Self::Output {
+                unsafe { Self::Output::new_unchecked(self.inner() * rhs.inner()) }
+            }
+        }
+
+        impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const Div<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
+            type Output = ${concat(R,$ty)}<{ Self::MIN_OF_CROSS_DIVS::<A, B, X, Y> }, { Self::MAX_OF_CROSS_DIVS::<A, B, X, Y> }>;
+
+            fn div(self, rhs: ${concat(R,$ty)}<{ X }, { Y }>) -> Self::Output {
+                unsafe { Self::Output::new_unchecked(self.inner() / rhs.inner()) }
             }
         }
     )*}
