@@ -75,7 +75,7 @@ pattern_type_at_home!(u8, u16, u32, u64, u128, i8, i16, i32, i64, i128,);
 
 #[macro_export]
 macro_rules! to_pattern_type {
-    (let $name:ident: $ty:ident is [$lower:expr]..=[$upper:expr] = $value:expr) => {
+    (let $name:ident: $ty:ident is $lower:literal..=$upper:literal = $value:expr) => {
         {
             let __assert_type: $crate::${concat(P,$ty)}::<$lower, $upper> = $value;
         }

@@ -18,7 +18,7 @@ fn it_works() {
     let y: Pu32<12, 14> = x.add::<5>().mul::<2>();
     dbg!(std::any::type_name_of_val(&y));
 
-    to_pattern_type!(let out_name: u32 is [12]..=[14] = y);
+    to_pattern_type!(let out_name: u32 is 12..=14 = y);
 
     dbg!(std::any::type_name_of_val(&out_name));
 }
