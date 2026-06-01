@@ -76,9 +76,9 @@ pattern_type_at_home!(u8, u16, u32, u64, u128, i8, i16, i32, i64, i128,);
 macro_rules! to_pattern_type {
     (let $name:ident: $ty:ident as $lower:expr=>$upper:expr => $value:expr) => {
         {
-            let __assert_type: ${concat(P,$ty)}::<$lower, $upper> = $value;
+            let __assert_type: $crate::${concat(P,$ty)}::<$lower, $upper> = $value;
         }
-        let $name: pattern_type!($ty is ${concat(P,$ty)}::<$lower, $upper>::LOWER..=${concat(P,$ty)}::<$lower, $upper>::UPPER) = unsafe { core::mem::transmute($value) };
+        let $name: pattern_type!($ty is $crate::${concat(P,$ty)}::<$lower, $upper>::LOWER..=$crate::${concat(P,$ty)}::<$lower, $upper>::UPPER) = unsafe { core::mem::transmute($value) };
     };
 }
 
