@@ -5,7 +5,9 @@
     generic_const_items,
     inherent_associated_types,
     pattern_types,
-    pattern_type_macro
+    pattern_type_macro,
+    const_ops,
+    const_trait_impl
 )]
 #![allow(incomplete_features)]
 
@@ -69,7 +71,7 @@ macro_rules! pattern_type_at_home {
             }
         }
 
-        impl<const A_LOWER: $ty, const A_UPPER: $ty, const B_LOWER: $ty, const B_UPPER: $ty> ::core::ops::Add<${concat(R,$ty)}<{ B_LOWER }, { B_UPPER }>> for ${concat(R,$ty)}<{ A_LOWER }, { A_UPPER }>{
+        impl<const A_LOWER: $ty, const A_UPPER: $ty, const B_LOWER: $ty, const B_UPPER: $ty> const ::core::ops::Add<${concat(R,$ty)}<{ B_LOWER }, { B_UPPER }>> for ${concat(R,$ty)}<{ A_LOWER }, { A_UPPER }>{
             type Output = ${concat(R,$ty)}<{ Self::ADD::<A_LOWER, B_LOWER>}, { Self::ADD::<A_UPPER, B_UPPER> }>;
 
             fn add(self, rhs: ${concat(R,$ty)}<{ B_LOWER }, { B_UPPER }>) -> Self::Output {
