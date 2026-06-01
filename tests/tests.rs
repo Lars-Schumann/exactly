@@ -9,6 +9,7 @@
 )]
 #![allow(incomplete_features)]
 
+use exactly::Ri32;
 use exactly::Ru32;
 use exactly::to_pattern_type;
 use std::any::type_name_of_val;
@@ -28,4 +29,44 @@ fn demo() {
     });
 
     let qux: Ru32<13, 19> = foo + bar;
+}
+
+#[test]
+fn range_add() {
+    let a: Ru32<1, 3> = Ru32::new(2).unwrap();
+    let b: Ru32<4, 5> = Ru32::new(5).unwrap();
+
+    let c: Ru32<5, 8> = a + b;
+
+    assert_eq!(c.inner(), 7);
+}
+
+#[test]
+fn range_sub() {
+    let a: Ri32<5, 6> = Ri32::new(5).unwrap();
+    let b: Ri32<2, 8> = Ri32::new(7).unwrap();
+
+    let c: Ri32<-3, 4> = a - b;
+
+    assert_eq!(c.inner(), -2);
+}
+
+#[test]
+fn range_mul() {
+    let a: Ri32<-2, 4> = Ri32::new(3).unwrap();
+    let b: Ri32<-10, 3> = Ri32::new(-9).unwrap();
+
+    let c: Ri32<-40, 20> = a * b;
+
+    assert_eq!(c.inner(), -27);
+}
+
+#[test]
+fn range_div() {
+    let a: Ri32<-2, 50> = Ri32::new(3).unwrap();
+    let b: Ri32<-25, 3> = Ri32::new(-9).unwrap();
+
+    let c: Ri32<-2, 16> = a / b;
+
+    assert_eq!(c.inner(), -27);
 }
