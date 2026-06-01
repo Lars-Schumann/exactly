@@ -79,6 +79,6 @@ macro_rules! to_pattern_type {
         {
             let __assert_type: $crate::${concat(R,$ty)}::<$lower, $upper> = $value;
         }
-        let $name: pattern_type!($ty is $lower..=$upper) = unsafe { ::core::mem::transmute($value) };
+        let $name: pattern_type!(::core::primitive::$ty is $lower..=$upper) = unsafe { ::core::mem::transmute($value) };
     };
 }
