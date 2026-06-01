@@ -9,15 +9,15 @@
 )]
 #![allow(incomplete_features)]
 
-use exactly::Pu32;
+use exactly::Ru32;
 use exactly::to_pattern_type;
 use std::any::type_name_of_val;
 use std::mem::transmute;
 
 #[test]
 fn demo() {
-    let foo: Pu32<1, 3> = Pu32::new(2);
-    let bar: Pu32<12, 16> = foo.add::<5>().mul::<2>();
+    let foo: Ru32<1, 3> = Ru32::new(2);
+    let bar: Ru32<12, 16> = foo.add::<5>().mul::<2>();
 
     dbg!(type_name_of_val(&bar), bar);
 
