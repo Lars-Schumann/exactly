@@ -3,7 +3,9 @@
     min_generic_const_args,
     generic_const_args,
     generic_const_items,
-    inherent_associated_types
+    inherent_associated_types,
+    pattern_types,
+    pattern_type_macro
 )]
 #![allow(incomplete_features)]
 
@@ -71,6 +73,15 @@ macro_rules! pattern_type_at_home {
 
 pattern_type_at_home!(u8, u16, u32, u64, u128, i8, i16, i32, i64, i128,);
 
+macro_rules! to_pattern_type {
+    (let $name:ident: $ty:ident as $lower:expr=>$upper:expr => $value:expr) => {
+        {
+            let __assert_type: ${concat(P,$ty)}::<$lower, $upper> = $value;
+        }
+        let $name: pattern_type!($ty is ${concat(P,$ty)}::<$lower, $upper>::LOWER..=${concat(P,$ty)}::<$lower, $upper>::UPPER) = unsafe { core::mem::transmute($value) };
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -78,11 +89,11 @@ mod tests {
     #[test]
     fn it_works() {
         let x: Pu32<1, 2> = Pu32::new(1);
-        let y = x.add::<5>().mul::<2>().sub::<4>();
+        let y: Pu32<12, 14> = x.add::<5>().mul::<2>();
         dbg!(std::any::type_name_of_val(&y));
 
-        let z = y.lower();
+        to_pattern_type!(let out_name: u32 as 12 => 14 => y);
 
-        dbg!(z);
+        dbg!(std::any::type_name_of_val(&out_name));
     }
 }
