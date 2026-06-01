@@ -68,6 +68,14 @@ macro_rules! pattern_type_at_home {
                 unsafe { ${concat(R,$ty)}::<{Self::DIV::<LOWER, V>},{ Self::DIV::<UPPER, V>}>::new_unchecked(self.inner() / V) }
             }
         }
+
+        impl<const A_LOWER: $ty, const A_UPPER: $ty, const B_LOWER: $ty, const B_UPPER: $ty> ::core::ops::Add<${concat(R,$ty)}<{ B_LOWER }, { B_UPPER }>> for ${concat(R,$ty)}<{ A_LOWER }, { A_UPPER }>{
+            type Output = ${concat(R,$ty)}<{ Self::ADD::<A_LOWER, B_LOWER>}, { Self::ADD::<A_UPPER, B_UPPER> }>;
+
+            fn add(self, rhs: ${concat(R,$ty)}<{ B_LOWER }, { B_UPPER }>) -> Self::Output {
+                unsafe { Self::Output::new_unchecked(self.inner() + rhs.inner()) }
+            }
+        }
     )*}
 }
 

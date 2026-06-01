@@ -26,4 +26,6 @@ fn demo() {
     dbg!(type_name_of_val(&baz), unsafe {
         transmute::<pattern_type!(u32 is 12..=16), u32>(baz)
     });
+
+    let qux: Ru32<13, 19> = foo + bar;
 }
