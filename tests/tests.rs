@@ -11,14 +11,19 @@
 
 use exactly::Pu32;
 use exactly::to_pattern_type;
+use std::any::type_name_of_val;
+use std::mem::transmute;
 
 #[test]
-fn it_works() {
-    let x: Pu32<1, 2> = Pu32::new(1);
-    let y: Pu32<12, 14> = x.add::<5>().mul::<2>();
-    dbg!(std::any::type_name_of_val(&y));
+fn demo() {
+    let foo: Pu32<1, 3> = Pu32::new(2);
+    let bar: Pu32<12, 16> = foo.add::<5>().mul::<2>();
 
-    to_pattern_type!(let out_name: u32 is 12..=14 = y);
+    dbg!(type_name_of_val(&bar), bar);
 
-    dbg!(std::any::type_name_of_val(&out_name));
+    to_pattern_type!(let baz: u32 is 12..=16 = bar);
+
+    dbg!(type_name_of_val(&baz), unsafe {
+        transmute::<pattern_type!(u32 is 12..=16), u32>(baz)
+    });
 }
