@@ -73,27 +73,12 @@ macro_rules! pattern_type_at_home {
 
 pattern_type_at_home!(u8, u16, u32, u64, u128, i8, i16, i32, i64, i128,);
 
+#[macro_export]
 macro_rules! to_pattern_type {
-    (let $name:ident: $ty:ident as $lower:expr=>$upper:expr => $value:expr) => {
+    (let $name:ident: $ty:ident is [$lower:expr]..=[$upper:expr] = $value:expr) => {
         {
             let __assert_type: $crate::${concat(P,$ty)}::<$lower, $upper> = $value;
         }
         let $name: pattern_type!($ty is $crate::${concat(P,$ty)}::<$lower, $upper>::LOWER..=$crate::${concat(P,$ty)}::<$lower, $upper>::UPPER) = unsafe { core::mem::transmute($value) };
     };
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let x: Pu32<1, 2> = Pu32::new(1);
-        let y: Pu32<12, 14> = x.add::<5>().mul::<2>();
-        dbg!(std::any::type_name_of_val(&y));
-
-        to_pattern_type!(let out_name: u32 as 12 => 14 => y);
-
-        dbg!(std::any::type_name_of_val(&out_name));
-    }
 }
