@@ -42,6 +42,8 @@
           export PS1="\[\e[1;33m\][exactly]\[\e[0m\] $PS1"
 
           alias msrv="cargo msrv find --linear -- cargo test"
+
+          export RUSTFLAGS="-Znext-solver=globally"
         '';
       };
     };
