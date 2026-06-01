@@ -33,9 +33,12 @@ macro_rules! pattern_type_at_home {
                 self.0
             }
 
-            pub const fn new(value: $ty) -> Self {
-                assert!(LOWER <= value && value <= UPPER);
-                Self(value)
+            pub const fn new(value: $ty) -> Option<Self> {
+                if !(LOWER <= value && value <= UPPER) {
+                    None
+                } else {
+                    Some(Self(value))
+                }
             }
 
             /// # Safety
