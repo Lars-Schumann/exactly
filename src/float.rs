@@ -37,8 +37,7 @@ const impl Add for NonNaNf32 {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        // SAFETY: addition of non-NaN's cannot lead to a NaN
-        unsafe { Self::new_unchecked(self.inner() + rhs.inner()) }
+        Self::new(self.inner() + rhs.inner()).expect("Addition failed, it evaluated to NaN")
     }
 }
 
@@ -46,8 +45,7 @@ const impl Sub for NonNaNf32 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        // SAFETY: subtraction of non-NaN's cannot lead to a NaN
-        unsafe { Self::new_unchecked(self.inner() - rhs.inner()) }
+        Self::new(self.inner() - rhs.inner()).expect("Subtraction failed, it evaluated to NaN")
     }
 }
 
