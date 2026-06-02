@@ -18,7 +18,7 @@ pub mod float;
 
 use core::ops::{Add, Div, Mul, Sub};
 
-macro_rules! pattern_type_at_home_common {
+macro_rules! impl_int_common {
     ($($ty:ident,)*) => {$(
         #[derive(Debug, Copy, Clone)]
         #[repr(transparent)]
@@ -103,7 +103,7 @@ macro_rules! pattern_type_at_home_common {
     )*}
 }
 
-macro_rules! pattern_type_at_home_unsigned {
+macro_rules! impl_int_unsigned {
     ($($ty:ident,)*) => {$(
         impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const Mul<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
             type Output = ${concat(R,$ty)}<{ Self::MUL::<A, X> }, { Self::MUL::<B, Y> }>;
@@ -123,7 +123,7 @@ macro_rules! pattern_type_at_home_unsigned {
     )*}
 }
 
-macro_rules! pattern_type_at_home_signed {
+macro_rules! impl_int_signed {
     ($($ty:ident,)*) => {$(
         impl<const LOWER: $ty, const UPPER: $ty> ${concat(R,$ty)}<LOWER, UPPER> {
             #[expect(unused)]
@@ -190,11 +190,11 @@ macro_rules! pattern_type_at_home_signed {
     )*}
 }
 
-pattern_type_at_home_common!(u8, u16, u32, u64, u128, i8, i16, i32, i64, i128,);
+impl_int_common!(u8, u16, u32, u64, u128, i8, i16, i32, i64, i128,);
 
-pattern_type_at_home_unsigned!(u8, u16, u32, u64, u128,);
+impl_int_unsigned!(u8, u16, u32, u64, u128,);
 
-pattern_type_at_home_signed!(i8, i16, i32, i64, i128,);
+impl_int_signed!(i8, i16, i32, i64, i128,);
 
 #[macro_export]
 macro_rules! to_pattern_type {
