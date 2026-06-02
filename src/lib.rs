@@ -14,7 +14,7 @@
 )]
 #![allow(incomplete_features)]
 
-// mod float;
+pub mod float;
 
 use core::ops::{Add, Div, Mul, Sub};
 
@@ -44,10 +44,9 @@ macro_rules! pattern_type_at_home_common {
             }
 
             pub const fn new(value: $ty) -> Option<Self> {
-                if !(LOWER <= value && value <= UPPER) {
-                    None
-                } else {
-                    Some(unsafe { Self::new_unchecked(value) })
+                match (LOWER <= value && value <= UPPER) {
+                    true => Some(unsafe { Self::new_unchecked(value) }),
+                    false => None,
                 }
             }
 
