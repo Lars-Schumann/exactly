@@ -68,6 +68,12 @@ const impl Div for NonNaNf32 {
 impl<const LOWER: NonNaNf32, const UPPER: NonNaNf32> Rf32<LOWER, UPPER> {
     #[expect(unused)]
     type const ADD<const N: NonNaNf32, const M: NonNaNf32>: NonNaNf32 = const { N + M };
+    #[expect(unused)]
+    type const SUB<const N: NonNaNf32, const M: NonNaNf32>: NonNaNf32 = const { N - M };
+    #[expect(unused)]
+    type const MUL<const N: NonNaNf32, const M: NonNaNf32>: NonNaNf32 = const { N * M };
+    #[expect(unused)]
+    type const DIV<const N: NonNaNf32, const M: NonNaNf32>: NonNaNf32 = const { N / M };
 
     /// # Safety
     /// LOWER.inner() <= value.inner() && value.inner() <= UPPER.inner() must hold
@@ -78,7 +84,10 @@ impl<const LOWER: NonNaNf32, const UPPER: NonNaNf32> Rf32<LOWER, UPPER> {
 
     pub const fn new(value: NonNaNf32) -> Option<Self> {
         match LOWER.inner() <= value.inner() && value.inner() <= UPPER.inner() {
-            true => Some(unsafe { Self::new_unchecked(value) }),
+            true => Some(
+                // SAFETY: we just checked the precondition
+                unsafe { Self::new_unchecked(value) },
+            ),
             false => None,
         }
     }
