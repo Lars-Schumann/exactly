@@ -25,7 +25,10 @@ impl NonNaNf32 {
     pub const fn new(value: f32) -> Option<Self> {
         match value.is_nan() {
             true => None,
-            false => Some(unsafe { Self::new_unchecked(value) }),
+            false => Some(
+                // SAFETY: we just checked the precondition
+                unsafe { Self::new_unchecked(value) },
+            ),
         }
     }
 }
@@ -34,7 +37,17 @@ const impl Add for NonNaNf32 {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
+        // SAFETY: addition of non-NaN's cannot lead to a NaN
         unsafe { Self::new_unchecked(self.inner() + rhs.inner()) }
+    }
+}
+
+const impl Sub for NonNaNf32 {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        // SAFETY: subtraction of non-NaN's cannot lead to a NaN
+        unsafe { Self::new_unchecked(self.inner() - rhs.inner()) }
     }
 }
 
