@@ -49,6 +49,22 @@ const impl Sub for NonNaNf32 {
     }
 }
 
+const impl Mul for NonNaNf32 {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self::new(self.inner() * rhs.inner()).expect("Multiplication failed, it evaluated to NaN")
+    }
+}
+
+const impl Div for NonNaNf32 {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Self::new(self.inner() / rhs.inner()).expect("Division failed, it evaluated to NaN")
+    }
+}
+
 impl<const LOWER: NonNaNf32, const UPPER: NonNaNf32> Rf32<LOWER, UPPER> {
     #[expect(unused)]
     type const ADD<const N: NonNaNf32, const M: NonNaNf32>: NonNaNf32 = const { N + M };
