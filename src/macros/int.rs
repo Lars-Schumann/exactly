@@ -108,15 +108,15 @@ macro_rules! impl_int_unsigned {
 pub(crate) use impl_int_unsigned;
 
 macro_rules! impl_int_signed {
-    ($($ty:ident,)*) => {$(
-        impl<const LOWER: $ty, const UPPER: $ty> ${concat(R,$ty)}<LOWER, UPPER> {
+    ($([inner_type: $inner_type:ty, range_type_name: $range_type_name:ident],)*) => {$(
+        impl<const LOWER: $inner_type, const UPPER: $inner_type> $range_type_name<LOWER, UPPER> {
             #[expect(unused)]
-            type const MIN_MUL_RES<const A: $ty, const B: $ty, const X: $ty, const Y: $ty>: $ty = const { (A * X).min(A * Y).min(B * X).min(B * Y) };
+            type const MIN_MUL_RES<const A: $inner_type, const B: $inner_type, const X: $inner_type, const Y: $inner_type>: $inner_type = const { (A * X).min(A * Y).min(B * X).min(B * Y) };
             #[expect(unused)]
-            type const MAX_MUL_RES<const A: $ty, const B: $ty, const X: $ty, const Y: $ty>: $ty = const { (A * X).max(A * Y).max(B * X).max(B * Y) };
+            type const MAX_MUL_RES<const A: $inner_type, const B: $inner_type, const X: $inner_type, const Y: $inner_type>: $inner_type = const { (A * X).max(A * Y).max(B * X).max(B * Y) };
 
             #[expect(unused)]
-            type const MIN_DIV_RES<const A: $ty, const B: $ty, const X: $ty, const Y: $ty>: $ty = const { 'out: {
+            type const MIN_DIV_RES<const A: $inner_type, const B: $inner_type, const X: $inner_type, const Y: $inner_type>: $inner_type = const {
                 if (X == 0 && Y == 0) {
                     panic!("unconditional division by 0")
                 }
@@ -132,10 +132,10 @@ macro_rules! impl_int_signed {
 
                 (A / furthest_hopefully_pos_divisor_from_0).min(B / closest_hopefully_neg_divisor_to_0)
 
-            }};
+            };
 
             #[expect(unused)]
-            type const MAX_DIV_RES<const A: $ty, const B: $ty, const X: $ty, const Y: $ty>: $ty = const {
+            type const MAX_DIV_RES<const A: $inner_type, const B: $inner_type, const X: $inner_type, const Y: $inner_type>: $inner_type = const {
                 if (X == 0 && Y == 0) {
                     panic!("unconditional division by 0")
                 }
@@ -155,18 +155,18 @@ macro_rules! impl_int_signed {
             };
         }
 
-        impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const ::core::ops::Mul<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
-            type Output = ${concat(R,$ty)}<{ Self::MIN_MUL_RES::<A, B, X, Y> }, { Self::MAX_MUL_RES::<A, B, X, Y> }>;
+        impl<const A: $inner_type, const B: $inner_type, const X: $inner_type, const Y: $inner_type> const ::core::ops::Mul<$range_type_name<{ X }, { Y }>> for $range_type_name<{ A }, { B }>{
+            type Output = $range_type_name<{ Self::MIN_MUL_RES::<A, B, X, Y> }, { Self::MAX_MUL_RES::<A, B, X, Y> }>;
 
-            fn mul(self, rhs: ${concat(R,$ty)}<{ X }, { Y }>) -> Self::Output {
+            fn mul(self, rhs: $range_type_name<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() * rhs.inner()) }
             }
         }
 
-        impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const ::core::ops::Div<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
-            type Output = ${concat(R,$ty)}<{ Self::MIN_DIV_RES::<A, B, X, Y> }, { Self::MAX_DIV_RES::<A, B, X, Y> }>;
+        impl<const A: $inner_type, const B: $inner_type, const X: $inner_type, const Y: $inner_type> const ::core::ops::Div<$range_type_name<{ X }, { Y }>> for $range_type_name<{ A }, { B }>{
+            type Output = $range_type_name<{ Self::MIN_DIV_RES::<A, B, X, Y> }, { Self::MAX_DIV_RES::<A, B, X, Y> }>;
 
-            fn div(self, rhs: ${concat(R,$ty)}<{ X }, { Y }>) -> Self::Output {
+            fn div(self, rhs: $range_type_name<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() / rhs.inner()) }
             }
         }
