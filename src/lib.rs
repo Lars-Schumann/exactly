@@ -10,7 +10,9 @@
     const_trait_impl,
     const_cmp,
     min_adt_const_params,
-    structural_match
+    structural_match,
+    derive_const,
+    likely_unlikely
 )]
 #![allow(incomplete_features)]
 
@@ -19,31 +21,31 @@ pub mod float;
 use core::ops::{Add, Div, Mul, Sub};
 
 macro_rules! impl_int_common {
-    ($($ty:ident,)*) => {$(
+    ($([inner_type: $inner_type:ty, range_type_name: $range_type_name:ident],)*) => {$(
         #[derive(Debug, Copy, Clone)]
         #[repr(transparent)]
-        pub struct ${concat(R,$ty)}<const LOWER: $ty, const UPPER: $ty>($ty);
+        pub struct $range_type_name<const LOWER: $inner_type, const UPPER: $inner_type>($inner_type);
 
-        impl<const LOWER: $ty, const UPPER: $ty> ${concat(R,$ty)}<LOWER, UPPER> {
+        impl<const LOWER: $inner_type, const UPPER: $inner_type> $range_type_name<LOWER, UPPER> {
 
             const __ASSERT_RANGE_NON_EMPTY: () = const { assert!(LOWER<=UPPER) };
 
-            pub type const LOWER: $ty = LOWER;
-            pub type const UPPER: $ty = UPPER;
+            pub type const LOWER: $inner_type = LOWER;
+            pub type const UPPER: $inner_type = UPPER;
 
-            pub const fn lower(&self) -> $ty {
+            pub const fn lower(&self) -> $inner_type {
                 LOWER
             }
 
-            pub const fn upper(&self) -> $ty {
+            pub const fn upper(&self) -> $inner_type {
                 UPPER
             }
 
-            pub const fn inner(&self) -> $ty {
+            pub const fn inner(&self) -> $inner_type {
                 self.0
             }
 
-            pub const fn new(value: $ty) -> Option<Self> {
+            pub const fn new(value: $inner_type) -> Option<Self> {
                 match (LOWER <= value && value <= UPPER) {
                     true => Some(unsafe { Self::new_unchecked(value) }),
                     false => None,
@@ -52,7 +54,7 @@ macro_rules! impl_int_common {
 
             /// # Safety
             /// LOWER <= value <= UPPER must hold.
-            pub const unsafe fn new_unchecked(value: $ty) -> Self {
+            pub const unsafe fn new_unchecked(value: $inner_type) -> Self {
                 #[expect(path_statements)]
                 Self::__ASSERT_RANGE_NON_EMPTY;
                 debug_assert!(LOWER <= value && value <= UPPER);
@@ -60,43 +62,45 @@ macro_rules! impl_int_common {
             }
 
             #[expect(unused)]
-            type const ADD<const N: $ty, const M: $ty>: $ty = const { N + M };
+            type const ADD<const N: $inner_type, const M: $inner_type>: $inner_type = const { N + M };
             #[expect(unused)]
-            type const SUB<const N: $ty, const M: $ty>: $ty = const { N - M };
+            type const SUB<const N: $inner_type, const M: $inner_type>: $inner_type = const { N - M };
             #[expect(unused)]
-            type const MUL<const N: $ty, const M: $ty>: $ty = const { N * M };
+            type const MUL<const N: $inner_type, const M: $inner_type>: $inner_type = const { N * M };
             #[expect(unused)]
-            type const DIV<const N: $ty, const M: $ty>: $ty = const { N / M };
+            type const DIV<const N: $inner_type, const M: $inner_type>: $inner_type = const { N / M };
 
-            pub const fn add<const V: $ty>(&self) -> ${concat(R,$ty)}::<{Self::ADD::<LOWER, V>},{ Self::ADD::<UPPER, V>}> {
-                unsafe { ${concat(R,$ty)}::<{Self::ADD::<LOWER, V>},{ Self::ADD::<UPPER, V>}>::new_unchecked(self.inner() + V) }
+            pub const fn add<const V: $inner_type>(&self) -> $range_type_name::<{Self::ADD::<LOWER, V>},{ Self::ADD::<UPPER, V>}> {
+                unsafe { $range_type_name::<{Self::ADD::<LOWER, V>},{ Self::ADD::<UPPER, V>}>::new_unchecked(self.inner() + V) }
             }
 
-            pub const fn sub<const V: $ty>(&self) -> ${concat(R,$ty)}::<{Self::SUB::<LOWER, V>},{ Self::SUB::<UPPER, V>}> {
-                unsafe { ${concat(R,$ty)}::<{Self::SUB::<LOWER, V>},{ Self::SUB::<UPPER, V>}>::new_unchecked(self.inner() - V) }
+            pub const fn sub<const V: $inner_type>(&self) -> $range_type_name::<{Self::SUB::<LOWER, V>},{ Self::SUB::<UPPER, V>}> {
+                unsafe { $range_type_name::<{Self::SUB::<LOWER, V>},{ Self::SUB::<UPPER, V>}>::new_unchecked(self.inner() - V) }
             }
 
-            pub const fn mul<const V: $ty>(&self) -> ${concat(R,$ty)}::<{Self::MUL::<LOWER, V>},{ Self::MUL::<UPPER, V>}> {
-                unsafe { ${concat(R,$ty)}::<{Self::MUL::<LOWER, V>},{ Self::MUL::<UPPER, V>}>::new_unchecked(self.inner() * V) }
+            pub const fn mul<const V: $inner_type>(&self) -> $range_type_name::<{Self::MUL::<LOWER, V>},{ Self::MUL::<UPPER, V>}> {
+                unsafe { $range_type_name::<{Self::MUL::<LOWER, V>},{ Self::MUL::<UPPER, V>}>::new_unchecked(self.inner() * V) }
             }
 
-            pub const fn div<const V: $ty>(&self) -> ${concat(R,$ty)}::<{Self::DIV::<LOWER, V>},{ Self::DIV::<UPPER, V>}> {
-                unsafe { ${concat(R,$ty)}::<{Self::DIV::<LOWER, V>},{ Self::DIV::<UPPER, V>}>::new_unchecked(self.inner() / V) }
+            pub const fn div<const V: $inner_type>(&self) -> $range_type_name::<{Self::DIV::<LOWER, V>},{ Self::DIV::<UPPER, V>}> {
+                unsafe { $range_type_name::<{Self::DIV::<LOWER, V>},{ Self::DIV::<UPPER, V>}>::new_unchecked(self.inner() / V) }
             }
+
         }
 
-        impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const Add<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
-            type Output = ${concat(R,$ty)}<{ Self::ADD::<A, X>}, { Self::ADD::<B, Y> }>;
 
-            fn add(self, rhs: ${concat(R,$ty)}<{ X }, { Y }>) -> Self::Output {
+        impl<const A: $inner_type, const B: $inner_type, const X: $inner_type, const Y: $inner_type> const Add<$range_type_name<{ X }, { Y }>> for $range_type_name<{ A }, { B }>{
+            type Output = $range_type_name<{ Self::ADD::<A, X>}, { Self::ADD::<B, Y> }>;
+
+            fn add(self, rhs: $range_type_name<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() + rhs.inner()) }
             }
         }
 
-        impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const Sub<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
-            type Output = ${concat(R,$ty)}<{ Self::SUB::<A, Y>}, { Self::SUB::<B, X> }>;
+        impl<const A: $inner_type, const B: $inner_type, const X: $inner_type, const Y: $inner_type> const Sub<$range_type_name<{ X }, { Y }>> for $range_type_name<{ A }, { B }>{
+            type Output = $range_type_name<{ Self::SUB::<A, Y>}, { Self::SUB::<B, X> }>;
 
-            fn sub(self, rhs: ${concat(R,$ty)}<{ X }, { Y }>) -> Self::Output {
+            fn sub(self, rhs: $range_type_name<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() - rhs.inner()) }
             }
         }
@@ -190,7 +194,22 @@ macro_rules! impl_int_signed {
     )*}
 }
 
-impl_int_common!(u8, u16, u32, u64, u128, i8, i16, i32, i64, i128,);
+impl_int_common!(
+    [inner_type: u8, range_type_name: Ru8],
+    [inner_type: u16, range_type_name: Ru16 ],
+    [inner_type: u32, range_type_name: Ru32 ],
+    [inner_type: u64, range_type_name: Ru64 ],
+    [inner_type: u128, range_type_name: Ru128 ],
+    [inner_type: i8, range_type_name: Ri8 ],
+    [inner_type: i16, range_type_name: Ri16 ],
+    [inner_type: i32, range_type_name: Ri32 ],
+    [inner_type: i64, range_type_name: Ri64 ],
+    [inner_type: i128, range_type_name: Ri128 ],
+
+    //[inner_type: crate::float::NonNaNf32, range_type_name: Rf32],
+);
+
+//impl_int_common!([inner_type: crate::float::NonNaNf32, range_type_name: Rf32],);
 
 impl_int_unsigned!(u8, u16, u32, u64, u128,);
 
