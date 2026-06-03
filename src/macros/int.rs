@@ -87,19 +87,19 @@ macro_rules! impl_int_common {
 pub(crate) use impl_int_common;
 
 macro_rules! impl_int_unsigned {
-    ($($ty:ident,)*) => {$(
-        impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const ::core::ops::Mul<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
-            type Output = ${concat(R,$ty)}<{ Self::MUL::<A, X> }, { Self::MUL::<B, Y> }>;
+    ($([inner_type: $inner_type:ty, range_type_name: $range_type_name:ident],)*) => {$(
+        impl<const A: $inner_type, const B: $inner_type, const X: $inner_type, const Y: $inner_type> const ::core::ops::Mul<$range_type_name<{ X }, { Y }>> for $range_type_name<{ A }, { B }>{
+            type Output = $range_type_name<{ Self::MUL::<A, X> }, { Self::MUL::<B, Y> }>;
 
-            fn mul(self, rhs: ${concat(R,$ty)}<{ X }, { Y }>) -> Self::Output {
+            fn mul(self, rhs: $range_type_name<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() * rhs.inner()) }
             }
         }
 
-        impl<const A: $ty, const B: $ty, const X: $ty, const Y: $ty> const ::core::ops::Div<${concat(R,$ty)}<{ X }, { Y }>> for ${concat(R,$ty)}<{ A }, { B }>{
-            type Output = ${concat(R,$ty)}<{ Self::DIV::<A, Y> }, { Self::DIV::<B, X> }>;
+        impl<const A: $inner_type, const B: $inner_type, const X: $inner_type, const Y: $inner_type> const ::core::ops::Div<$range_type_name<{ X }, { Y }>> for $range_type_name<{ A }, { B }>{
+            type Output = $range_type_name<{ Self::DIV::<A, Y> }, { Self::DIV::<B, X> }>;
 
-            fn div(self, rhs: ${concat(R,$ty)}<{ X }, { Y }>) -> Self::Output {
+            fn div(self, rhs: $range_type_name<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() / rhs.inner()) }
             }
         }
