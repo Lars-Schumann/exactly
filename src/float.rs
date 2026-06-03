@@ -1,146 +1,127 @@
 use core::cmp::Ordering;
-use core::hint::unlikely;
 use core::ops::{Add, Div, Mul, Sub};
 
-#[derive(core::marker::ConstParamTy, Debug, Clone, Copy)]
-#[derive_const(PartialEq, Eq)]
-#[repr(transparent)]
-pub struct NonNaNf32 {
-    pub __private: u32,
-}
-
-impl NonNaNf32 {
-    pub const fn inner(self) -> f32 {
-        f32::from_bits(self.__private)
-    }
-}
-
-impl NonNaNf32 {
-    /// # Safety
-    /// value cannot be NaN
-    pub const unsafe fn new_unchecked(value: f32) -> Self {
-        debug_assert!(!(value.is_nan()));
-        Self {
-            __private: value.to_bits(),
-        }
-    }
-
-    pub const fn new(value: f32) -> Option<Self> {
-        match value.is_nan() {
-            true => None,
-            false => Some(
-                // SAFETY: we just checked the precondition
-                unsafe { Self::new_unchecked(value) },
-            ),
-        }
-    }
-}
-
-const impl PartialOrd for NonNaNf32 {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        let (lhs, rhs) = (self.inner(), other.inner());
-
-        if unlikely(lhs == -0.0 && rhs == 0.0) {
-            return Some(Ordering::Less);
+macro_rules! define_non_nan_float {
+    ($([base_type: $base_type:ty, float_type: $float_type:ty, wrapper_name: $wrapper_name:ident],)*) => {$(
+        #[derive(core::marker::ConstParamTy, Debug, Clone, Copy)]
+        #[derive_const(PartialEq, Eq)]
+        #[repr(transparent)]
+        pub struct $wrapper_name {
+            pub __private: $base_type,
         }
 
-        if unlikely(lhs == 0.0 && rhs == -0.0) {
-            return Some(Ordering::Greater);
+        impl $wrapper_name {
+            pub const fn inner(self) -> $float_type {
+                <$float_type>::from_bits(self.__private)
+            }
         }
 
-        lhs.partial_cmp(&rhs)
-    }
-}
+        impl $wrapper_name {
+            /// # Safety
+            /// value cannot be NaN
+            pub const unsafe fn new_unchecked(value: $float_type) -> Self {
+                debug_assert!(!(value.is_nan()));
+                Self {
+                    __private: value.to_bits(),
+                }
+            }
 
-const impl Add for NonNaNf32 {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Self::new(self.inner() + rhs.inner()).expect("Addition failed, it evaluated to NaN")
-    }
-}
-
-const impl Sub for NonNaNf32 {
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self::new(self.inner() - rhs.inner()).expect("Subtraction failed, it evaluated to NaN")
-    }
-}
-
-const impl Mul for NonNaNf32 {
-    type Output = Self;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        Self::new(self.inner() * rhs.inner()).expect("Multiplication failed, it evaluated to NaN")
-    }
-}
-
-const impl Div for NonNaNf32 {
-    type Output = Self;
-
-    fn div(self, rhs: Self) -> Self::Output {
-        Self::new(self.inner() / rhs.inner()).expect("Division failed, it evaluated to NaN")
-    }
-}
-
-impl<const LOWER: NonNaNf32, const UPPER: NonNaNf32> Rf32<LOWER, UPPER> {
-    #[expect(unused)]
-    type const ADD<const N: NonNaNf32, const M: NonNaNf32>: NonNaNf32 = const { N + M };
-    #[expect(unused)]
-    type const SUB<const N: NonNaNf32, const M: NonNaNf32>: NonNaNf32 = const { N - M };
-    #[expect(unused)]
-    type const MUL<const N: NonNaNf32, const M: NonNaNf32>: NonNaNf32 = const { N * M };
-    #[expect(unused)]
-    type const DIV<const N: NonNaNf32, const M: NonNaNf32>: NonNaNf32 = const { N / M };
-
-    /// # Safety
-    /// LOWER.inner() <= value.inner() && value.inner() <= UPPER.inner() must hold
-    pub const unsafe fn new_unchecked(value: NonNaNf32) -> Self {
-        debug_assert!(LOWER.inner() <= value.inner() && value.inner() <= UPPER.inner());
-        Self(value)
-    }
-
-    pub const fn new(value: NonNaNf32) -> Option<Self> {
-        match LOWER.inner() <= value.inner() && value.inner() <= UPPER.inner() {
-            true => Some(
-                // SAFETY: we just checked the precondition
-                unsafe { Self::new_unchecked(value) },
-            ),
-            false => None,
+            pub const fn new(value: $float_type) -> Option<Self> {
+                match value.is_nan() {
+                    true => None,
+                    false => Some(
+                        // SAFETY: we just checked the precondition
+                        unsafe { Self::new_unchecked(value) },
+                    ),
+                }
+            }
         }
-    }
 
-    pub const fn inner(self) -> NonNaNf32 {
-        self.0
-    }
+        const impl PartialOrd for $wrapper_name {
+            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+                let (lhs, rhs) = (self.inner(), other.inner());
+
+                if lhs == -0.0 && rhs == 0.0 {
+                    return Some(Ordering::Less);
+                }
+
+                if lhs == 0.0 && rhs == -0.0 {
+                    return Some(Ordering::Greater);
+                }
+
+                lhs.partial_cmp(&rhs)
+            }
+        }
+
+        const impl Add for $wrapper_name {
+            type Output = Self;
+
+            fn add(self, rhs: Self) -> Self::Output {
+                Self::new(self.inner() + rhs.inner()).expect("Addition failed, it evaluated to NaN")
+            }
+        }
+
+        const impl Sub for $wrapper_name {
+            type Output = Self;
+
+            fn sub(self, rhs: Self) -> Self::Output {
+                Self::new(self.inner() - rhs.inner())
+                    .expect("Subtraction failed, it evaluated to NaN")
+            }
+        }
+
+        const impl Mul for $wrapper_name {
+            type Output = Self;
+
+            fn mul(self, rhs: Self) -> Self::Output {
+                Self::new(self.inner() * rhs.inner())
+                    .expect("Multiplication failed, it evaluated to NaN")
+            }
+        }
+
+        const impl Div for $wrapper_name {
+            type Output = Self;
+
+            fn div(self, rhs: Self) -> Self::Output {
+                Self::new(self.inner() / rhs.inner()).expect("Division failed, it evaluated to NaN")
+            }
+        }
+    )*};
 }
 
-const impl<const A: NonNaNf32, const B: NonNaNf32, const X: NonNaNf32, const Y: NonNaNf32>
-    Add<Rf32<X, Y>> for Rf32<A, B>
-{
-    type Output = Rf32<{ Self::ADD::<A, X> }, { Self::ADD::<B, Y> }>;
+macro_rules! define_helper_macros {
+    ($([float_type_macro_name: $float_type_macro_name:ident, range_name: $range_name:ident, range_type_macro_name: $range_type_macro_name:ident, non_nan_float_name: $non_nan_float_name:ident],)*) => {$(
+        #[macro_export]
+        macro_rules! $float_type_macro_name {
+            ($value:expr) => {
+                const { $crate::float::$non_nan_float_name::new($value).unwrap() }
+            };
+        }
 
-    fn add(self, rhs: Rf32<X, Y>) -> Self::Output {
-        unsafe { Self::Output::new_unchecked(self.inner() + rhs.inner()) }
-    }
+        #[macro_export]
+        macro_rules! $range_type_macro_name {
+                    ($lower:expr, $upper:expr) => {
+                        $range_name<
+                            { const { $crate::float::$non_nan_float_name::new($lower).unwrap() } },
+                            { const { $crate::float::$non_nan_float_name::new($upper).unwrap() } },
+                        >
+                    };
+                }
+    )*};
 }
 
-pub struct Rf32<const LOWER: NonNaNf32, const UPPER: NonNaNf32>(NonNaNf32);
+define_non_nan_float!(
+    [base_type: u16, float_type: f16, wrapper_name: NonNaNf16],
+    [base_type: u32, float_type: f32, wrapper_name: NonNaNf32],
+    [base_type: u64, float_type: f64, wrapper_name: NonNaNf64],
+    [base_type: u128, float_type: f128, wrapper_name: NonNaNf128],
+);
 
-#[macro_export]
-macro_rules! f32 {
-    ($value:literal) => {
-        const { $crate::float::NonNaNf32::new($value).unwrap() }
-    };
-}
+define_helper_macros!(
+    [float_type_macro_name: MakeF16, range_name: Rf16, range_type_macro_name: MakeRangeF16, non_nan_float_name: NonNaNf16],
+    [float_type_macro_name: MakeF32, range_name: Rf32, range_type_macro_name: MakeRangeF32, non_nan_float_name: NonNaNf32],
+    [float_type_macro_name: MakeF64, range_name: Rf64, range_type_macro_name: MakeRangeF64, non_nan_float_name: NonNaNf64],
+    [float_type_macro_name: MakeF128, range_name: Rf128, range_type_macro_name: MakeRangeF128, non_nan_float_name: NonNaNf128],
+);
 
-#[macro_export]
-macro_rules! Rf32 {
-    ($lower:literal, $upper:literal) => {
-        Rf32<
-        { const { $crate::float::NonNaNf32::new($lower).unwrap() } },
-        { const { $crate::float::NonNaNf32::new($upper).unwrap() } },
-    >
-    };
-}
+crate::macros::impl_int_common!([inner_type: crate::float::NonNaNf32, range_type_name: Rf32],);

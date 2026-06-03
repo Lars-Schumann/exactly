@@ -9,12 +9,11 @@
 )]
 #![allow(incomplete_features)]
 
-use exactly::Rf32;
-use exactly::Ri32;
-use exactly::Ru32;
-use exactly::f32;
-use exactly::float::NonNaNf32;
+use exactly::MakeF32;
+use exactly::MakeRangeF32;
 use exactly::float::Rf32;
+use exactly::int::Ri32;
+use exactly::int::Ru32;
 use exactly::to_pattern_type;
 use std::any::type_name_of_val;
 use std::mem::transmute;
@@ -77,10 +76,10 @@ fn range_div() {
 
 #[test]
 fn test_float() {
-    let a: Rf32![0.0, 3.0] = Rf32::new(f32!(2.5)).unwrap();
-    let b: Rf32![0.0, 8.5] = Rf32::new(f32!(5.22)).unwrap();
+    let a: MakeRangeF32![0.0, 3.0] = Rf32::new(MakeF32!(2.5)).unwrap();
+    let b: MakeRangeF32![0.0, 8.5] = Rf32::new(MakeF32!(5.22)).unwrap();
 
-    let c: Rf32![0.0, 11.5] = a + b;
+    let c: MakeRangeF32![0.0, 11.5] = a + b;
 
     assert_eq!(c.inner().inner(), 7.72);
 }
