@@ -12,4 +12,4 @@ crate::macros::float::define_helper_macros!(
     [float_type_macro_name: MakeF128, range_name: Rf128, range_type_macro_name: MakeRangeF128, non_nan_float_name: NonNaNf128],
 );
 
-crate::macros::impl_int_common!([inner_type: crate::float::NonNaNf32, range_type_name: Rf32],);
+crate::macros::int::impl_int_common!([inner_type: crate::float::NonNaNf32, range_type_name: Rf32],);
