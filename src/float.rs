@@ -1,6 +1,9 @@
+use core::cmp::Ordering;
+use core::hint::unlikely;
 use core::ops::{Add, Div, Mul, Sub};
 
-#[derive(core::marker::ConstParamTy, Clone, Copy, PartialEq, Eq)]
+#[derive(core::marker::ConstParamTy, Debug, Clone, Copy)]
+#[derive_const(PartialEq, Eq)]
 #[repr(transparent)]
 pub struct NonNaNf32 {
     pub __private: u32,
@@ -30,6 +33,22 @@ impl NonNaNf32 {
                 unsafe { Self::new_unchecked(value) },
             ),
         }
+    }
+}
+
+const impl PartialOrd for NonNaNf32 {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        let (lhs, rhs) = (self.inner(), other.inner());
+
+        if unlikely(lhs == -0.0 && rhs == 0.0) {
+            return Some(Ordering::Less);
+        }
+
+        if unlikely(lhs == 0.0 && rhs == -0.0) {
+            return Some(Ordering::Greater);
+        }
+
+        lhs.partial_cmp(&rhs)
     }
 }
 
