@@ -1,3 +1,6 @@
+pub(crate) mod float;
+pub(crate) mod int;
+
 macro_rules! impl_int_common {
     ($([inner_type: $inner_type:ty, range_type_name: $range_type_name:ident],)*) => {$(
         #[derive(Debug, Copy, Clone)]
