@@ -97,9 +97,21 @@ macro_rules! impl_math_common {
             }
 
             pub type const DIV_CEIL<const L: $ty, const R: $ty>: $ty = const { <$ty>::div_ceil(L, R) };
+
+            pub type const DIV_EUCLID<const L: $ty, const R: $ty>: $ty = const { <$ty>::div_euclid(L, R) };
             
+            // DIV_EXACT omitted, returns Option<_>
+
+            pub type const DIV_FLOOR<const L: $ty, const R: $ty>: $ty = const { <$ty>::div_floor(L, R) };
             
-            
+            // EXTEND omitted, idk how to do this atm
+
+            if_unsigned!{ $ty_ident,
+                pub type const EXTRACT_BITS<const N: $ty, const MASK: $ty>: $ty = const { <$ty>::extract_bits(N, MASK) };
+            }
+
+            // FORMAT_INTO omitted, doesn't apply
+
             
 
 
