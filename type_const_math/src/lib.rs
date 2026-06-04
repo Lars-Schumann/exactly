@@ -6,10 +6,11 @@
 
     signed_bigint_helpers,
     const_unsigned_bigint_helpers,
+    uint_carryless_mul,
 )]
 #![allow(incomplete_features)]
 
-macro_rules! only_if_ty_is_unsigned {
+macro_rules! only_if_ty_unsigned {
     (u8, $($tt:tt)+) => {$($tt)+};
     (u16, $($tt:tt)+) => {$($tt)+};
     (u32, $($tt:tt)+) => {$($tt)+};
@@ -38,21 +39,21 @@ macro_rules! only_if_ty_is_signed {
 }
 
 macro_rules! match_ty_signdness {
-    (u8, is_unsigned => $tt1:item, is_signed => $tt2:item) => { $tt1  };
-    (u16, is_unsigned => $tt1:item, is_signed => $tt2:item) => { $tt1 };
-    (u32, is_unsigned => $tt1:item, is_signed => $tt2:item) => { $tt1 };
-    (u64, is_unsigned => $tt1:item, is_signed => $tt2:item) => { $tt1 };
-    (u128, is_unsigned => $tt1:item, is_signed => $tt2:item) => { $tt1 };
+    (u8, unsigned => $tt1:item, signed => $tt2:item) => { $tt1  };
+    (u16, unsigned => $tt1:item, signed => $tt2:item) => { $tt1 };
+    (u32, unsigned => $tt1:item, signed => $tt2:item) => { $tt1 };
+    (u64, unsigned => $tt1:item, signed => $tt2:item) => { $tt1 };
+    (u128, unsigned => $tt1:item, signed => $tt2:item) => { $tt1 };
 
-    (i8, is_unsigned => $tt1:item, is_signed => $tt2:item) => { $tt2  };
-    (i16, is_unsigned => $tt1:item, is_signed => $tt2:item) => { $tt2 };
-    (i32, is_unsigned => $tt1:item, is_signed => $tt2:item) => { $tt2 };
-    (i64, is_unsigned => $tt1:item, is_signed => $tt2:item) => { $tt2 };
-    (i128, is_unsigned => $tt1:item, is_signed => $tt2:item) => { $tt2 };
+    (i8, unsigned => $tt1:item, signed => $tt2:item) => { $tt2  };
+    (i16, unsigned => $tt1:item, signed => $tt2:item) => { $tt2 };
+    (i32, unsigned => $tt1:item, signed => $tt2:item) => { $tt2 };
+    (i64, unsigned => $tt1:item, signed => $tt2:item) => { $tt2 };
+    (i128, unsigned => $tt1:item, signed => $tt2:item) => { $tt2 };
 }
 
 macro_rules! impl_math_common {
-    ($([for_type:[$ty:ty,$ty_ident:ident], unsigned_equiv_type: $unsigned_equiv_type:ty, dummy_struct_name: $dummy_struct_name:ident],)*) => {$(
+    ($([for_ty:[$ty:ty,$ty_ident:ident], ty_unsigned: $ty_unsigned:ty, dummy_struct_name: $dummy_struct_name:ident],)*) => {$(
         pub struct $dummy_struct_name;
 
         impl $dummy_struct_name {
@@ -60,19 +61,26 @@ macro_rules! impl_math_common {
             pub type const SUB<const L: $ty, const R: $ty>: $ty = const { L - R };
             pub type const MUL<const L: $ty, const R: $ty>: $ty = const { L * R };
             pub type const DIV<const L: $ty, const R: $ty>: $ty = const { L / R };
-
-            match_ty_signdness!{ $ty_ident,
-                is_unsigned =>  pub type const ABS_DIFF<const L: $ty, const R: $ty>: $ty = const { <$ty>::abs_diff(L, R) }; ,
-                is_signed   =>  pub type const ABS_DIFF<const L: $ty, const R: $ty>: $unsigned_equiv_type = const { <$ty>::abs_diff(L, R) }; 
-            }
-
-            only_if_ty_is_unsigned!{ $ty_ident, 
+            
+            pub type const ABS_DIFF<const L: $ty, const R: $ty>: $ty_unsigned = const { <$ty>::abs_diff(L, R) }; 
+            
+            only_if_ty_unsigned!{ $ty_ident, 
                 pub type const BIT_WIDTH<const N: $ty>: u32 = const { <$ty>::bit_width(N) };
             }
 
             pub type const BORROWING_SUB<const L: $ty, const R: $ty, const BORROW: bool>: ($ty, bool) = const { <$ty>::borrowing_sub(L, R, BORROW) }; 
 
             pub type const CARRYING_ADD<const L: $ty, const R: $ty, const CARRY: bool>: ($ty, bool) = const { <$ty>::carrying_add(L, R, CARRY) }; 
+
+            only_if_ty_unsigned!{ $ty_ident,
+                pub type const CARRYING_CARRYLESS_MUL<const L: $ty, const R: $ty, const CARRY: $ty>: ($ty, $ty) = const { <$ty>::carrying_carryless_mul(L, R, CARRY) }; 
+            }
+            
+            pub type const CARRYING_MUL<const L: $ty, const R: $ty, const CARRY: $ty>: ($ty_unsigned, $ty) = const { <$ty>::carrying_mul(L, R, CARRY) }; 
+            
+            
+
+
             
         }
     )*};
@@ -81,18 +89,18 @@ macro_rules! impl_math_common {
 
 
 impl_math_common!(
-    [for_type: [u8, u8], unsigned_equiv_type: u8, dummy_struct_name: MathU8],
-    [for_type: [u16, u16], unsigned_equiv_type: u16, dummy_struct_name: MathU16],
-    [for_type: [u32, u32], unsigned_equiv_type: u32, dummy_struct_name: MathU32],
-    [for_type: [u64, u64], unsigned_equiv_type: u64, dummy_struct_name: MathU64],
-    [for_type: [u128, u128], unsigned_equiv_type: u128, dummy_struct_name: MathU128],
-    [for_type: [u128, u128], unsigned_equiv_type: u128, dummy_struct_name: MathUsize],
-    [for_type: [i8, i8], unsigned_equiv_type: u8, dummy_struct_name: MathI8],
-    [for_type: [i16, i16], unsigned_equiv_type: u16, dummy_struct_name: MathI16],
-    [for_type: [i32, i32], unsigned_equiv_type: u32, dummy_struct_name: MathI32],
-    [for_type: [i64, i64], unsigned_equiv_type: u64, dummy_struct_name: MathI64],
-    [for_type: [i128, i128], unsigned_equiv_type: u128, dummy_struct_name: MathI128],
-    [for_type: [i128, i128], unsigned_equiv_type: u128, dummy_struct_name: MathIsize],
+    [for_ty: [u8, u8], ty_unsigned: u8, dummy_struct_name: MathU8],
+    [for_ty: [u16, u16], ty_unsigned: u16, dummy_struct_name: MathU16],
+    [for_ty: [u32, u32], ty_unsigned: u32, dummy_struct_name: MathU32],
+    [for_ty: [u64, u64], ty_unsigned: u64, dummy_struct_name: MathU64],
+    [for_ty: [u128, u128], ty_unsigned: u128, dummy_struct_name: MathU128],
+    [for_ty: [u128, u128], ty_unsigned: u128, dummy_struct_name: MathUsize],
+    [for_ty: [i8, i8], ty_unsigned: u8, dummy_struct_name: MathI8],
+    [for_ty: [i16, i16], ty_unsigned: u16, dummy_struct_name: MathI16],
+    [for_ty: [i32, i32], ty_unsigned: u32, dummy_struct_name: MathI32],
+    [for_ty: [i64, i64], ty_unsigned: u64, dummy_struct_name: MathI64],
+    [for_ty: [i128, i128], ty_unsigned: u128, dummy_struct_name: MathI128],
+    [for_ty: [i128, i128], ty_unsigned: u128, dummy_struct_name: MathIsize],
 );
 
 #[cfg(test)]
