@@ -1,12 +1,4 @@
-#![feature(
-    macro_metavar_expr_concat,
-    min_generic_const_args,
-    generic_const_args,
-    generic_const_items,
-    inherent_associated_types,
-    pattern_types,
-    pattern_type_macro
-)]
+#![feature(min_generic_const_args, generic_const_args, generic_const_items)]
 #![allow(incomplete_features)]
 
 use exactly::MakeF32;
@@ -14,9 +6,7 @@ use exactly::MakeRangeF32;
 use exactly::float::Rf32;
 use exactly::int::Ri32;
 use exactly::int::Ru32;
-use exactly::to_pattern_type;
 use std::any::type_name_of_val;
-use std::mem::transmute;
 
 #[test]
 fn demo() {
@@ -25,13 +15,7 @@ fn demo() {
 
     dbg!(type_name_of_val(&bar), bar);
 
-    to_pattern_type!(let baz: u32 is 12..=16 = bar);
-
-    dbg!(type_name_of_val(&baz), unsafe {
-        transmute::<pattern_type!(u32 is 12..=16), u32>(baz)
-    });
-
-    let qux: Ru32<13, 19> = foo + bar;
+    let _qux: Ru32<13, 19> = foo + bar;
 }
 
 #[test]
