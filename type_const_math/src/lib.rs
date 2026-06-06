@@ -54,27 +54,22 @@ macro_rules! impl_math {
             // CHECKED_* omitted, since they all return Option<_>, which doesn't impl ConstParamTy
             
             pub type const COUNT_ONES<const N: $ty>: u32 = const { <$ty>::count_ones(N) };
-
             pub type const COUNT_ZEROS<const N: $ty>: u32 = const { <$ty>::count_zeros(N) };
 
             pub type const DIV_EUCLID<const L: $ty, const R: $ty>: $ty = const { <$ty>::div_euclid(L, R) };
 
             pub type const ILOG<const N: $ty, const BASE: $ty>: u32 = const { <$ty>::ilog(N, BASE) };
-
             pub type const ILOG2<const N: $ty>: u32 = const { <$ty>::ilog2(N) };
-
             pub type const ILOG10<const N: $ty>: u32 = const { <$ty>::ilog10(N) };
 
             if_unsigned!{ $ty_ident,
             pub type const IS_MULTIPLE_OF<const L: $ty, const R: $ty>: bool = const { <$ty>::is_multiple_of(L, R) };
-          
             pub type const IS_POWER_OF_TWO<const N: $ty>: bool = const { <$ty>::is_power_of_two(N) };
             }
 
             pub type const ISQRT<const N: $ty>: $ty = const { <$ty>::isqrt(N) };
 
             pub type const LEADING_ONES<const N: $ty>: u32 = const { <$ty>::leading_ones(N) };
-
             pub type const LEADING_ZEROS<const N: $ty>: u32 = const { <$ty>::leading_zeros(N) };
 
             pub type const MIDPOINT<const L: $ty, const R: $ty>: $ty = const { <$ty>::midpoint(L, R) };
@@ -84,6 +79,25 @@ macro_rules! impl_math {
 
             pub type const NEXT_POWER_OF_TWO<const N: $ty>: $ty = const { <$ty>::next_power_of_two(N) };
             }
+
+            pub type const OVERFLOWING_ADD<const L: $ty, const R: $ty>: ($ty, bool) = const { <$ty>::overflowing_add(L, R) };
+            if_unsigned!{ $ty_ident,
+            pub type const OVERFLOWING_ADD_SIGNED<const L: $ty, const R: $ty_signed>: ($ty, bool) = const { <$ty>::overflowing_add_signed(L, R) };
+            }
+            pub type const OVERFLOWING_DIV<const L: $ty, const R: $ty>: ($ty, bool) = const { <$ty>::overflowing_div(L, R) };
+            pub type const OVERFLOWING_DIV_EUCLID<const L: $ty, const R: $ty>: ($ty, bool) = const { <$ty>::overflowing_div_euclid(L, R) };
+            pub type const OVERFLOWING_MUL<const L: $ty, const R: $ty>: ($ty, bool) = const { <$ty>::overflowing_mul(L, R) };
+            pub type const OVERFLOWING_NEG<const N: $ty>: ($ty, bool) = const { <$ty>::overflowing_neg(N) };
+            pub type const OVERFLOWING_POW<const N: $ty, const POW: u32>: ($ty, bool) = const { <$ty>::overflowing_pow(N, POW) };
+            pub type const OVERFLOWING_REM<const L: $ty, const R: $ty>: ($ty, bool) = const { <$ty>::overflowing_rem(L, R) };
+            pub type const OVERFLOWING_REM_EUCLID<const L: $ty, const R: $ty>: ($ty, bool) = const { <$ty>::overflowing_rem_euclid(L, R) };
+            pub type const OVERFLOWING_SHL<const L: $ty, const R: u32>: ($ty, bool) = const { <$ty>::overflowing_shl(L, R) };
+            pub type const OVERFLOWING_SHR<const L: $ty, const R: u32>: ($ty, bool) = const { <$ty>::overflowing_shr(L, R) };
+            pub type const OVERFLOWING_SUB<const L: $ty, const R: $ty>: ($ty, bool) = const { <$ty>::overflowing_sub(L, R) };
+            if_unsigned!{ $ty_ident,
+            pub type const OVERFLOWING_SUB_SIGNED<const L: $ty, const R: $ty_signed>: ($ty, bool) = const { <$ty>::overflowing_sub_signed(L, R) };
+            }
+            
 
 
         
