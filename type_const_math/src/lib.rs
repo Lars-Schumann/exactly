@@ -47,11 +47,11 @@ macro_rules! impl_math {
 
             pub type const ABS_DIFF<const L: $ty, const R: $ty>: $ty_unsigned = const { <$ty>::abs_diff(L, R) };
 
-            // CHECKED_* omitted, since they all return Option<_>, which doesn't impl ConstParamTy
-
             if_unsigned!{ $ty_ident,
             pub type const CAST_SIGNED<const N: $ty>: $ty_signed = const { <$ty>::cast_signed(N) };
             }
+
+            // CHECKED_* omitted, since they all return Option<_>, which doesn't impl ConstParamTy
             
             pub type const COUNT_ONES<const N: $ty>: u32 = const { <$ty>::count_ones(N) };
 
@@ -59,11 +59,11 @@ macro_rules! impl_math {
 
             pub type const DIV_EUCLID<const L: $ty, const R: $ty>: $ty = const { <$ty>::div_euclid(L, R) };
 
-            // DIV_EXACT omitted, returns Option<_>
+            pub type const ILOG<const N: $ty, const BASE: $ty>: u32 = const { <$ty>::ilog(N, BASE) };
 
-            // EXTEND omitted, idk how to do this atm
+            pub type const ILOG2<const N: $ty>: u32 = const { <$ty>::ilog2(N) };
 
-            // FORMAT_INTO omitted, doesn't apply
+            pub type const ILOG10<const N: $ty>: u32 = const { <$ty>::ilog10(N) };
 
         
         }
