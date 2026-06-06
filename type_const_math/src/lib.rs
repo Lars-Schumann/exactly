@@ -2,8 +2,8 @@
 #![forbid(unsafe_code)]
 
 #![feature( //
-    generic_const_args, 
     min_generic_const_args,
+    generic_const_args, 
     generic_const_items
 )]
 #![allow(incomplete_features)]
