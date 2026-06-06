@@ -14,12 +14,14 @@ macro_rules! if_unsigned {
     (u32, $($tt:tt)+) => {$($tt)+};
     (u64, $($tt:tt)+) => {$($tt)+};
     (u128, $($tt:tt)+) => {$($tt)+};
+    (usize, $($tt:tt)+) => {$($tt)+};
 
     (i8, $($tt:tt)+) => { /* nothing, i8 is signed */ };
     (i16, $($tt:tt)+) => { /* nothing, i16 is signed*/ };
     (i32, $($tt:tt)+) => { /* nothing, i32 is signed*/ };
     (i64, $($tt:tt)+) => { /* nothing, i64 is signed*/ };
     (i128, $($tt:tt)+) => { /* nothing, i128 is signed*/ };
+    (isize, $($tt:tt)+) => { /* nothing, isize is signed*/ };
 }
 
 // macro_rules! if_signed {
@@ -28,12 +30,14 @@ macro_rules! if_unsigned {
 //     (u32, $($tt:tt)+) => { /* nothing, u32 is unsigned */ };
 //     (u64, $($tt:tt)+) => { /* nothing, u64 is unsigned */ };
 //     (u128, $($tt:tt)+) => { /* nothing, u128 is unsigned */ };
+//     (usize, $($tt:tt)+) => { /* nothing, usize is unsigned */ };
 
 //     (i8, $($tt:tt)+) => { $($tt)+};
 //     (i16, $($tt:tt)+) => { $($tt)+};
 //     (i32, $($tt:tt)+) => { $($tt)+};
 //     (i64, $($tt:tt)+) => { $($tt)+};
 //     (i128, $($tt:tt)+) => { $($tt)+};
+//     (isize, $($tt:tt)+) => { $($tt)+ };
 // }
 
 macro_rules! impl_math {
@@ -116,11 +120,13 @@ impl_math!(
     [for_ty: [u32, u32],    ty_unsigned: u32,   ty_signed: i32],
     [for_ty: [u64, u64],    ty_unsigned: u64,   ty_signed: i64],
     [for_ty: [u128, u128],  ty_unsigned: u128,  ty_signed: i128],
+    [for_ty: [usize, usize],ty_unsigned: usize, ty_signed: isize],
     [for_ty: [i8, i8],      ty_unsigned: u8,    ty_signed: i8],
     [for_ty: [i16, i16],    ty_unsigned: u16,   ty_signed: i16],
     [for_ty: [i32, i32],    ty_unsigned: u32,   ty_signed: i32],
     [for_ty: [i64, i64],    ty_unsigned: u64,   ty_signed: i64],
     [for_ty: [i128, i128],  ty_unsigned: u128,  ty_signed: i128],
+    [for_ty: [isize, isize],ty_unsigned: usize, ty_signed: isize],
 );
 
 #[cfg(test)]
