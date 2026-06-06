@@ -37,10 +37,9 @@ macro_rules! if_signed {
 }
 
 macro_rules! impl_math_common {
-    ($([for_ty:[$ty:ty,$ty_ident:ident], ty_unsigned: $ty_unsigned:ty, dummy_struct_name: $dummy_struct_name:ident],)*) => {$(
-        pub struct $dummy_struct_name;
+    ($([for_ty:[$ty:ty,$ty_ident:ident], ty_unsigned: $ty_unsigned:ty],)*) => {$(
+        pub mod $ty_ident {
 
-        impl $dummy_struct_name {
             pub type const ADD<const L: $ty, const R: $ty>: $ty = const { L + R };
             pub type const SUB<const L: $ty, const R: $ty>: $ty = const { L - R };
             pub type const MUL<const L: $ty, const R: $ty>: $ty = const { L * R };
@@ -62,23 +61,22 @@ macro_rules! impl_math_common {
 
             // FORMAT_INTO omitted, doesn't apply
 
+        
         }
     )*};
 }
 
 impl_math_common!(
-    [for_ty: [u8, u8], ty_unsigned: u8, dummy_struct_name: MathU8],
-    [for_ty: [u16, u16], ty_unsigned: u16, dummy_struct_name: MathU16],
-    [for_ty: [u32, u32], ty_unsigned: u32, dummy_struct_name: MathU32],
-    [for_ty: [u64, u64], ty_unsigned: u64, dummy_struct_name: MathU64],
-    [for_ty: [u128, u128], ty_unsigned: u128, dummy_struct_name: MathU128],
-    [for_ty: [u128, u128], ty_unsigned: u128, dummy_struct_name: MathUsize],
-    [for_ty: [i8, i8], ty_unsigned: u8, dummy_struct_name: MathI8],
-    [for_ty: [i16, i16], ty_unsigned: u16, dummy_struct_name: MathI16],
-    [for_ty: [i32, i32], ty_unsigned: u32, dummy_struct_name: MathI32],
-    [for_ty: [i64, i64], ty_unsigned: u64, dummy_struct_name: MathI64],
-    [for_ty: [i128, i128], ty_unsigned: u128, dummy_struct_name: MathI128],
-    [for_ty: [i128, i128], ty_unsigned: u128, dummy_struct_name: MathIsize],
+    [for_ty: [u8, u8], ty_unsigned: u8],
+    [for_ty: [u16, u16], ty_unsigned: u16],
+    [for_ty: [u32, u32], ty_unsigned: u32],
+    [for_ty: [u64, u64], ty_unsigned: u64],
+    [for_ty: [u128, u128], ty_unsigned: u128],
+    [for_ty: [i8, i8], ty_unsigned: u8],
+    [for_ty: [i16, i16], ty_unsigned: u16],
+    [for_ty: [i32, i32], ty_unsigned: u32],
+    [for_ty: [i64, i64], ty_unsigned: u64],
+    [for_ty: [i128, i128], ty_unsigned: u128],
 );
 
 #[cfg(test)]
