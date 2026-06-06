@@ -36,8 +36,8 @@ macro_rules! if_signed {
     (i128, $($tt:tt)+) => { $($tt)+};
 }
 
-macro_rules! impl_math_common {
-    ($([for_ty:[$ty:ty,$ty_ident:ident], ty_unsigned: $ty_unsigned:ty],)*) => {$(
+macro_rules! impl_math {
+    ($([for_ty:[$ty:ty,$ty_ident:ident], ty_unsigned: $ty_unsigned:ty, ty_signed: $ty_signed:ty],)*) => {$(
         pub mod $ty_ident {
 
             pub type const ADD<const L: $ty, const R: $ty>: $ty = const { L + R };
@@ -49,6 +49,10 @@ macro_rules! impl_math_common {
 
             // CHECKED_* omitted, since they all return Option<_>, which doesn't impl ConstParamTy
 
+            if_unsigned!{ $ty_ident,
+            pub type const CAST_SIGNED<const N: $ty>: $ty_signed = const { <$ty>::cast_signed(N) };
+            }
+            
             pub type const COUNT_ONES<const N: $ty>: u32 = const { <$ty>::count_ones(N) };
 
             pub type const COUNT_ZEROS<const N: $ty>: u32 = const { <$ty>::count_zeros(N) };
@@ -66,17 +70,17 @@ macro_rules! impl_math_common {
     )*};
 }
 
-impl_math_common!(
-    [for_ty: [u8, u8], ty_unsigned: u8],
-    [for_ty: [u16, u16], ty_unsigned: u16],
-    [for_ty: [u32, u32], ty_unsigned: u32],
-    [for_ty: [u64, u64], ty_unsigned: u64],
-    [for_ty: [u128, u128], ty_unsigned: u128],
-    [for_ty: [i8, i8], ty_unsigned: u8],
-    [for_ty: [i16, i16], ty_unsigned: u16],
-    [for_ty: [i32, i32], ty_unsigned: u32],
-    [for_ty: [i64, i64], ty_unsigned: u64],
-    [for_ty: [i128, i128], ty_unsigned: u128],
+impl_math!(
+    [for_ty: [u8, u8],      ty_unsigned: u8,    ty_signed: i8],
+    [for_ty: [u16, u16],    ty_unsigned: u16,   ty_signed: i16],
+    [for_ty: [u32, u32],    ty_unsigned: u32,   ty_signed: i32],
+    [for_ty: [u64, u64],    ty_unsigned: u64,   ty_signed: i64],
+    [for_ty: [u128, u128],  ty_unsigned: u128,  ty_signed: i128],
+    [for_ty: [i8, i8],      ty_unsigned: u8,    ty_signed: i8],
+    [for_ty: [i16, i16],    ty_unsigned: u16,   ty_signed: i16],
+    [for_ty: [i32, i32],    ty_unsigned: u32,   ty_signed: i32],
+    [for_ty: [i64, i64],    ty_unsigned: u64,   ty_signed: i64],
+    [for_ty: [i128, i128],  ty_unsigned: u128,  ty_signed: i128],
 );
 
 #[cfg(test)]
