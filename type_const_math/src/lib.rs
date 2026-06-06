@@ -97,10 +97,27 @@ macro_rules! impl_math {
             if_unsigned!{ $ty_ident,
             pub type const OVERFLOWING_SUB_SIGNED<const L: $ty, const R: $ty_signed>: ($ty, bool) = const { <$ty>::overflowing_sub_signed(L, R) };
             }
+
+            pub type const POW<const L: $ty, const R: u32>: $ty = const { <$ty>::pow(L, R) };
+
+            pub type const REM_EUCLID<const L: $ty, const R: $ty>: $ty = const { <$ty>::rem_euclid(L, R) };
+
+            pub type const REVERSE_BITS<const N: $ty>: $ty = const { <$ty>::reverse_bits(N) };
+
+            pub type const ROTATE_LEFT<const L: $ty, const R: u32>: $ty = const { <$ty>::rotate_left(L, R) };
+            pub type const ROTATE_RIGHT<const L: $ty, const R: u32>: $ty = const { <$ty>::rotate_right(L, R) };
             
-
-
-        
+            pub type const SATURATING_ADD<const L: $ty, const R: $ty>: $ty = const { <$ty>::saturating_add(L, R) };
+            if_unsigned!{ $ty_ident,
+            pub type const SATURATING_ADD_SIGNED<const L: $ty, const R: $ty_signed>: $ty = const { <$ty>::saturating_add_signed(L, R) };
+            }
+            pub type const SATURATING_DIV<const L: $ty, const R: $ty>: $ty = const { <$ty>::saturating_div(L, R) };
+            pub type const SATURATING_MUL<const L: $ty, const R: $ty>: $ty = const { <$ty>::saturating_mul(L, R) };
+            pub type const SATURATING_POW<const L: $ty, const R: u32>: $ty = const { <$ty>::saturating_pow(L, R) };
+            pub type const SATURATING_SUB<const L: $ty, const R: $ty>: $ty = const { <$ty>::saturating_mul(L, R) };
+            if_unsigned!{ $ty_ident,
+            pub type const SATURATING_SUB_SIGNED<const L: $ty, const R: $ty_signed>: $ty = const { <$ty>::saturating_sub_signed(L, R) };
+            }
         }
     )*};
 }
