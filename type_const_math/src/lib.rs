@@ -1,14 +1,10 @@
-#![feature(
-    //
-    generic_const_args, 
-    min_generic_const_args, 
-    generic_const_items,
+#![no_std]
+#![forbid(unsafe_code)]
 
-    signed_bigint_helpers,
-    const_unsigned_bigint_helpers,
-    uint_carryless_mul,
-    uint_gather_scatter_bits,
-    int_roundings
+#![feature( //
+    generic_const_args, 
+    min_generic_const_args,
+    generic_const_items
 )]
 #![allow(incomplete_features)]
 
@@ -40,20 +36,6 @@ macro_rules! if_signed {
     (i128, $($tt:tt)+) => { $($tt)+};
 }
 
-macro_rules! match_ty_signdness {
-    (u8, unsigned => $tt1:item, signed => $tt2:item) => { $tt1  };
-    (u16, unsigned => $tt1:item, signed => $tt2:item) => { $tt1 };
-    (u32, unsigned => $tt1:item, signed => $tt2:item) => { $tt1 };
-    (u64, unsigned => $tt1:item, signed => $tt2:item) => { $tt1 };
-    (u128, unsigned => $tt1:item, signed => $tt2:item) => { $tt1 };
-
-    (i8, unsigned => $tt1:item, signed => $tt2:item) => { $tt2  };
-    (i16, unsigned => $tt1:item, signed => $tt2:item) => { $tt2 };
-    (i32, unsigned => $tt1:item, signed => $tt2:item) => { $tt2 };
-    (i64, unsigned => $tt1:item, signed => $tt2:item) => { $tt2 };
-    (i128, unsigned => $tt1:item, signed => $tt2:item) => { $tt2 };
-}
-
 macro_rules! impl_math_common {
     ($([for_ty:[$ty:ty,$ty_ident:ident], ty_unsigned: $ty_unsigned:ty, dummy_struct_name: $dummy_struct_name:ident],)*) => {$(
         pub struct $dummy_struct_name;
@@ -63,64 +45,26 @@ macro_rules! impl_math_common {
             pub type const SUB<const L: $ty, const R: $ty>: $ty = const { L - R };
             pub type const MUL<const L: $ty, const R: $ty>: $ty = const { L * R };
             pub type const DIV<const L: $ty, const R: $ty>: $ty = const { L / R };
-            
-            pub type const ABS_DIFF<const L: $ty, const R: $ty>: $ty_unsigned = const { <$ty>::abs_diff(L, R) }; 
-            
-            if_unsigned!{ $ty_ident, 
-                pub type const BIT_WIDTH<const N: $ty>: u32 = const { <$ty>::bit_width(N) };
-            }
 
-            pub type const BORROWING_SUB<const L: $ty, const R: $ty, const BORROW: bool>: ($ty, bool) = const { <$ty>::borrowing_sub(L, R, BORROW) }; 
-
-            pub type const CARRYING_ADD<const L: $ty, const R: $ty, const CARRY: bool>: ($ty, bool) = const { <$ty>::carrying_add(L, R, CARRY) }; 
-
-            if_unsigned!{ $ty_ident,
-                pub type const CARRYING_CARRYLESS_MUL<const L: $ty, const R: $ty, const CARRY: $ty>: ($ty, $ty) = const { <$ty>::carrying_carryless_mul(L, R, CARRY) }; 
-            }
-            
-            pub type const CARRYING_MUL<const L: $ty, const R: $ty, const CARRY: $ty>: ($ty_unsigned, $ty) = const { <$ty>::carrying_mul(L, R, CARRY) }; 
-
-            pub type const CARRYING_MUL_ADD<const L: $ty, const R: $ty, const CARRY: $ty, const ADD: $ty>: ($ty_unsigned, $ty) = const { <$ty>::carrying_mul_add(L, R, CARRY, ADD) }; 
-
-            if_signed!{ $ty_ident,
-                pub type const CAST_UNSIGNED<const N: $ty>: $ty_unsigned = const { <$ty>::cast_unsigned(N) };
-            }
+            pub type const ABS_DIFF<const L: $ty, const R: $ty>: $ty_unsigned = const { <$ty>::abs_diff(L, R) };
 
             // CHECKED_* omitted, since they all return Option<_>, which doesn't impl ConstParamTy
-            
+
             pub type const COUNT_ONES<const N: $ty>: u32 = const { <$ty>::count_ones(N) };
 
             pub type const COUNT_ZEROS<const N: $ty>: u32 = const { <$ty>::count_zeros(N) };
 
-            if_unsigned!{ $ty_ident,
-                pub type const DEPOSIT_BITS<const N: $ty, const MASK: $ty>: $ty = const { <$ty>::deposit_bits(N, MASK) }; 
-            }
-
-            pub type const DIV_CEIL<const L: $ty, const R: $ty>: $ty = const { <$ty>::div_ceil(L, R) };
-
             pub type const DIV_EUCLID<const L: $ty, const R: $ty>: $ty = const { <$ty>::div_euclid(L, R) };
-            
+
             // DIV_EXACT omitted, returns Option<_>
 
-            pub type const DIV_FLOOR<const L: $ty, const R: $ty>: $ty = const { <$ty>::div_floor(L, R) };
-            
             // EXTEND omitted, idk how to do this atm
-
-            if_unsigned!{ $ty_ident,
-                pub type const EXTRACT_BITS<const N: $ty, const MASK: $ty>: $ty = const { <$ty>::extract_bits(N, MASK) };
-            }
 
             // FORMAT_INTO omitted, doesn't apply
 
-            
-
-
-            
         }
     )*};
 }
-
-
 
 impl_math_common!(
     [for_ty: [u8, u8], ty_unsigned: u8, dummy_struct_name: MathU8],
@@ -139,11 +83,13 @@ impl_math_common!(
 
 #[cfg(test)]
 mod tests {
+    extern crate std;
     use super::*;
+    
+    use std::println;
 
     #[test]
     fn it_works() {
         println!("gay")
     }
-    
 }
