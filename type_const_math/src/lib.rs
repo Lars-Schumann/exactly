@@ -65,6 +65,27 @@ macro_rules! impl_math {
 
             pub type const ILOG10<const N: $ty>: u32 = const { <$ty>::ilog10(N) };
 
+            if_unsigned!{ $ty_ident,
+            pub type const IS_MULTIPLE_OF<const L: $ty, const R: $ty>: bool = const { <$ty>::is_multiple_of(L, R) };
+          
+            pub type const IS_POWER_OF_TWO<const N: $ty>: bool = const { <$ty>::is_power_of_two(N) };
+            }
+
+            pub type const ISQRT<const N: $ty>: $ty = const { <$ty>::isqrt(N) };
+
+            pub type const LEADING_ONES<const N: $ty>: u32 = const { <$ty>::leading_ones(N) };
+
+            pub type const LEADING_ZEROS<const N: $ty>: u32 = const { <$ty>::leading_zeros(N) };
+
+            pub type const MIDPOINT<const L: $ty, const R: $ty>: $ty = const { <$ty>::midpoint(L, R) };
+
+            if_unsigned!{ $ty_ident,
+            pub type const NEXT_MULTIPLE_OF<const L: $ty, const R: $ty>: $ty = const { <$ty>::next_multiple_of(L, R) };
+
+            pub type const NEXT_POWER_OF_TWO<const N: $ty>: $ty = const { <$ty>::next_power_of_two(N) };
+            }
+
+
         
         }
     )*};
