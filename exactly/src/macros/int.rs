@@ -52,27 +52,27 @@ macro_rules! impl_int_common {
                 unsafe { $range_t_name::<{ NEW_LOWER }, { NEW_UPPER }>::new_unchecked(self.inner()) }
             }
 
-            pub const fn add<const V: $num_t>(&self) -> $range_t_name::<{ ::tcm::$num_t::ADD::<LOWER, V>},{ ::tcm::$num_t::ADD::<UPPER, V>}> {
-                unsafe { $range_t_name::<{ ::tcm::$num_t::ADD::<LOWER, V>},{ ::tcm::$num_t::ADD::<UPPER, V>}>::new_unchecked(self.inner() + V) }
+            pub const fn add<const V: $num_t>(&self) -> $range_t_name::<{ ::tcm::$num_t::ADD::<LOWER, V> },{ ::tcm::$num_t::ADD::<UPPER, V> }> {
+                unsafe { $range_t_name::<{ ::tcm::$num_t::ADD::<LOWER, V> },{ ::tcm::$num_t::ADD::<UPPER, V> }>::new_unchecked(self.inner() + V) }
             }
 
-            pub const fn sub<const V: $num_t>(&self) -> $range_t_name::<{ ::tcm::$num_t::SUB::<LOWER, V>},{ ::tcm::$num_t::SUB::<UPPER, V>}> {
-                unsafe { $range_t_name::<{ ::tcm::$num_t::SUB::<LOWER, V>},{ ::tcm::$num_t::SUB::<UPPER, V>}>::new_unchecked(self.inner() - V) }
+            pub const fn sub<const V: $num_t>(&self) -> $range_t_name::<{ ::tcm::$num_t::SUB::<LOWER, V> },{ ::tcm::$num_t::SUB::<UPPER, V> }> {
+                unsafe { $range_t_name::<{ ::tcm::$num_t::SUB::<LOWER, V> },{ ::tcm::$num_t::SUB::<UPPER, V> }>::new_unchecked(self.inner() - V) }
             }
 
-            pub const fn mul<const V: $num_t>(&self) -> $range_t_name::<{ ::tcm::$num_t::MUL::<LOWER, V>},{ ::tcm::$num_t::MUL::<UPPER, V>}> {
-                unsafe { $range_t_name::<{ ::tcm::$num_t::MUL::<LOWER, V>},{ ::tcm::$num_t::MUL::<UPPER, V>}>::new_unchecked(self.inner() * V) }
+            pub const fn mul<const V: $num_t>(&self) -> $range_t_name::<{ ::tcm::$num_t::MUL::<LOWER, V> },{ ::tcm::$num_t::MUL::<UPPER, V> }> {
+                unsafe { $range_t_name::<{ ::tcm::$num_t::MUL::<LOWER, V> },{ ::tcm::$num_t::MUL::<UPPER, V> }>::new_unchecked(self.inner() * V) }
             }
 
-            pub const fn div<const V: $num_t>(&self) -> $range_t_name::<{ ::tcm::$num_t::DIV::<LOWER, V>},{ ::tcm::$num_t::DIV::<UPPER, V>}> {
-                unsafe { $range_t_name::<{ ::tcm::$num_t::DIV::<LOWER, V>},{ ::tcm::$num_t::DIV::<UPPER, V>}>::new_unchecked(self.inner() / V) }
+            pub const fn div<const V: $num_t>(&self) -> $range_t_name::<{ ::tcm::$num_t::DIV::<LOWER, V> },{ ::tcm::$num_t::DIV::<UPPER, V> }> {
+                unsafe { $range_t_name::<{ ::tcm::$num_t::DIV::<LOWER, V> },{ ::tcm::$num_t::DIV::<UPPER, V> }>::new_unchecked(self.inner() / V) }
             }
 
         }
 
 
         impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Add<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
-            type Output = $range_t_name<{ ::tcm::$num_t::ADD::<A, X>}, { ::tcm::$num_t::ADD::<B, Y> }>;
+            type Output = $range_t_name<{ ::tcm::$num_t::ADD::<A, X> }, { ::tcm::$num_t::ADD::<B, Y> }>;
 
             fn add(self, rhs: $range_t_name<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() + rhs.inner()) }
@@ -80,7 +80,7 @@ macro_rules! impl_int_common {
         }
 
         impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Sub<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
-            type Output = $range_t_name<{ ::tcm::$num_t::SUB::<A, Y>}, { ::tcm::$num_t::SUB::<B, X> }>;
+            type Output = $range_t_name<{ ::tcm::$num_t::SUB::<A, Y> }, { ::tcm::$num_t::SUB::<B, X> }>;
 
             fn sub(self, rhs: $range_t_name<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() - rhs.inner()) }
