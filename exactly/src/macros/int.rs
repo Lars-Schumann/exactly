@@ -23,19 +23,26 @@ macro_rules! impl_int_common {
                 self.0
             }
 
+            pub const fn includes(value: $num_t) -> bool {
+                LOWER <= value && value <= UPPER
+            }
+
             pub const fn new(value: $num_t) -> Option<Self> {
-                match (LOWER <= value && value <= UPPER) {
-                    true => Some(unsafe { Self::new_unchecked(value) }),
+                match Self::includes(value) {
+                    true => Some(
+                        // SAFETY: we just checked the precondition
+                        unsafe { Self::new_unchecked(value) }
+                    ),
                     false => None,
                 }
             }
 
             /// # Safety
-            /// LOWER <= value <= UPPER must hold.
+            /// `Self::includes(value)`, which checks `LOWER <= value <= UPPER`, must hold.
             pub const unsafe fn new_unchecked(value: $num_t) -> Self {
                 #[expect(path_statements)]
                 Self::__ASSERT_RANGE_NON_EMPTY;
-                debug_assert!(LOWER <= value && value <= UPPER);
+                debug_assert!(Self::includes(value));
                 Self(value)
             }
 
@@ -43,10 +50,6 @@ macro_rules! impl_int_common {
                 const { assert!(NEW_LOWER <= LOWER && UPPER <= NEW_UPPER) };
                 // SAFETY: we just asserted the precondition
                 unsafe { $range_t_name::<{ NEW_LOWER }, { NEW_UPPER }>::new_unchecked(self.inner()) }
-            }
-
-            pub const fn includes(value: $num_t) -> bool {
-                LOWER <= value && value <= UPPER
             }
 
             pub const fn add<const V: $num_t>(&self) -> $range_t_name::<{ ::tcm::$num_t::ADD::<LOWER, V>},{ ::tcm::$num_t::ADD::<UPPER, V>}> {
