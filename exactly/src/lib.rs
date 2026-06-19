@@ -13,6 +13,5 @@
 )]
 #![allow(incomplete_features)]
 
-pub mod float;
 pub mod int;
 pub(crate) mod macros;

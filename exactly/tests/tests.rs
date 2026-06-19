@@ -1,9 +1,6 @@
 #![feature(min_generic_const_args, generic_const_args, generic_const_items)]
 #![allow(incomplete_features)]
 
-use exactly::MakeF32;
-use exactly::MakeRangeF32;
-use exactly::float::Rf32;
 use exactly::int::Ri32;
 use exactly::int::Ru32;
 use std::any::type_name_of_val;
@@ -56,14 +53,4 @@ fn range_div() {
     let c: Ri32<-50, 50> = a / b;
 
     assert_eq!(c.inner(), -2);
-}
-
-#[test]
-fn test_float() {
-    let a: MakeRangeF32![0.0, 3.0] = Rf32::new(MakeF32!(2.5)).unwrap();
-    let b: MakeRangeF32![0.0, 8.5] = Rf32::new(MakeF32!(5.22)).unwrap();
-
-    let c: MakeRangeF32![0.0, 11.5] = a + b;
-
-    assert_eq!(c.inner().inner(), 7.72);
 }
