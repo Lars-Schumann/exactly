@@ -45,6 +45,10 @@ macro_rules! impl_int_common {
                 unsafe { $range_t_name::<{ NEW_LOWER }, { NEW_UPPER }>::new_unchecked(self.inner()) }
             }
 
+            pub const fn includes(value: $num_t) -> bool {
+                LOWER <= value && value <= UPPER
+            }
+
             pub const fn add<const V: $num_t>(&self) -> $range_t_name::<{ ::tcm::$num_t::ADD::<LOWER, V>},{ ::tcm::$num_t::ADD::<UPPER, V>}> {
                 unsafe { $range_t_name::<{ ::tcm::$num_t::ADD::<LOWER, V>},{ ::tcm::$num_t::ADD::<UPPER, V>}>::new_unchecked(self.inner() + V) }
             }
@@ -114,41 +118,20 @@ macro_rules! impl_int_signed {
 
             #[expect(unused)]
             type const MIN_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
-                if (X == 0 && Y == 0) {
-                    panic!("unconditional division by 0")
+                if (X <= 0 && 0 <= Y) {
+                    panic!("potential division by 0")
                 }
 
-                let furthest_hopefully_pos_divisor_from_0 = if Y == 0 {-1} else {Y};
-
-                let closest_hopefully_neg_divisor_to_0 = match (X < 0, Y < 0){
-                    (true, true) => Y,
-                    (false, false) => X,
-                    (true, false) => -1,
-                    (false, true) => unreachable!() // Y can't be less than X
-                };
-
-                (A / furthest_hopefully_pos_divisor_from_0).min(B / closest_hopefully_neg_divisor_to_0)
-
+                (A / X).min(A / Y).min(B / X).min(B / Y)
             };
 
             #[expect(unused)]
             type const MAX_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
-                if (X == 0 && Y == 0) {
-                    panic!("unconditional division by 0")
+                if (X <= 0 && 0 <= Y) {
+                    panic!("potential division by 0")
                 }
 
-                let closest_hopefully_pos_divisor_to_0 = match (0 < X , 0 < Y){
-                    (true, true) => X,
-                    (false, false) => Y,
-                    (false, true) => 1,
-                    (true, false) => unreachable!() // Y can't be less than X
-                };
-
-                let furthest_hopefully_neg_divisor_from_0 = if X == 0 {1} else {X};
-
-
-
-                (B / closest_hopefully_pos_divisor_to_0).max(A / furthest_hopefully_neg_divisor_from_0)
+                (A / X).max(A / Y).max(B / X).max(B / Y)
             };
         }
 

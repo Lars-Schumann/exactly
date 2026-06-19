@@ -47,12 +47,12 @@ fn range_mul() {
 
 #[test]
 fn range_div() {
-    let a: Ri32<-2, 50> = Ri32::new(10).unwrap();
-    let b: Ri32<-25, 3> = Ri32::new(-5).unwrap();
+    let a: Ri32<-2, 50> = Ri32::new(12).unwrap();
+    let b: Ri32<1, 3> = Ri32::new(3).unwrap();
 
-    let c: Ri32<-50, 50> = a / b;
+    let c: Ri32<-2, 50> = a / b;
 
-    assert_eq!(c.inner(), -2);
+    assert_eq!(c.inner(), 4);
 }
 
 #[test]
