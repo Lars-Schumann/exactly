@@ -54,3 +54,10 @@ fn range_div() {
 
     assert_eq!(c.inner(), -2);
 }
+
+#[test]
+fn test_widen() {
+    let a: Ri32<1, 3> = Ri32::new(1).unwrap();
+    let b: Ri32<-1, 4> = a.widen();
+    dbg!(b);
+}

@@ -39,6 +39,12 @@ macro_rules! impl_int_common {
                 Self(value)
             }
 
+            pub const fn widen<const NEW_LOWER: $inner_type, const NEW_UPPER: $inner_type>(self) -> $range_type_name<{ NEW_LOWER }, { NEW_UPPER }> {
+                const { assert!(NEW_LOWER <= LOWER && UPPER <= NEW_UPPER) };
+                // SAFETY: we just asserted the precondition
+                unsafe { $range_type_name::<{ NEW_LOWER }, { NEW_UPPER }>::new_unchecked(self.inner()) }
+            }
+
             #[expect(unused)]
             type const ADD<const N: $inner_type, const M: $inner_type>: $inner_type = const { N + M };
             #[expect(unused)]
@@ -82,7 +88,7 @@ macro_rules! impl_int_common {
                 unsafe { Self::Output::new_unchecked(self.inner() - rhs.inner()) }
             }
         }
-    )*}
+)*}
 }
 pub(crate) use impl_int_common;
 
