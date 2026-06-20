@@ -3,17 +3,6 @@
 
 use exactly::int::Ri32;
 use exactly::int::Ru32;
-use std::any::type_name_of_val;
-
-#[test]
-fn demo() {
-    let foo: Ru32<1, 3> = Ru32::new(2).unwrap();
-    let bar: Ru32<12, 16> = foo.add::<5>().mul::<2>();
-
-    dbg!(type_name_of_val(&bar), bar);
-
-    let _qux: Ru32<13, 19> = foo + bar;
-}
 
 #[test]
 fn range_add() {
