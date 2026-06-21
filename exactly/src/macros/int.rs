@@ -4,19 +4,19 @@ macro_rules! impl_int_common {
         #[repr(transparent)]
         pub struct $range_t_name<const LOWER: $num_t, const UPPER: $num_t>($num_t);
 
-        impl<const LOWER: $num_t, const UPPER: $num_t> $range_t_name<LOWER, UPPER> {
+        impl<const A: $num_t, const B: $num_t> $range_t_name<A, B> {
 
-            const __ASSERT_RANGE_NON_EMPTY: () = const { assert!(LOWER <= UPPER) };
+            pub type const LOWER: $num_t = A;
+            pub type const UPPER: $num_t = B;
 
-            pub type const LOWER: $num_t = LOWER;
-            pub type const UPPER: $num_t = UPPER;
+            const __ASSERT_RANGE_NON_EMPTY: () = const { assert!(Self::LOWER <= Self::UPPER) };
 
             pub const fn lower(&self) -> $num_t {
-                LOWER
+                Self::LOWER
             }
 
             pub const fn upper(&self) -> $num_t {
-                UPPER
+                Self::UPPER
             }
 
             pub const fn inner(&self) -> $num_t {
@@ -24,7 +24,7 @@ macro_rules! impl_int_common {
             }
 
             pub const fn includes(value: $num_t) -> bool {
-                LOWER <= value && value <= UPPER
+                Self::LOWER <= value && value <= Self::UPPER
             }
 
             pub const fn new(value: $num_t) -> Option<Self> {
@@ -47,17 +47,17 @@ macro_rules! impl_int_common {
             }
 
             pub const fn widen<const NEW_LOWER: $num_t, const NEW_UPPER: $num_t>(self) -> $range_t_name<{ NEW_LOWER }, { NEW_UPPER }> {
-                const { assert!(NEW_LOWER <= LOWER && UPPER <= NEW_UPPER) };
+                const { assert!(NEW_LOWER <= Self::LOWER && Self::UPPER <= NEW_UPPER) };
                 // SAFETY: we just asserted the precondition
                 unsafe { $range_t_name::<{ NEW_LOWER }, { NEW_UPPER }>::new_unchecked(self.inner()) }
             }
 
 
-            pub const fn saturating_add<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_ADD::<LOWER, X> }, { ::tcm::$num_t::SATURATING_ADD::<UPPER, Y> }> {
+            pub const fn saturating_add<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_ADD::<A, X> }, { ::tcm::$num_t::SATURATING_ADD::<B, Y> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_add(other.inner())) }
             }
 
-            pub const fn saturating_sub<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_SUB::<LOWER, Y> }, { ::tcm::$num_t::SATURATING_SUB::<UPPER, X> }> {
+            pub const fn saturating_sub<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_SUB::<A, Y> }, { ::tcm::$num_t::SATURATING_SUB::<B, X> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_sub(other.inner())) }
             }
 
@@ -89,13 +89,13 @@ pub(crate) use impl_int_common;
 macro_rules! impl_int_unsigned {
     ($([inner_type: $num_t:ident, range_t_name: $range_t_name:ident],)*) => {$(
 
-        impl<const LOWER: $num_t, const UPPER: $num_t> $range_t_name<LOWER, UPPER> {
+        impl<const A: $num_t, const B: $num_t> $range_t_name<A, B> {
 
-            pub const fn saturating_mul<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_MUL::<LOWER, X> }, { ::tcm::$num_t::SATURATING_MUL::<UPPER, Y> }> {
+            pub const fn saturating_mul<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_MUL::<A, X> }, { ::tcm::$num_t::SATURATING_MUL::<B, Y> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_mul(other.inner())) }
             }
 
-            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_DIV::<LOWER, Y> }, { ::tcm::$num_t::SATURATING_DIV::<UPPER, X> }> {
+            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_DIV::<A, Y> }, { ::tcm::$num_t::SATURATING_DIV::<B, X> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_div(other.inner())) }
             }
 
@@ -122,51 +122,69 @@ pub(crate) use impl_int_unsigned;
 
 macro_rules! impl_int_signed {
     ($([inner_type: $num_t:ident, range_t_name: $range_t_name:ident],)*) => {$(
-        impl<const LOWER: $num_t, const UPPER: $num_t> $range_t_name<LOWER, UPPER> {
+        impl<const A: $num_t, const B: $num_t> $range_t_name<A, B> {
 
             #[expect(unused)]
-            type const MIN_SATURATING_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
-                    (A.saturating_mul(X))
-                .min(A.saturating_mul(Y))
-                .min(B.saturating_mul(X))
-                .min(B.saturating_mul(Y))
+            type const MIN_SATURATING_MUL_RES<const _A: $num_t, const _B: $num_t, const _X: $num_t, const _Y: $num_t>: $num_t = const {
+                    (_A.saturating_mul(_X))
+                .min(_A.saturating_mul(_Y))
+                .min(_B.saturating_mul(_X))
+                .min(_B.saturating_mul(_Y))
             };
 
             #[expect(unused)]
-            type const MAX_SATURATING_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
-                    (A.saturating_mul(X))
-                .max(A.saturating_mul(Y))
-                .max(B.saturating_mul(X))
-                .max(B.saturating_mul(Y))
+            type const MAX_SATURATING_MUL_RES<const _A: $num_t, const _B: $num_t, const _X: $num_t, const _Y: $num_t>: $num_t = const {
+                    (_A.saturating_mul(_X))
+                .max(_A.saturating_mul(_Y))
+                .max(_B.saturating_mul(_X))
+                .max(_B.saturating_mul(_Y))
             };
 
-            pub const fn saturating_mul<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ Self::MIN_SATURATING_MUL_RES::<LOWER, UPPER, X, Y> }, { Self::MAX_SATURATING_MUL_RES::<LOWER, UPPER, X, Y> }> {
+            pub const fn saturating_mul<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ Self::MIN_SATURATING_MUL_RES::<A, B, X, Y> }, { Self::MAX_SATURATING_MUL_RES::<A, B, X, Y> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_mul(other.inner())) }
             }
 
-            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_DIV::<LOWER, Y> }, { ::tcm::$num_t::SATURATING_DIV::<UPPER, X> }> {
+            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_DIV::<A, Y> }, { ::tcm::$num_t::SATURATING_DIV::<B, X> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_div(other.inner())) }
             }
 
             #[expect(unused)]
-            type const MIN_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const { (A * X).min(A * Y).min(B * X).min(B * Y) };
-            #[expect(unused)]
-            type const MAX_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const { (A * X).max(A * Y).max(B * X).max(B * Y) };
+            type const MIN_MUL_RES<const _A: $num_t, const _B: $num_t, const _X: $num_t, const _Y: $num_t>: $num_t = const {
+                    (A * _X)
+                .min(A * _Y)
+                .min(B * _X)
+                .min(B * _Y)
+            };
+
 
             #[expect(unused)]
-            type const MIN_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
-                if (X <= 0 && 0 <= Y) {
-                    panic!("potential division by 0")
-                }
-                (A / X).min(A / Y).min(B / X).min(B / Y)
+            type const MAX_MUL_RES<const _A: $num_t, const _B: $num_t, const _X: $num_t, const _Y: $num_t>: $num_t = const {
+                    (_A * _X)
+                .min(_A * _Y)
+                .min(_B * _X)
+                .min(_B * _Y)
             };
 
             #[expect(unused)]
-            type const MAX_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
-                if (X <= 0 && 0 <= Y) {
+            type const MIN_DIV_RES<const _A: $num_t, const _B: $num_t, const _X: $num_t, const _Y: $num_t>: $num_t = const {
+                if (_X <= 0 && 0 <= _Y) {
                     panic!("potential division by 0")
                 }
-                (A / X).max(A / Y).max(B / X).max(B / Y)
+                    (_A / _X)
+                .min(_A / _Y)
+                .min(_B / _X)
+                .min(_B / _Y)
+            };
+
+            #[expect(unused)]
+            type const MAX_DIV_RES<const _A: $num_t, const _B: $num_t, const _X: $num_t, const _Y: $num_t>: $num_t = const {
+                if (_X <= 0 && 0 <= _Y) {
+                    panic!("potential division by 0")
+                }
+                    (_A / _X)
+                .max(_A / _Y)
+                .max(_B / _X)
+                .max(_B / _Y)
             };
         }
 
