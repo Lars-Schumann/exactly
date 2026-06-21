@@ -125,12 +125,36 @@ macro_rules! impl_int_signed {
         impl<const LOWER: $num_t, const UPPER: $num_t> $range_t_name<LOWER, UPPER> {
 
             #[expect(unused)]
-            type const RANGE_MIN_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const { (A * X).min(A * Y).min(B * X).min(B * Y) };
-            #[expect(unused)]
-            type const RANGE_MAX_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const { (A * X).max(A * Y).max(B * X).max(B * Y) };
+            type const MIN_SATURATING_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+                    (A.saturating_mul(X))
+                .min(A.saturating_mul(Y))
+                .min(B.saturating_mul(X))
+                .min(B.saturating_mul(Y))
+            };
 
             #[expect(unused)]
-            type const RANGE_MIN_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+            type const MAX_SATURATING_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+                    (A.saturating_mul(X))
+                .max(A.saturating_mul(Y))
+                .max(B.saturating_mul(X))
+                .max(B.saturating_mul(Y))
+            };
+
+            pub const fn saturating_mul<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ Self::MIN_SATURATING_MUL_RES::<LOWER, UPPER, X, Y> }, { Self::MAX_SATURATING_MUL_RES::<LOWER, UPPER, X, Y> }> {
+                unsafe { $range_t_name::new_unchecked(self.inner().saturating_mul(other.inner())) }
+            }
+
+            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_DIV::<LOWER, Y> }, { ::tcm::$num_t::SATURATING_DIV::<UPPER, X> }> {
+                unsafe { $range_t_name::new_unchecked(self.inner().saturating_div(other.inner())) }
+            }
+
+            #[expect(unused)]
+            type const MIN_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const { (A * X).min(A * Y).min(B * X).min(B * Y) };
+            #[expect(unused)]
+            type const MAX_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const { (A * X).max(A * Y).max(B * X).max(B * Y) };
+
+            #[expect(unused)]
+            type const MIN_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
                 if (X <= 0 && 0 <= Y) {
                     panic!("potential division by 0")
                 }
@@ -138,7 +162,7 @@ macro_rules! impl_int_signed {
             };
 
             #[expect(unused)]
-            type const RANGE_MAX_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+            type const MAX_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
                 if (X <= 0 && 0 <= Y) {
                     panic!("potential division by 0")
                 }
@@ -147,7 +171,7 @@ macro_rules! impl_int_signed {
         }
 
         impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Mul<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
-            type Output = $range_t_name<{ Self::RANGE_MIN_MUL_RES::<A, B, X, Y> }, { Self::RANGE_MAX_MUL_RES::<A, B, X, Y> }>;
+            type Output = $range_t_name<{ Self::MIN_MUL_RES::<A, B, X, Y> }, { Self::MAX_MUL_RES::<A, B, X, Y> }>;
 
             fn mul(self, rhs: $range_t_name<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() * rhs.inner()) }
@@ -155,7 +179,7 @@ macro_rules! impl_int_signed {
         }
 
         impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Div<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
-            type Output = $range_t_name<{ Self::RANGE_MIN_DIV_RES::<A, B, X, Y> }, { Self::RANGE_MAX_DIV_RES::<A, B, X, Y> }>;
+            type Output = $range_t_name<{ Self::MIN_DIV_RES::<A, B, X, Y> }, { Self::MAX_DIV_RES::<A, B, X, Y> }>;
 
             fn div(self, rhs: $range_t_name<{ X }, { Y }>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() / rhs.inner()) }
