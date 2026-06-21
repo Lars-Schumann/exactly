@@ -49,13 +49,13 @@ macro_rules! impl_int_common {
                 Self(value)
             }
 
-            pub const fn widen<const NEW_MIN: $num_t, const NEW_MAX: $num_t>(self) -> $range_t_name<{ NEW_MIN }, { NEW_MAX }> {
+            pub const fn widen<const NEW_MIN: $num_t, const NEW_MAX: $num_t>(self) -> $range_t_name<NEW_MIN, NEW_MAX> {
                 const { assert!(NEW_MIN <= Self::MIN && Self::MAX <= NEW_MAX) };
                 // SAFETY: we just asserted the precondition
-                unsafe { $range_t_name::<{ NEW_MIN }, { NEW_MAX }>::new_unchecked(self.inner()) }
+                unsafe { $range_t_name::<NEW_MIN, NEW_MAX>::new_unchecked(self.inner()) }
             }
 
-            pub const fn resize<const NEW_MIN: $num_t, const NEW_MAX: $num_t>(self) -> Option<$range_t_name<{ NEW_MIN }, { NEW_MAX }>> {
+            pub const fn resize<const NEW_MIN: $num_t, const NEW_MAX: $num_t>(self) -> Option<$range_t_name<NEW_MIN, NEW_MAX>> {
                 match $range_t_name::<NEW_MIN, NEW_MAX>::includes(self.inner()) {
                     true => {
                         // SAFETY: we just checked the precondition
@@ -67,33 +67,33 @@ macro_rules! impl_int_common {
 
             /// # Safety
             /// TODO
-            pub const unsafe fn resize_unchecked<const NEW_MIN: $num_t, const NEW_MAX: $num_t>(self) -> $range_t_name<{ NEW_MIN }, { NEW_MAX }> {
+            pub const unsafe fn resize_unchecked<const NEW_MIN: $num_t, const NEW_MAX: $num_t>(self) -> $range_t_name<NEW_MIN, NEW_MAX> {
                 unsafe { $range_t_name::<NEW_MIN, NEW_MAX>::new_unchecked(self.inner()) }
             }
 
 
-            pub const fn saturating_add<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_ADD::<A, X> }, { ::tcm::$num_t::SATURATING_ADD::<B, Y> }> {
+            pub const fn saturating_add<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<X, Y>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_ADD::<A, X> }, { ::tcm::$num_t::SATURATING_ADD::<B, Y> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_add(other.inner())) }
             }
 
-            pub const fn saturating_sub<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_SUB::<A, Y> }, { ::tcm::$num_t::SATURATING_SUB::<B, X> }> {
+            pub const fn saturating_sub<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<X, Y>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_SUB::<A, Y> }, { ::tcm::$num_t::SATURATING_SUB::<B, X> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_sub(other.inner())) }
             }
 
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Add<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
+        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Add<$range_t_name<X, Y>> for $range_t_name<A, B>{
             type Output = $range_t_name<{ ::tcm::$num_t::ADD::<A, X> }, { ::tcm::$num_t::ADD::<B, Y> }>;
 
-            fn add(self, rhs: $range_t_name<{ X }, { Y }>) -> Self::Output {
+            fn add(self, rhs: $range_t_name<X, Y>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() + rhs.inner()) }
             }
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Sub<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
+        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Sub<$range_t_name<X, Y>> for $range_t_name<A, B>{
             type Output = $range_t_name<{ ::tcm::$num_t::SUB::<A, Y> }, { ::tcm::$num_t::SUB::<B, X> }>;
 
-            fn sub(self, rhs: $range_t_name<{ X }, { Y }>) -> Self::Output {
+            fn sub(self, rhs: $range_t_name<X, Y>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() - rhs.inner()) }
             }
         }
@@ -110,28 +110,28 @@ macro_rules! impl_int_unsigned {
 
         impl<const A: $num_t, const B: $num_t> $range_t_name<A, B> {
 
-            pub const fn saturating_mul<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_MUL::<A, X> }, { ::tcm::$num_t::SATURATING_MUL::<B, Y> }> {
+            pub const fn saturating_mul<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<X, Y>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_MUL::<A, X> }, { ::tcm::$num_t::SATURATING_MUL::<B, Y> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_mul(other.inner())) }
             }
 
-            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_DIV::<A, Y> }, { ::tcm::$num_t::SATURATING_DIV::<B, X> }> {
+            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<X, Y>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_DIV::<A, Y> }, { ::tcm::$num_t::SATURATING_DIV::<B, X> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_div(other.inner())) }
             }
 
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Mul<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
+        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Mul<$range_t_name<X, Y>> for $range_t_name<A, B>{
             type Output = $range_t_name<{ ::tcm::$num_t::MUL::<A, X> }, { ::tcm::$num_t::MUL::<B, Y> }>;
 
-            fn mul(self, rhs: $range_t_name<{ X }, { Y }>) -> Self::Output {
+            fn mul(self, rhs: $range_t_name<X, Y>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() * rhs.inner()) }
             }
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Div<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
+        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Div<$range_t_name<X, Y>> for $range_t_name<A, B>{
             type Output = $range_t_name<{ ::tcm::$num_t::DIV::<A, Y> }, { ::tcm::$num_t::DIV::<B, X> }>;
 
-            fn div(self, rhs: $range_t_name<{ X }, { Y }>) -> Self::Output {
+            fn div(self, rhs: $range_t_name<X, Y>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() / rhs.inner()) }
             }
         }
@@ -209,27 +209,27 @@ macro_rules! impl_int_signed {
 
         impl<const A: $num_t, const B: $num_t> $range_t_name<A, B> {
 
-            pub const fn saturating_mul<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ $extra_tcm::MIN_SATURATING_MUL_RES::<A, B, X, Y> }, { $extra_tcm::MAX_SATURATING_MUL_RES::<A, B, X, Y> }> {
+            pub const fn saturating_mul<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<X, Y>) -> $range_t_name<{ $extra_tcm::MIN_SATURATING_MUL_RES::<A, B, X, Y> }, { $extra_tcm::MAX_SATURATING_MUL_RES::<A, B, X, Y> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_mul(other.inner())) }
             }
 
-            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ $extra_tcm::MIN_SATURATING_DIV_RES::<A, B, X, Y> }, { $extra_tcm::MAX_SATURATING_DIV_RES::<A, B, X, Y> }> {
+            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<X, Y>) -> $range_t_name<{ $extra_tcm::MIN_SATURATING_DIV_RES::<A, B, X, Y> }, { $extra_tcm::MAX_SATURATING_DIV_RES::<A, B, X, Y> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_div(other.inner())) }
             }
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Mul<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
+        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Mul<$range_t_name<X, Y>> for $range_t_name<{ A }, { B }>{
             type Output = $range_t_name<{ $extra_tcm::MIN_MUL_RES::<A, B, X, Y> }, { $extra_tcm::MAX_MUL_RES::<A, B, X, Y> }>;
 
-            fn mul(self, rhs: $range_t_name<{ X }, { Y }>) -> Self::Output {
+            fn mul(self, rhs: $range_t_name<X, Y>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() * rhs.inner()) }
             }
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Div<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
+        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Div<$range_t_name<X, Y>> for $range_t_name<{ A }, { B }>{
             type Output = $range_t_name<{ $extra_tcm::MIN_DIV_RES::<A, B, X, Y> }, { $extra_tcm::MAX_DIV_RES::<A, B, X, Y> }>;
 
-            fn div(self, rhs: $range_t_name<{ X }, { Y }>) -> Self::Output {
+            fn div(self, rhs: $range_t_name<X, Y>) -> Self::Output {
                 unsafe { Self::Output::new_unchecked(self.inner() / rhs.inner()) }
             }
         }
