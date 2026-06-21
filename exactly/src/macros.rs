@@ -2,24 +2,24 @@ macro_rules! impl_int_common {
     ($([inner_type: $num_t:ident, range_t_name: $range_t_name:ident, range_t_alias: $range_t_alias:ident, exact_fn_name: $exact_fn_name:ident ],)*) => {$(
         #[derive(Debug, Copy, Clone)]
         #[repr(transparent)]
-        pub struct $range_t_name<const LOWER: $num_t, const UPPER: $num_t>($num_t);
+        pub struct $range_t_name<const MIN: $num_t, const MAX: $num_t>($num_t);
 
         #[expect(non_camel_case_types)]
-        pub type $range_t_alias<const LOWER: $num_t, const UPPER: $num_t> = $range_t_name<LOWER, UPPER>;
+        pub type $range_t_alias<const MIN: $num_t, const MAX: $num_t> = $range_t_name<MIN, MAX>;
 
         impl<const A: $num_t, const B: $num_t> $range_t_name<A, B> {
 
-            pub type const LOWER: $num_t = A;
-            pub type const UPPER: $num_t = B;
+            pub type const MIN: $num_t = A;
+            pub type const MAX: $num_t = B;
 
-            const __ASSERT_RANGE_NON_EMPTY: () = const { assert!(Self::LOWER <= Self::UPPER) };
+            const __ASSERT_RANGE_NON_EMPTY: () = const { assert!(Self::MIN <= Self::MAX) };
 
-            pub const fn lower(&self) -> $num_t {
-                Self::LOWER
+            pub const fn min(&self) -> $num_t {
+                Self::MIN
             }
 
-            pub const fn upper(&self) -> $num_t {
-                Self::UPPER
+            pub const fn max(&self) -> $num_t {
+                Self::MAX
             }
 
             pub const fn inner(&self) -> $num_t {
@@ -27,7 +27,7 @@ macro_rules! impl_int_common {
             }
 
             pub const fn includes(value: $num_t) -> bool {
-                Self::LOWER <= value && value <= Self::UPPER
+                Self::MIN <= value && value <= Self::MAX
             }
 
             pub const fn new(value: $num_t) -> Option<Self> {
@@ -41,7 +41,7 @@ macro_rules! impl_int_common {
             }
 
             /// # Safety
-            /// `Self::includes(value)`, which checks `LOWER <= value <= UPPER`, must hold.
+            /// `Self::includes(value)`, which checks `MIN <= value <= MAX`, must hold.
             pub const unsafe fn new_unchecked(value: $num_t) -> Self {
                 #[expect(path_statements)]
                 Self::__ASSERT_RANGE_NON_EMPTY;
@@ -49,17 +49,17 @@ macro_rules! impl_int_common {
                 Self(value)
             }
 
-            pub const fn widen<const NEW_LOWER: $num_t, const NEW_UPPER: $num_t>(self) -> $range_t_name<{ NEW_LOWER }, { NEW_UPPER }> {
-                const { assert!(NEW_LOWER <= Self::LOWER && Self::UPPER <= NEW_UPPER) };
+            pub const fn widen<const NEW_MIN: $num_t, const NEW_MAX: $num_t>(self) -> $range_t_name<{ NEW_MIN }, { NEW_MAX }> {
+                const { assert!(NEW_MIN <= Self::MIN && Self::MAX <= NEW_MAX) };
                 // SAFETY: we just asserted the precondition
-                unsafe { $range_t_name::<{ NEW_LOWER }, { NEW_UPPER }>::new_unchecked(self.inner()) }
+                unsafe { $range_t_name::<{ NEW_MIN }, { NEW_MAX }>::new_unchecked(self.inner()) }
             }
 
-            pub const fn resize<const NEW_LOWER: $num_t, const NEW_UPPER: $num_t>(self) -> Option<$range_t_name<{ NEW_LOWER }, { NEW_UPPER }>> {
-                match $range_t_name::<NEW_LOWER, NEW_UPPER>::includes(self.inner()) {
+            pub const fn resize<const NEW_MIN: $num_t, const NEW_MAX: $num_t>(self) -> Option<$range_t_name<{ NEW_MIN }, { NEW_MAX }>> {
+                match $range_t_name::<NEW_MIN, NEW_MAX>::includes(self.inner()) {
                     true => {
                         // SAFETY: we just checked the precondition
-                        Some(unsafe { self.resize_unchecked::<NEW_LOWER, NEW_UPPER>() })
+                        Some(unsafe { self.resize_unchecked::<NEW_MIN, NEW_MAX>() })
                     },
                     false => None,
                 }
@@ -67,8 +67,8 @@ macro_rules! impl_int_common {
 
             /// # Safety
             /// TODO
-            pub const unsafe fn resize_unchecked<const NEW_LOWER: $num_t, const NEW_UPPER: $num_t>(self) -> $range_t_name<{ NEW_LOWER }, { NEW_UPPER }> {
-                unsafe { $range_t_name::<NEW_LOWER, NEW_UPPER>::new_unchecked(self.inner()) }
+            pub const unsafe fn resize_unchecked<const NEW_MIN: $num_t, const NEW_MAX: $num_t>(self) -> $range_t_name<{ NEW_MIN }, { NEW_MAX }> {
+                unsafe { $range_t_name::<NEW_MIN, NEW_MAX>::new_unchecked(self.inner()) }
             }
 
 
