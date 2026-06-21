@@ -55,6 +55,22 @@ macro_rules! impl_int_common {
                 unsafe { $range_t_name::<{ NEW_LOWER }, { NEW_UPPER }>::new_unchecked(self.inner()) }
             }
 
+            pub const fn resize<const NEW_LOWER: $num_t, const NEW_UPPER: $num_t>(self) -> Option<$range_t_name<{ NEW_LOWER }, { NEW_UPPER }>> {
+                match $range_t_name::<NEW_LOWER, NEW_UPPER>::includes(self.inner()) {
+                    true => {
+                        // SAFETY: we just checked the precondition
+                        Some(unsafe { self.resize_unchecked::<NEW_LOWER, NEW_UPPER>() })
+                    },
+                    false => None,
+                }
+            }
+
+            /// # Safety
+            /// TODO
+            pub const unsafe fn resize_unchecked<const NEW_LOWER: $num_t, const NEW_UPPER: $num_t>(self) -> $range_t_name<{ NEW_LOWER }, { NEW_UPPER }> {
+                unsafe { $range_t_name::<NEW_LOWER, NEW_UPPER>::new_unchecked(self.inner()) }
+            }
+
 
             pub const fn saturating_add<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_ADD::<A, X> }, { ::tcm::$num_t::SATURATING_ADD::<B, Y> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_add(other.inner())) }
