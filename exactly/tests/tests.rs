@@ -1,9 +1,9 @@
 #![feature(min_generic_const_args, generic_const_args, generic_const_items)]
 #![allow(incomplete_features)]
 
-use exactly::int::Ri32;
-use exactly::int::Ru32;
-use exactly::int::exact_u32;
+use exactly::Ri32;
+use exactly::Ru32;
+use exactly::exact_u32;
 
 #[test]
 fn range_add() {
