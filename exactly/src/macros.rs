@@ -1,8 +1,11 @@
 macro_rules! impl_int_common {
-    ($([inner_type: $num_t:ident, range_t_name: $range_t_name:ident, exact_fn_name: $exact_fn_name:ident ],)*) => {$(
+    ($([inner_type: $num_t:ident, range_t_name: $range_t_name:ident, range_t_alias: $range_t_alias:ident, exact_fn_name: $exact_fn_name:ident ],)*) => {$(
         #[derive(Debug, Copy, Clone)]
         #[repr(transparent)]
         pub struct $range_t_name<const LOWER: $num_t, const UPPER: $num_t>($num_t);
+
+        #[expect(non_camel_case_types)]
+        pub type $range_t_alias<const LOWER: $num_t, const UPPER: $num_t> = $range_t_name<LOWER, UPPER>;
 
         impl<const A: $num_t, const B: $num_t> $range_t_name<A, B> {
 
