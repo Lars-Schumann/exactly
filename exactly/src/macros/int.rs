@@ -52,6 +52,11 @@ macro_rules! impl_int_common {
                 unsafe { $range_t_name::<{ NEW_LOWER }, { NEW_UPPER }>::new_unchecked(self.inner()) }
             }
 
+
+            pub const fn saturating_add<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_ADD::<LOWER, X> }, { ::tcm::$num_t::SATURATING_ADD::<UPPER, Y> }> {
+                unsafe { $range_t_name::<{ ::tcm::$num_t::SATURATING_ADD::<LOWER, X> }, { ::tcm::$num_t::SATURATING_ADD::<UPPER, Y> }>::new_unchecked(self.inner().saturating_add(other.inner())) }
+            }
+
         }
 
         impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Add<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
