@@ -54,11 +54,11 @@ macro_rules! impl_int_common {
 
 
             pub const fn saturating_add<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_ADD::<LOWER, X> }, { ::tcm::$num_t::SATURATING_ADD::<UPPER, Y> }> {
-                unsafe { $range_t_name::<{ ::tcm::$num_t::SATURATING_ADD::<LOWER, X> }, { ::tcm::$num_t::SATURATING_ADD::<UPPER, Y> }>::new_unchecked(self.inner().saturating_add(other.inner())) }
+                unsafe { $range_t_name::new_unchecked(self.inner().saturating_add(other.inner())) }
             }
 
             pub const fn saturating_sub<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_SUB::<LOWER, Y> }, { ::tcm::$num_t::SATURATING_SUB::<UPPER, X> }> {
-                unsafe { $range_t_name::<{ ::tcm::$num_t::SATURATING_SUB::<LOWER, Y> }, { ::tcm::$num_t::SATURATING_SUB::<UPPER, X> }>::new_unchecked(self.inner().saturating_sub(other.inner())) }
+                unsafe { $range_t_name::new_unchecked(self.inner().saturating_sub(other.inner())) }
             }
 
         }
@@ -88,6 +88,18 @@ pub(crate) use impl_int_common;
 
 macro_rules! impl_int_unsigned {
     ($([inner_type: $num_t:ident, range_t_name: $range_t_name:ident],)*) => {$(
+
+        impl<const LOWER: $num_t, const UPPER: $num_t> $range_t_name<LOWER, UPPER> {
+
+            pub const fn saturating_mul<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_MUL::<LOWER, X> }, { ::tcm::$num_t::SATURATING_MUL::<UPPER, Y> }> {
+                unsafe { $range_t_name::new_unchecked(self.inner().saturating_mul(other.inner())) }
+            }
+
+            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_DIV::<LOWER, Y> }, { ::tcm::$num_t::SATURATING_DIV::<UPPER, X> }> {
+                unsafe { $range_t_name::new_unchecked(self.inner().saturating_div(other.inner())) }
+            }
+
+        }
 
         impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Mul<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
             type Output = $range_t_name<{ ::tcm::$num_t::MUL::<A, X> }, { ::tcm::$num_t::MUL::<B, Y> }>;
