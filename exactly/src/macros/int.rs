@@ -1,5 +1,5 @@
 macro_rules! impl_int_common {
-    ($([inner_type: $num_t:ident, range_type_name: $range_t_name:ident],)*) => {$(
+    ($([inner_type: $num_t:ident, range_t_name: $range_t_name:ident, exact_fn_name: $exact_fn_name:ident],)*) => {$(
         #[derive(Debug, Copy, Clone)]
         #[repr(transparent)]
         pub struct $range_t_name<const LOWER: $num_t, const UPPER: $num_t>($num_t);
@@ -51,6 +51,7 @@ macro_rules! impl_int_common {
                 // SAFETY: we just asserted the precondition
                 unsafe { $range_t_name::<{ NEW_LOWER }, { NEW_UPPER }>::new_unchecked(self.inner()) }
             }
+
         }
 
         impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Add<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
@@ -68,12 +69,16 @@ macro_rules! impl_int_common {
                 unsafe { Self::Output::new_unchecked(self.inner() - rhs.inner()) }
             }
         }
+
+        pub const fn $exact_fn_name<const NUM: $num_t>() -> $range_t_name::<NUM, NUM> {
+            const { $range_t_name::<NUM, NUM>::new(NUM).expect("This should be infallible, please file a bug report.") }
+        }
 )*}
 }
 pub(crate) use impl_int_common;
 
 macro_rules! impl_int_unsigned {
-    ($([inner_type: $num_t:ident, range_type_name: $range_t_name:ident],)*) => {$(
+    ($([inner_type: $num_t:ident, range_t_name: $range_t_name:ident],)*) => {$(
 
         impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Mul<$range_t_name<{ X }, { Y }>> for $range_t_name<{ A }, { B }>{
             type Output = $range_t_name<{ ::tcm::$num_t::MUL::<A, X> }, { ::tcm::$num_t::MUL::<B, Y> }>;
@@ -95,7 +100,7 @@ macro_rules! impl_int_unsigned {
 pub(crate) use impl_int_unsigned;
 
 macro_rules! impl_int_signed {
-    ($([inner_type: $num_t:ident, range_type_name: $range_t_name:ident],)*) => {$(
+    ($([inner_type: $num_t:ident, range_t_name: $range_t_name:ident],)*) => {$(
         impl<const LOWER: $num_t, const UPPER: $num_t> $range_t_name<LOWER, UPPER> {
 
             #[expect(unused)]
