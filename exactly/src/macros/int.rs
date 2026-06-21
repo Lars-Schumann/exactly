@@ -172,6 +172,20 @@ macro_rules! impl_int_signed {
                 .max(B.saturating_mul(X))
                 .max(B.saturating_mul(Y))
             };
+
+            pub(super) type const MIN_SATURATING_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+                    (A.saturating_div(X))
+                .min(A.saturating_div(Y))
+                .min(B.saturating_div(X))
+                .min(B.saturating_div(Y))
+            };
+
+            pub(super) type const MAX_SATURATING_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+                    (A.saturating_div(X))
+                .max(A.saturating_div(Y))
+                .max(B.saturating_div(X))
+                .max(B.saturating_div(Y))
+            };
         }
 
         impl<const A: $num_t, const B: $num_t> $range_t_name<A, B> {
@@ -180,7 +194,7 @@ macro_rules! impl_int_signed {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_mul(other.inner())) }
             }
 
-            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ ::tcm::$num_t::SATURATING_DIV::<A, Y> }, { ::tcm::$num_t::SATURATING_DIV::<B, X> }> {
+            pub const fn saturating_div<const X: $num_t, const Y: $num_t>(self, other: $range_t_name<{ X }, { Y }>) -> $range_t_name<{ $extra_tcm::MIN_SATURATING_DIV_RES::<A, B, X, Y> }, { $extra_tcm::MAX_SATURATING_DIV_RES::<A, B, X, Y> }> {
                 unsafe { $range_t_name::new_unchecked(self.inner().saturating_div(other.inner())) }
             }
         }
