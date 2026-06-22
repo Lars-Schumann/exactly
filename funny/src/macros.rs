@@ -12,6 +12,18 @@ macro_rules! impl_ints {
                 &core::array::from_fn::<$num_t, { ::tcm::usize::MUL::<{ LEN::<A> }, { LEN::<B> }> }, _>(const |i| A[i / B.len()] + B[i % B.len()])
             };
 
+            pub(super) type const SUB<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { ::tcm::usize::MUL::<{ LEN::<A> }, { LEN::<B> }> }, _>(const |i| A[i / B.len()] - B[i % B.len()])
+            };
+
+            pub(super) type const MUL<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { ::tcm::usize::MUL::<{ LEN::<A> }, { LEN::<B> }> }, _>(const |i| A[i / B.len()] * B[i % B.len()])
+            };
+
+            pub(super) type const DIV<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { ::tcm::usize::MUL::<{ LEN::<A> }, { LEN::<B> }> }, _>(const |i| A[i / B.len()] / B[i % B.len()])
+            };
+
             pub(super) type const SORT<const SLICE: &'static[$num_t]>: &[$num_t] = const {
                 let arr: [$num_t; LEN::<SLICE>] = match SLICE.try_into() {
                     Ok(arr) => arr,
@@ -98,19 +110,50 @@ macro_rules! impl_ints {
                 false
             }
 
-            pub const fn add<const OTHER: &'static [$num_t]>(self, other: $wrap_t_name<OTHER>) -> $wrap_t_name<{ $extra_tcm::ADD::<VALUES, OTHER> }> {
-                $wrap_t_name::<{ $extra_tcm::ADD::<VALUES, OTHER> }>(self.0 + other.0)
+            pub const fn inner(self) -> $num_t {
+                self.0
             }
 
             pub const fn sort(self) -> $wrap_t_name<{ $extra_tcm::SORT::<VALUES> }> {
-                $wrap_t_name::<{ $extra_tcm::SORT::<VALUES> }>(self.0)
+                unsafe { $wrap_t_name::new_unchecked(self.inner()) }
             }
 
             pub const fn normalize(self) -> $wrap_t_name<{ $extra_tcm::NORMALIZE::<VALUES> }> {
-                $wrap_t_name::<{ $extra_tcm::NORMALIZE::<VALUES> }>(self.0)
+                unsafe { $wrap_t_name::new_unchecked(self.inner()) }
             }
         }
 
+        impl<const A_VALUES: &'static [$num_t], const B_VALUES: &'static [$num_t]> ::core::ops::Add<$wrap_t_name<B_VALUES>> for $wrap_t_name<A_VALUES> {
+            type Output = $wrap_t_name<{ $extra_tcm::ADD::<{ A_VALUES }, { B_VALUES }> }>;
+
+            fn add(self, rhs: $wrap_t_name<B_VALUES>) -> Self::Output {
+                unsafe { $wrap_t_name::new_unchecked(self.inner() + rhs.inner()) }
+            }
+        }
+
+        impl<const A_VALUES: &'static [$num_t], const B_VALUES: &'static [$num_t]> ::core::ops::Sub<$wrap_t_name<B_VALUES>> for $wrap_t_name<A_VALUES> {
+            type Output = $wrap_t_name<{ $extra_tcm::SUB::<{ A_VALUES }, { B_VALUES }> }>;
+
+            fn sub(self, rhs: $wrap_t_name<B_VALUES>) -> Self::Output {
+                unsafe { $wrap_t_name::new_unchecked(self.inner() - rhs.inner()) }
+            }
+        }
+
+        impl<const A_VALUES: &'static [$num_t], const B_VALUES: &'static [$num_t]> ::core::ops::Mul<$wrap_t_name<B_VALUES>> for $wrap_t_name<A_VALUES> {
+            type Output = $wrap_t_name<{ $extra_tcm::MUL::<{ A_VALUES }, { B_VALUES }> }>;
+
+            fn mul(self, rhs: $wrap_t_name<B_VALUES>) -> Self::Output {
+                unsafe { $wrap_t_name::new_unchecked(self.inner() * rhs.inner()) }
+            }
+        }
+
+        impl<const A_VALUES: &'static [$num_t], const B_VALUES: &'static [$num_t]> ::core::ops::Div<$wrap_t_name<B_VALUES>> for $wrap_t_name<A_VALUES> {
+            type Output = $wrap_t_name<{ $extra_tcm::DIV::<{ A_VALUES }, { B_VALUES }> }>;
+
+            fn div(self, rhs: $wrap_t_name<B_VALUES>) -> Self::Output {
+                unsafe { $wrap_t_name::new_unchecked(self.inner() / rhs.inner()) }
+            }
+        }
 
     )*}
 }
