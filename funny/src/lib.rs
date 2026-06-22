@@ -11,6 +11,7 @@
     maybe_uninit_array_assume_init
 )]
 #![allow(incomplete_features)]
+#![allow(long_running_const_eval)]
 
 mod macros;
 
@@ -38,5 +39,15 @@ mod tests {
 
         let _qux: Wu8<{ const { &[11, 11, 11, 21, 21, 21] } }> = baz.sort();
         let _qox: Wu8<{ const { &[11, 21] } }> = baz.normalize();
+    }
+
+    #[test]
+    fn gee() {
+        let foo: Wu8<{ const { &[1, 1, 1, 2, 2] } }> = Wu8(2);
+        let bar: Wu8<{ const { &[1, 2, 3] } }> = Wu8(2);
+        let baz: Wu8<{ const { &[2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5] } }> =
+            foo.add(bar).sort();
+
+        let _qox: Wu8<{ const { &[2, 3, 4, 5] } }> = baz.normalize();
     }
 }
