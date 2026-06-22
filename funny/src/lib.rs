@@ -23,8 +23,8 @@ mod tests {
 
     #[test]
     fn yee() {
-        let foo: Wu8<{ const { &[1, 2, 3] } }> = Wu8(2);
-        let bar: Wu8<{ const { &[10, 20] } }> = Wu8(10);
+        let foo: Wu8<{ const { &[1, 2, 3] } }> = Wu8::new(2).unwrap();
+        let bar: Wu8<{ const { &[10, 20] } }> = Wu8::new(10).unwrap();
 
         let baz: Wu8<{ const { &[11, 21, 12, 22, 13, 23] } }> = foo.add(bar);
 
@@ -33,8 +33,8 @@ mod tests {
 
     #[test]
     fn tee() {
-        let foo: Wu8<{ const { &[1, 1, 1] } }> = Wu8(2);
-        let bar: Wu8<{ const { &[10, 20] } }> = Wu8(10);
+        let foo: Wu8<{ const { &[1, 1, 1] } }> = Wu8::new(1).unwrap();
+        let bar: Wu8<{ const { &[10, 20] } }> = Wu8::new(10).unwrap();
         let baz: Wu8<{ const { &[11, 21, 11, 21, 11, 21] } }> = foo.add(bar);
 
         let _qux: Wu8<{ const { &[11, 11, 11, 21, 21, 21] } }> = baz.sort();
@@ -43,8 +43,8 @@ mod tests {
 
     #[test]
     fn gee() {
-        let foo: Wu8<{ const { &[1, 1, 1, 2, 2] } }> = Wu8(2);
-        let bar: Wu8<{ const { &[1, 2, 3] } }> = Wu8(2);
+        let foo: Wu8<{ const { &[1, 1, 1, 2, 2] } }> = Wu8::new(2).unwrap();
+        let bar: Wu8<{ const { &[1, 2, 3] } }> = Wu8::new(2).unwrap();
         let baz: Wu8<{ const { &[2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5] } }> =
             foo.add(bar).sort();
 
