@@ -8,8 +8,8 @@ macro_rules! impl_ints {
         mod $extra_tcm {
             pub(super) type const LEN<const SLICE: &'static[$num_t]>: usize = const { SLICE.len()};
 
-            pub(super) type const ADD<const A: &'static[$num_t], const B: &'static[$num_t]>: &[u8] = const {
-                &core::array::from_fn::<u8, { ::tcm::usize::MUL::<{ LEN::<A> }, { LEN::<B> }> }, _>(const |i| A[i / B.len()] + B[i % B.len()])
+            pub(super) type const ADD<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { ::tcm::usize::MUL::<{ LEN::<A> }, { LEN::<B> }> }, _>(const |i| A[i / B.len()] + B[i % B.len()])
             };
 
             pub(super) type const SORT<const SLICE: &'static[$num_t]>: &[$num_t] = const {
