@@ -31,11 +31,8 @@ macro_rules! impl_ints {
                         while i < slice_sorted.len() {
                             let previous = slice_sorted[i - 1];
                             let current = slice_sorted[i];
-                            match previous == current {
-                                true => {},
-                                false => {
-                                    unique_element_count += 1;
-                                }
+                            if previous != current {
+                                unique_element_count += 1;
                             }
                             i += 1;
                         }
@@ -60,12 +57,9 @@ macro_rules! impl_ints {
                         while i < slice_sorted.len() {
                             let previous = slice_sorted[i - 1];
                             let current = slice_sorted[i];
-                            match previous == current {
-                                true => {},
-                                false => {
-                                    unique_count += 1;
-                                    normalized[unique_count - 1] = MU::new(current);
-                                }
+                            if previous != current {
+                                unique_count += 1;
+                                normalized[unique_count - 1] = MU::new(current);
                             }
                             i += 1;
                         }
