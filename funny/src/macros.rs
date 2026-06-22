@@ -20,27 +20,26 @@ macro_rules! impl_ints {
                 &::compile_time_sort::$sort_fn_name(arr)
             };
 
-            pub(super) type const UNIQUE_COUNT<const SLICE: &'static[$num_t]>: usize = const {
-                let sorted = SORT::<SLICE>;
-                match sorted {
+            pub(super) type const UNIQUE_ELEMENT_COUNT<const SLICE: &'static[$num_t]>: usize = const {
+                let slice_sorted = SORT::<SLICE>;
+                match slice_sorted {
                     [] => 0,
-                    [first, tail @ ..] => {
-                        let mut last_seen = *first;
-                        let mut unique_count: usize = 1;
-                        let mut i: usize = 0;
+                    [_, ..] => {
+                        let mut unique_element_count: usize = 1;
+                        let mut i: usize = 1;
 
-                        while i < tail.len(){
-                            let current = tail[i];
-                            match current == last_seen {
+                        while i < slice_sorted.len() {
+                            let past = slice_sorted[i - 1];
+                            let current = slice_sorted[i];
+                            match past == current {
                                 true => {},
                                 false => {
-                                    unique_count += 1;
-                                    last_seen = current;
+                                    unique_element_count += 1;
                                 }
                             }
                             i += 1;
                         }
-                        unique_count
+                        unique_element_count
                     }
                 }
             };
@@ -52,7 +51,7 @@ macro_rules! impl_ints {
                     [] => &[],
                     [first, tail @ ..] => {
 
-                        let mut mu: [MaybeUninit<$num_t>; UNIQUE_COUNT::<SLICE>] = [MaybeUninit::uninit(); UNIQUE_COUNT::<SLICE>];
+                        let mut mu: [MaybeUninit<$num_t>; UNIQUE_ELEMENT_COUNT::<SLICE>] = [MaybeUninit::uninit(); UNIQUE_ELEMENT_COUNT::<SLICE>];
 
                         mu[0] = MaybeUninit::new(*first);
 
