@@ -15,7 +15,7 @@
 
 mod macros;
 
-macros::impl_ints! {[inner_type: u8, wrap_t_name: Wu8, extra_tcm: extra_tcm_u8, sort_fn_name: into_sorted_u8_array],}
+macros::impl_ints! {[inner_type: u8, wrap_t_name: Wu8, range_fn_name: range_u8, extra_tcm: extra_tcm_u8, sort_fn_name: into_sorted_u8_array],}
 
 #[cfg(test)]
 mod tests {
@@ -66,5 +66,13 @@ mod tests {
         let bar: Wu8<{ const { &[1, 2, 3] } }> = Wu8::new(3).unwrap();
 
         let _qox: Wu8<{ const { &[1, 2, 3] } }> = bar * four / four + four - four;
+    }
+
+    #[test]
+    fn six() {
+        let r1: Wu8<{ extra_tcm_u8::RANGE::<0, 255> }> = Wu8::new(2).unwrap();
+        let r2: Wu8<{ extra_tcm_u8::RANGE::<1, 255> }> = Wu8::new(4).unwrap();
+
+        let p: Wu8<{ extra_tcm_u8::RANGE::<0, 255> }> = (r1 / r2).normalize();
     }
 }
