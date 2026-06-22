@@ -29,9 +29,9 @@ macro_rules! impl_ints {
                         let mut i: usize = 1;
 
                         while i < slice_sorted.len() {
-                            let past = slice_sorted[i - 1];
+                            let previous = slice_sorted[i - 1];
                             let current = slice_sorted[i];
-                            match past == current {
+                            match previous == current {
                                 true => {},
                                 false => {
                                     unique_element_count += 1;
@@ -45,33 +45,31 @@ macro_rules! impl_ints {
             };
 
             pub(super) type const NORMALIZE<const SLICE: &'static[$num_t]>: &[$num_t] = const {
-                use core::mem::MaybeUninit;
-                let sorted = SORT::<SLICE>;
-                match sorted {
+                use core::mem::MaybeUninit as MU;
+                let slice_sorted = SORT::<SLICE>;
+                match slice_sorted {
                     [] => &[],
-                    [first, tail @ ..] => {
+                    [first, ..] => {
 
-                        let mut mu: [MaybeUninit<$num_t>; UNIQUE_ELEMENT_COUNT::<SLICE>] = [MaybeUninit::uninit(); UNIQUE_ELEMENT_COUNT::<SLICE>];
+                        let mut normalized: [MU<$num_t>; UNIQUE_ELEMENT_COUNT::<SLICE>] = [MU::uninit(); UNIQUE_ELEMENT_COUNT::<SLICE>];
+                        normalized[0] = MU::new(*first);
 
-                        mu[0] = MaybeUninit::new(*first);
-
-                        let mut last_seen = *first;
                         let mut unique_count: usize = 1;
-                        let mut i: usize = 0;
+                        let mut i: usize = 1;
 
-                        while i < tail.len(){
-                            let current = tail[i];
-                            match current == last_seen {
+                        while i < slice_sorted.len() {
+                            let previous = slice_sorted[i - 1];
+                            let current = slice_sorted[i];
+                            match previous == current {
                                 true => {},
                                 false => {
                                     unique_count += 1;
-                                    mu[unique_count - 1] = MaybeUninit::new(current);
-                                    last_seen = current;
+                                    normalized[unique_count - 1] = MU::new(current);
                                 }
                             }
                             i += 1;
                         }
-                        &unsafe { MaybeUninit::array_assume_init(mu) }
+                        &unsafe { MU::array_assume_init(normalized) }
                     }
                 }
             };
