@@ -1,0 +1,8 @@
+[package]
+name = "funny"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+compile_time_sort = "1.5.1"
+tcm = { path = "../type_const_math", package = "type_const_math" }
