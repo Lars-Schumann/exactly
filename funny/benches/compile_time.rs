@@ -2,11 +2,11 @@
 
 #[cfg(feature = "bench_compile_time")]
 fn main() {
-    use funny::SetU16;
-    use funny::extra_tcm_u16;
+    use funny::SetI32;
+    use funny::extra_tcm_i32;
 
-    let r1: SetU16<{ extra_tcm_u16::RANGE::<0, 131> }> = SetU16::new(1).unwrap();
-    let r2: SetU16<{ extra_tcm_u16::RANGE::<1, 131> }> = SetU16::new(10).unwrap();
+    let r1: SetI32<{ extra_tcm_i32::RANGE::<0, 115> }> = SetI32::new(1).unwrap();
+    let r2: SetI32<{ extra_tcm_i32::RANGE::<1, 115> }> = SetI32::new(10).unwrap();
 
-    let _q /* :SetU16<{ extra_tcm_u16::RANGE::<0, 131> }>*/ = (r1 / r2).normalize();
+    let _q /* :SetI32<{ extra_tcm_i32::RANGE::<0, 115> }>*/ = (r1 / r2).normalize();
 }
