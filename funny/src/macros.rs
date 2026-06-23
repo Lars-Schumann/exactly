@@ -1,11 +1,11 @@
 macro_rules! impl_ints {
-    ($([inner_type: $num_t:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, extra_tcm: $extra_tcm:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
+    ($([inner_type: $num_t:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, type_macro_name: $type_macro_name:ident, extra_tcm: $extra_tcm:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
 
         #[derive(Debug, Copy, Clone,)]
         #[repr(transparent)]
         pub struct $wrap_t_name<const VALUES: &'static [$num_t]>($num_t);
 
-        mod $extra_tcm {
+        pub mod $extra_tcm {
             pub(super) type const LEN<const SLICE: &'static[$num_t]>: usize = const { SLICE.len()};
 
             pub(super) type const ADD<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
@@ -87,7 +87,7 @@ macro_rules! impl_ints {
                 }
             };
 
-            pub(super) type const RANGE<const MIN: $num_t, const MAX: $num_t>: &[$num_t] = const {
+            pub type const RANGE<const MIN: $num_t, const MAX: $num_t>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { RANGE_LENGTH::<MIN, MAX> }, _>(const |i| MIN + i as $num_t)
             };
         }
