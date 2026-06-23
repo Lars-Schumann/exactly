@@ -1,5 +1,5 @@
 {
     "rust-analyzer.cargo.features": [
-        //    "bench_compile_time"
+        // "bench_compile_time"
     ]
 }
