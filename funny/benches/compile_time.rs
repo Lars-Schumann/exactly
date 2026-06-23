@@ -32,7 +32,12 @@ fn main() {
         assert_eq!(z.inner(), 1);
     }
 
-    println!("done!");
+    println!("bench done!");
 }
 
-// 23.3s
+#[cfg(not(feature = "bench_compile_time"))]
+fn main() {
+    println!("bench skipped!")
+}
+
+// 29.5s
