@@ -8,7 +8,8 @@
     const_closures,
     const_array,
     const_convert,
-    maybe_uninit_array_assume_init
+    const_heap,
+    const_destruct
 )]
 #![allow(incomplete_features)]
 #![allow(long_running_const_eval)]

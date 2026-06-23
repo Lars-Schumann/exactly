@@ -32,50 +32,27 @@ macro_rules! impl_ints {
                 &::compile_time_sort::$sort_fn_name(arr)
             };
 
-            pub(super) const UNIQUE_ELEMENT_COUNT<const SLICE: &'static[$num_t]>: usize = const {
-                let slice_sorted = SORT::<SLICE>;
-                match slice_sorted {
-                    [] => 0,
-                    [_, ..] => {
-                        let mut unique_element_count: usize = 1;
-                        let mut i: usize = 1;
-
-                        while i < slice_sorted.len() {
-                            let previous = slice_sorted[i - 1];
-                            let current = slice_sorted[i];
-                            if previous != current {
-                                unique_element_count += 1;
-                            }
-                            i += 1;
-                        }
-                        unique_element_count
-                    }
-                }
-            };
-
             pub(super) const NORMALIZE<const SLICE: &'static[$num_t]>: &[$num_t] = const {
-                use core::mem::MaybeUninit as MU;
                 let slice_sorted = SORT::<SLICE>;
+                let mut normalized: Vec<$num_t> = Vec::new();
+
                 match slice_sorted {
                     [] => &[],
                     [first, ..] => {
 
-                        let mut normalized: [MU<$num_t>; UNIQUE_ELEMENT_COUNT::<SLICE>] = [MU::uninit(); UNIQUE_ELEMENT_COUNT::<SLICE>];
-                        normalized[0] = MU::new(*first);
+                        normalized.push(*first);
 
-                        let mut unique_count: usize = 1;
                         let mut i: usize = 1;
 
                         while i < slice_sorted.len() {
                             let previous = slice_sorted[i - 1];
                             let current = slice_sorted[i];
                             if previous != current {
-                                unique_count += 1;
-                                normalized[unique_count - 1] = MU::new(current);
+                                normalized.push(current)
                             }
                             i += 1;
                         }
-                        &unsafe { MU::array_assume_init(normalized) }
+                        normalized.const_make_global()
                     }
                 }
             };
