@@ -6,25 +6,25 @@ macro_rules! impl_ints {
         pub struct $wrap_t_name<const VALUES: &'static [$num_t]>($num_t);
 
         pub mod $extra_tcm {
-            pub(super) type const LEN<const SLICE: &'static[$num_t]>: usize = const { SLICE.len()};
+            pub(super) const LEN<const SLICE: &'static[$num_t]>: usize = const { SLICE.len()};
 
-            pub(super) type const ADD<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+            pub(super) const ADD<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { ::tcm::usize::MUL::<{ LEN::<A> }, { LEN::<B> }> }, _>(const |i| A[i / B.len()] + B[i % B.len()])
             };
 
-            pub(super) type const SUB<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+            pub(super) const SUB<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { ::tcm::usize::MUL::<{ LEN::<A> }, { LEN::<B> }> }, _>(const |i| A[i / B.len()] - B[i % B.len()])
             };
 
-            pub(super) type const MUL<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+            pub(super) const MUL<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { ::tcm::usize::MUL::<{ LEN::<A> }, { LEN::<B> }> }, _>(const |i| A[i / B.len()] * B[i % B.len()])
             };
 
-            pub(super) type const DIV<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+            pub(super) const DIV<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { ::tcm::usize::MUL::<{ LEN::<A> }, { LEN::<B> }> }, _>(const |i| A[i / B.len()] / B[i % B.len()])
             };
 
-            pub(super) type const SORT<const SLICE: &'static[$num_t]>: &[$num_t] = const {
+            pub(super) const SORT<const SLICE: &'static[$num_t]>: &[$num_t] = const {
                 let arr: [$num_t; LEN::<SLICE>] = match SLICE.try_into() {
                     Ok(arr) => arr,
                     Err(_) => unreachable!()
@@ -32,7 +32,7 @@ macro_rules! impl_ints {
                 &::compile_time_sort::$sort_fn_name(arr)
             };
 
-            pub(super) type const UNIQUE_ELEMENT_COUNT<const SLICE: &'static[$num_t]>: usize = const {
+            pub(super) const UNIQUE_ELEMENT_COUNT<const SLICE: &'static[$num_t]>: usize = const {
                 let slice_sorted = SORT::<SLICE>;
                 match slice_sorted {
                     [] => 0,
@@ -53,7 +53,7 @@ macro_rules! impl_ints {
                 }
             };
 
-            pub(super) type const NORMALIZE<const SLICE: &'static[$num_t]>: &[$num_t] = const {
+            pub(super) const NORMALIZE<const SLICE: &'static[$num_t]>: &[$num_t] = const {
                 use core::mem::MaybeUninit as MU;
                 let slice_sorted = SORT::<SLICE>;
                 match slice_sorted {
@@ -80,14 +80,14 @@ macro_rules! impl_ints {
                 }
             };
 
-            type const RANGE_LENGTH<const MIN: $num_t, const MAX: $num_t>: usize = const {
+            const RANGE_LENGTH<const MIN: $num_t, const MAX: $num_t>: usize = const {
                 match <$num_t as ::core::convert::TryInto<usize>>::try_into(MAX - MIN) {
                     Err(_) => panic!(),
                     Ok(len) => len + 1_usize,
                 }
             };
 
-            pub type const RANGE<const MIN: $num_t, const MAX: $num_t>: &[$num_t] = const {
+            pub const RANGE<const MIN: $num_t, const MAX: $num_t>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { RANGE_LENGTH::<MIN, MAX> }, _>(const |i| MIN + i as $num_t)
             };
         }

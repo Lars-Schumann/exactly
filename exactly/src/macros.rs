@@ -9,8 +9,8 @@ macro_rules! impl_int_common {
 
         impl<const A: $num_t, const B: $num_t> $range_t_name<A, B> {
 
-            pub type const MIN: $num_t = A;
-            pub type const MAX: $num_t = B;
+            pub const MIN: $num_t = A;
+            pub const MAX: $num_t = B;
 
             const __ASSERT_RANGE_NON_EMPTY: () = const { assert!(Self::MIN <= Self::MAX) };
 
@@ -82,7 +82,7 @@ macro_rules! impl_int_common {
 
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Add<$range_t_name<X, Y>> for $range_t_name<A, B>{
+        const impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> ::core::ops::Add<$range_t_name<X, Y>> for $range_t_name<A, B>{
             type Output = $range_t_name<{ ::tcm::$num_t::ADD::<A, X> }, { ::tcm::$num_t::ADD::<B, Y> }>;
 
             fn add(self, rhs: $range_t_name<X, Y>) -> Self::Output {
@@ -90,7 +90,7 @@ macro_rules! impl_int_common {
             }
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Sub<$range_t_name<X, Y>> for $range_t_name<A, B>{
+        const impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> ::core::ops::Sub<$range_t_name<X, Y>> for $range_t_name<A, B>{
             type Output = $range_t_name<{ ::tcm::$num_t::SUB::<A, Y> }, { ::tcm::$num_t::SUB::<B, X> }>;
 
             fn sub(self, rhs: $range_t_name<X, Y>) -> Self::Output {
@@ -120,7 +120,7 @@ macro_rules! impl_int_unsigned {
 
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Mul<$range_t_name<X, Y>> for $range_t_name<A, B>{
+        const impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> ::core::ops::Mul<$range_t_name<X, Y>> for $range_t_name<A, B>{
             type Output = $range_t_name<{ ::tcm::$num_t::MUL::<A, X> }, { ::tcm::$num_t::MUL::<B, Y> }>;
 
             fn mul(self, rhs: $range_t_name<X, Y>) -> Self::Output {
@@ -128,7 +128,7 @@ macro_rules! impl_int_unsigned {
             }
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Div<$range_t_name<X, Y>> for $range_t_name<A, B>{
+        const impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> ::core::ops::Div<$range_t_name<X, Y>> for $range_t_name<A, B>{
             type Output = $range_t_name<{ ::tcm::$num_t::DIV::<A, Y> }, { ::tcm::$num_t::DIV::<B, X> }>;
 
             fn div(self, rhs: $range_t_name<X, Y>) -> Self::Output {
@@ -144,21 +144,21 @@ macro_rules! impl_int_signed {
 
         mod $extra_tcm {
 
-            pub(super) type const MIN_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+            pub(super) const MIN_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
                     (A * X)
                 .min(A * Y)
                 .min(B * X)
                 .min(B * Y)
             };
 
-            pub(super) type const MAX_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+            pub(super) const MAX_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
                     (A * X)
                 .max(A * Y)
                 .max(B * X)
                 .max(B * Y)
             };
 
-            pub(super) type const MIN_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+            pub(super) const MIN_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
                 if (X <= 0 && 0 <= Y) {
                     panic!("potential division by 0")
                 }
@@ -168,7 +168,7 @@ macro_rules! impl_int_signed {
                 .min(B / Y)
             };
 
-            pub(super) type const MAX_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+            pub(super) const MAX_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
                 if (X <= 0 && 0 <= Y) {
                     panic!("potential division by 0")
                 }
@@ -178,28 +178,28 @@ macro_rules! impl_int_signed {
                 .max(B / Y)
             };
 
-            pub(super) type const MIN_SATURATING_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+            pub(super) const MIN_SATURATING_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
                     (A.saturating_mul(X))
                 .min(A.saturating_mul(Y))
                 .min(B.saturating_mul(X))
                 .min(B.saturating_mul(Y))
             };
 
-            pub(super) type const MAX_SATURATING_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+            pub(super) const MAX_SATURATING_MUL_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
                     (A.saturating_mul(X))
                 .max(A.saturating_mul(Y))
                 .max(B.saturating_mul(X))
                 .max(B.saturating_mul(Y))
             };
 
-            pub(super) type const MIN_SATURATING_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+            pub(super) const MIN_SATURATING_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
                     (A.saturating_div(X))
                 .min(A.saturating_div(Y))
                 .min(B.saturating_div(X))
                 .min(B.saturating_div(Y))
             };
 
-            pub(super) type const MAX_SATURATING_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
+            pub(super) const MAX_SATURATING_DIV_RES<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t>: $num_t = const {
                     (A.saturating_div(X))
                 .max(A.saturating_div(Y))
                 .max(B.saturating_div(X))
@@ -218,7 +218,7 @@ macro_rules! impl_int_signed {
             }
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Mul<$range_t_name<X, Y>> for $range_t_name<{ A }, { B }>{
+        const impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> ::core::ops::Mul<$range_t_name<X, Y>> for $range_t_name<{ A }, { B }>{
             type Output = $range_t_name<{ $extra_tcm::MIN_MUL_RES::<A, B, X, Y> }, { $extra_tcm::MAX_MUL_RES::<A, B, X, Y> }>;
 
             fn mul(self, rhs: $range_t_name<X, Y>) -> Self::Output {
@@ -226,7 +226,7 @@ macro_rules! impl_int_signed {
             }
         }
 
-        impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> const ::core::ops::Div<$range_t_name<X, Y>> for $range_t_name<{ A }, { B }>{
+        const impl<const A: $num_t, const B: $num_t, const X: $num_t, const Y: $num_t> ::core::ops::Div<$range_t_name<X, Y>> for $range_t_name<{ A }, { B }>{
             type Output = $range_t_name<{ $extra_tcm::MIN_DIV_RES::<A, B, X, Y> }, { $extra_tcm::MAX_DIV_RES::<A, B, X, Y> }>;
 
             fn div(self, rhs: $range_t_name<X, Y>) -> Self::Output {
