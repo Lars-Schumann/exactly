@@ -24,7 +24,6 @@ name = "funny"
 version = "0.1.0"
 dependencies = [
  "compile_time_sort",
- "type_const_math",
 ]
 
 [[package]]
