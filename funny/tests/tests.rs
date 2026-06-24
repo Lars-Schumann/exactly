@@ -6,49 +6,49 @@ mod tests {
     use funny::SetU16;
     use funny::extra_tcm_u16;
 
+    #[test]
     fn one() {
-        let foo: SetU8<{ const { &[1, 2, 3] } }> = SetU8::new(2).unwrap();
-        let bar: SetU8<{ const { &[10, 20] } }> = SetU8::new(10).unwrap();
-        let baz: SetU8<{ const { &[11, 21, 12, 22, 13, 23] } }> = foo + bar;
+        let foo: SetU8<{ &[1, 2, 3] }> = SetU8::new(2).unwrap();
+        let bar: SetU8<{ &[10, 20] }> = SetU8::new(10).unwrap();
+        let _baz: SetU8<{ &[11, 21, 12, 22, 13, 23] }> = foo + bar;
 
-        let _qux: SetU8<{ const { &[11, 12, 13, 21, 22, 23] } }> = baz.sort();
+        let _qux: SetU8<{ &[11, 12, 13, 21, 22, 23] }> = _baz.sort();
     }
 
     #[test]
     fn two() {
-        let foo: SetU8<{ const { &[1, 1, 1] } }> = SetU8::new(1).unwrap();
-        let bar: SetU8<{ const { &[10, 20] } }> = SetU8::new(10).unwrap();
-        let baz: SetU8<{ const { &[11, 21, 11, 21, 11, 21] } }> = foo + bar;
+        let foo: SetU8<{ &[1, 1, 1] }> = SetU8::new(1).unwrap();
+        let bar: SetU8<{ &[10, 20] }> = SetU8::new(10).unwrap();
+        let baz: SetU8<{ &[11, 21, 11, 21, 11, 21] }> = foo + bar;
 
-        let _qux: SetU8<{ const { &[11, 11, 11, 21, 21, 21] } }> = baz.sort();
-        let _qox: SetU8<{ const { &[11, 21] } }> = baz.normalize();
+        let _qux: SetU8<{ &[11, 11, 11, 21, 21, 21] }> = baz.sort();
+        let _qox: SetU8<{ &[11, 21] }> = baz.normalize();
     }
 
     #[test]
     fn three() {
-        let foo: SetU8<{ const { &[1, 1, 1, 2, 2] } }> = SetU8::new(2).unwrap();
-        let bar: SetU8<{ const { &[1, 2, 3] } }> = SetU8::new(2).unwrap();
-        let baz: SetU8<{ const { &[2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5] } }> =
-            (foo + bar).sort();
+        let foo: SetU8<{ &[1, 1, 1, 2, 2] }> = SetU8::new(2).unwrap();
+        let bar: SetU8<{ &[1, 2, 3] }> = SetU8::new(2).unwrap();
+        let baz: SetU8<{ &[2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5] }> = (foo + bar).sort();
 
-        let _qox: SetU8<{ const { &[2, 3, 4, 5] } }> = baz.normalize();
+        let _qox: SetU8<{ &[2, 3, 4, 5] }> = baz.normalize();
     }
 
     #[test]
     fn four() {
-        let foo: SetU8<{ const { &[2, 4] } }> = SetU8::new(2).unwrap();
-        let bar: SetU8<{ const { &[1, 2, 3] } }> = SetU8::new(3).unwrap();
-        let baz: SetU8<{ const { &[2, 4, 4, 6, 8, 12] } }> = (foo * bar).sort();
+        let foo: SetU8<{ &[2, 4] }> = SetU8::new(2).unwrap();
+        let bar: SetU8<{ &[1, 2, 3] }> = SetU8::new(3).unwrap();
+        let baz: SetU8<{ &[2, 4, 4, 6, 8, 12] }> = (foo * bar).sort();
 
-        let _qox: SetU8<{ const { &[2, 4, 6, 8, 12] } }> = baz.normalize();
+        let _qox: SetU8<{ &[2, 4, 6, 8, 12] }> = baz.normalize();
     }
 
     #[test]
     fn five() {
-        let a: SetI8<{ const { &[2, 4] } }> = SetI8::new(4).unwrap();
-        let b: SetI8<{ const { &[1, 3] } }> = SetI8::new(1).unwrap();
+        let a: SetI8<{ &[2, 4] }> = SetI8::new(4).unwrap();
+        let b: SetI8<{ &[1, 3] }> = SetI8::new(1).unwrap();
 
-        let _c: SetI8<{ const { &[3, 5, 7] } }> = (a + b).normalize();
+        let _c: SetI8<{ &[3, 5, 7] }> = (a + b).normalize();
     }
 
     #[test]
@@ -58,12 +58,10 @@ mod tests {
 
         let _q: SetU16<
             {
-                const {
-                    &[
-                        0_u16, 10_u16, 11_u16, 12_u16, 20_u16, 22_u16, 24_u16, 30_u16, 33_u16,
-                        36_u16, 40_u16, 44_u16, 48_u16,
-                    ]
-                }
+                &[
+                    0_u16, 10_u16, 11_u16, 12_u16, 20_u16, 22_u16, 24_u16, 30_u16, 33_u16, 36_u16,
+                    40_u16, 44_u16, 48_u16,
+                ]
             },
         > = (r1 * r2).normalize();
     }
