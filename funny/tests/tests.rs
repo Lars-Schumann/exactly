@@ -57,10 +57,7 @@ mod tests {
         let r1: SetU16<{ extra_tcm_u16::RANGE::<0, 4> }> = SetU16::new(1).unwrap();
         let r2: SetU16<{ extra_tcm_u16::RANGE::<10, 12> }> = SetU16::new(10).unwrap();
 
-        let _q: SetU16![
-            0_u16, 10_u16, 11_u16, 12_u16, 20_u16, 22_u16, 24_u16, 30_u16, 33_u16, 36_u16, 40_u16,
-            44_u16, 48_u16,
-        ] = (r1 * r2).normalize();
+        let _q: SetU16![0, 10, 11, 12, 20, 22, 24, 30, 33, 36, 40, 44, 48] = (r1 * r2).normalize();
     }
 
     #[test]
