@@ -1,5 +1,5 @@
 macro_rules! impl_ints {
-    ($([inner_type: $num_t:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, type_macro_name: $type_macro_name:ident, extra_tcm: $extra_tcm:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
+    (the_dolla: $d:tt, $([inner_type: $num_t:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, type_macro_name: $type_macro_name:ident, extra_tcm: $extra_tcm:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
 
         #[derive(Debug, Copy, Clone,)]
         #[repr(transparent)]
@@ -64,6 +64,16 @@ macro_rules! impl_ints {
 
             pub const RANGE<const MIN: $num_t, const MAX: $num_t>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { RANGE_LENGTH::<MIN, MAX> }, _>(const |i| MIN + i as $num_t)
+            };
+
+            pub(crate) const SLICEINATOR<const N: $num_t>: &[$num_t] = const {
+                &[N]
+            };
+        }
+
+        impl $wrap_t_name<{ const { &[] } }> {
+            pub const NEW<const NUM: $num_t>: $wrap_t_name<{ $extra_tcm::SLICEINATOR::<NUM> }> = const {
+                unsafe { ::core::mem::transmute(NUM) }
             };
         }
 
@@ -139,6 +149,13 @@ macro_rules! impl_ints {
             fn div(self, rhs: $wrap_t_name<B_SET>) -> Self::Output {
                 unsafe { $wrap_t_name::new_unchecked(self.inner() / rhs.inner()) }
             }
+        }
+
+        #[macro_export]
+        macro_rules! $wrap_t_name {
+            ($d($elem:expr),+ $d(,)?) => {
+                $d crate::$wrap_t_name<{ &[$d($elem, )+] }>
+            };
         }
 
     )*}
