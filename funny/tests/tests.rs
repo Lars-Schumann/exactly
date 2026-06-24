@@ -5,7 +5,7 @@ mod tests {
     use funny::SetU8;
 
     use funny::SetU16;
-    use funny::extra_tcm_u16;
+    use funny::set_u16;
 
     #[test]
     fn one() {
@@ -54,8 +54,8 @@ mod tests {
 
     #[test]
     fn huge() {
-        let r1: SetU16<{ extra_tcm_u16::RANGE::<0, 4> }> = SetU16::new(1).unwrap();
-        let r2: SetU16<{ extra_tcm_u16::RANGE::<10, 12> }> = SetU16::new(10).unwrap();
+        let r1: SetU16<{ set_u16::RANGE::<0, 4> }> = SetU16::new(1).unwrap();
+        let r2: SetU16<{ set_u16::RANGE::<10, 12> }> = SetU16::new(10).unwrap();
 
         let _q: SetU16![0, 10, 11, 12, 20, 22, 24, 30, 33, 36, 40, 44, 48] = (r1 * r2).normalize();
     }

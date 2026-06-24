@@ -1,30 +1,26 @@
 macro_rules! impl_ints {
-    (the_dolla: $d:tt, $([inner_type: $num_t:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, type_macro_name: $type_macro_name:ident, extra_tcm: $extra_tcm:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
+    (the_dolla: $d:tt, $([inner_type: $num_t:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, type_macro_name: $type_macro_name:ident, extra_mod: $extra_mod:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
 
         #[derive(Debug, Copy, Clone,)]
         #[repr(transparent)]
         pub struct $wrap_t_name<const SET: &'static [$num_t]>($num_t);
 
-        pub mod $extra_tcm {
+        pub mod $extra_mod {
             const LEN<const SET: &'static[$num_t]>: usize = const { SET.len()};
             const PRODUCT_OF_LENGTHS<const A: &'static[$num_t], const B: &'static[$num_t]>: usize = const { A.len() * B.len() };
 
             pub(super) const ADD<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { PRODUCT_OF_LENGTHS::<A, B> }, _>(const |i| A[i / B.len()] + B[i % B.len()])
             };
-
             pub(super) const SUB<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { PRODUCT_OF_LENGTHS::<A, B> }, _>(const |i| A[i / B.len()] - B[i % B.len()])
             };
-
             pub(super) const MUL<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { PRODUCT_OF_LENGTHS::<A, B> }, _>(const |i| A[i / B.len()] * B[i % B.len()])
             };
-
             pub(super) const DIV<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { PRODUCT_OF_LENGTHS::<A, B> }, _>(const |i| A[i / B.len()] / B[i % B.len()])
             };
-
             pub(super) const SORT<const SET: &'static[$num_t]>: &[$num_t] = const {
                 let arr: [$num_t; LEN::<SET>] = match SET.try_into() {
                     Ok(arr) => arr,
@@ -32,7 +28,6 @@ macro_rules! impl_ints {
                 };
                 &::compile_time_sort::$sort_fn_name(arr)
             };
-
             pub(super) const NORMALIZE<const SET: &'static[$num_t]>: &[$num_t] = const { 'out: {
                 let set_sorted = SORT::<SET>;
                 let mut normalized: Vec<$num_t> = Vec::new();
@@ -72,7 +67,7 @@ macro_rules! impl_ints {
         }
 
         impl $wrap_t_name<{ const { &[] } }> {
-            pub const NEW<const NUM: $num_t>: $wrap_t_name<{ $extra_tcm::SLICEINATOR::<NUM> }> = const {
+            pub const NEW<const NUM: $num_t>: $wrap_t_name<{ $extra_mod::SLICEINATOR::<NUM> }> = const {
                 unsafe { ::core::mem::transmute(NUM) }
             };
         }
@@ -110,17 +105,17 @@ macro_rules! impl_ints {
                 self.0
             }
 
-            pub const fn sort(self) -> $wrap_t_name<{ $extra_tcm::SORT::<SET> }> {
+            pub const fn sort(self) -> $wrap_t_name<{ $extra_mod::SORT::<SET> }> {
                 unsafe { $wrap_t_name::new_unchecked(self.inner()) }
             }
 
-            pub const fn normalize(self) -> $wrap_t_name<{ $extra_tcm::NORMALIZE::<SET> }> {
+            pub const fn normalize(self) -> $wrap_t_name<{ $extra_mod::NORMALIZE::<SET> }> {
                 unsafe { $wrap_t_name::new_unchecked(self.inner()) }
             }
         }
 
         impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> ::core::ops::Add<$wrap_t_name<B_SET>> for $wrap_t_name<A_SET> {
-            type Output = $wrap_t_name<{ $extra_tcm::ADD::<{ A_SET }, { B_SET }> }>;
+            type Output = $wrap_t_name<{ $extra_mod::ADD::<{ A_SET }, { B_SET }> }>;
 
             fn add(self, rhs: $wrap_t_name<B_SET>) -> Self::Output {
                 unsafe { $wrap_t_name::new_unchecked(self.inner() + rhs.inner()) }
@@ -128,7 +123,7 @@ macro_rules! impl_ints {
         }
 
         impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> ::core::ops::Sub<$wrap_t_name<B_SET>> for $wrap_t_name<A_SET> {
-            type Output = $wrap_t_name<{ $extra_tcm::SUB::<{ A_SET }, { B_SET }> }>;
+            type Output = $wrap_t_name<{ $extra_mod::SUB::<{ A_SET }, { B_SET }> }>;
 
             fn sub(self, rhs: $wrap_t_name<B_SET>) -> Self::Output {
                 unsafe { $wrap_t_name::new_unchecked(self.inner() - rhs.inner()) }
@@ -136,7 +131,7 @@ macro_rules! impl_ints {
         }
 
         impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> ::core::ops::Mul<$wrap_t_name<B_SET>> for $wrap_t_name<A_SET> {
-            type Output = $wrap_t_name<{ $extra_tcm::MUL::<{ A_SET }, { B_SET }> }>;
+            type Output = $wrap_t_name<{ $extra_mod::MUL::<{ A_SET }, { B_SET }> }>;
 
             fn mul(self, rhs: $wrap_t_name<B_SET>) -> Self::Output {
                 unsafe { $wrap_t_name::new_unchecked(self.inner() * rhs.inner()) }
@@ -144,7 +139,7 @@ macro_rules! impl_ints {
         }
 
         impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> ::core::ops::Div<$wrap_t_name<B_SET>> for $wrap_t_name<A_SET> {
-            type Output = $wrap_t_name<{ $extra_tcm::DIV::<{ A_SET }, { B_SET }> }>;
+            type Output = $wrap_t_name<{ $extra_mod::DIV::<{ A_SET }, { B_SET }> }>;
 
             fn div(self, rhs: $wrap_t_name<B_SET>) -> Self::Output {
                 unsafe { $wrap_t_name::new_unchecked(self.inner() / rhs.inner()) }
