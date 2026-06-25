@@ -64,6 +64,22 @@ macro_rules! impl_ints {
             pub(crate) const SLICEINATOR<const N: $num_t>: &[$num_t] = const {
                 &[N]
             };
+
+            pub const UNION<const SETS: &'static [&'static [$num_t]]>: &[$num_t] = const {
+                let mut onion: Vec<$num_t> = Vec::new();
+                let mut i: usize = 0;
+
+                while i < SETS.len() {
+                    let mut j: usize = 0;
+                    while j < SETS[i].len() {
+                        onion.push(SETS[i][j]);
+                        j += 1;
+                    }
+                    i += 1;
+                }
+
+                onion.const_make_global()
+            };
         }
 
         impl $wrap_t_name<{ const { &[] } }> {
