@@ -1,12 +1,7 @@
 #[cfg(not(feature = "bench_compile_time"))]
 mod tests {
 
-    use funny::SetI8;
-    use funny::SetU8;
-    use funny::set_u8;
-
-    use funny::SetU16;
-    use funny::set_u16;
+    use funny::*;
 
     #[test]
     fn one() {
@@ -62,13 +57,14 @@ mod tests {
     }
 
     #[test]
-    fn hug2e() {
-        let r1: SetU8![4] = SetU8::NEW::<4>;
+    fn bleh() {
+        let _r1: SetU8![4] = SetU8::NEW::<4>;
     }
 
     #[test]
     fn onion() {
-        let r1: SetU8<{ set_u8::UNION::<{ &[set_u8::RANGE::<0, 2>, set_u8::RANGE::<4, 5>] }> }> =
-            SetU8::<{ &[0, 1, 2, 4, 5] }>::new(2).unwrap();
+        let _r1: SetU32<
+            { set_u32::UNION::<{ &[set_u32::RANGE::<0, 2>, set_u32::RANGE::<4, 5>] }> },
+        > = SetU32::<{ &[0, 1, 2, 4, 5] }>::new(2).unwrap();
     }
 }
