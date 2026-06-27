@@ -1,7 +1,7 @@
 #[cfg(not(feature = "bench_compile_time"))]
 mod tests {
 
-    use funny::*;
+    use exactly::*;
 
     #[test]
     fn one() {
@@ -64,14 +64,15 @@ mod tests {
 
     #[test]
     fn onion() {
-        use funny::set_u32::*;
+        use set_u32::{Range, Union};
+
         let _r1: SetU32![Union![Range![0..=2], Range![4..=5]]] =
             <SetU32![0, 1, 2, 4, 5]>::new(2).unwrap();
     }
 
     #[test]
     fn onion2() {
-        use funny::set_u32::*;
+        use set_u32::{Range, Union};
 
         let _r1: SetU32![Union![Range![0..=2], Range![4..=5]]] =
             <SetU32![0, 1, 2, 4, 5]>::new(2).unwrap();

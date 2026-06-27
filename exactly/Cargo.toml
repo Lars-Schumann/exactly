@@ -1,7 +1,0 @@
-[package]
-name = "exactly"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-tcm = { path = "../type_const_math", package = "type_const_math" }

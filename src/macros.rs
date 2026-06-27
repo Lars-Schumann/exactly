@@ -113,7 +113,7 @@ macro_rules! impl_ints {
             //     unsafe { std::slice::from_raw_parts(core::intrinsics::const_make_global(x2 as _) as _, n)}
             // };
 
-            #[cfg_attr(doc, doc_hidden)]
+            #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, union) } {
                 ($d($set:expr),+ $d(,)?) => {
@@ -122,7 +122,7 @@ macro_rules! impl_ints {
             }
             pub use ${ concat($private_macro_prefix, union) } as Union;
 
-            #[cfg_attr(doc, doc_hidden)]
+            #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, range) } {
                 ($start:literal..$end:literal) => {
