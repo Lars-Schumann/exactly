@@ -50,27 +50,22 @@ macro_rules! impl_ints {
                 normalized.const_make_global()
             }};
 
-            const RANGE_LENGTH<const START: $num_t, const END: $num_t>: usize = const {
-                match <$num_t as ::core::convert::TryInto<usize>>::try_into(END - START) {
+            const RANGE_LENGTH_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: usize = const {
+                match <$num_t as ::core::convert::TryInto<usize>>::try_into(MAX.strict_sub(MIN)) {
                     Err(_) => panic!(),
-                    Ok(len) => len,
+                    Ok(len) => len.strict_add(usize::from(IS_INCLUSIVE)),
                 }
             };
 
-            pub const RANGE<const START: $num_t, const END: $num_t>: &[$num_t] = const {
-                &core::array::from_fn::<$num_t, { RANGE_LENGTH::<START, END> }, _>(const |i| START + i as $num_t)
+            const RANGE_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { RANGE_LENGTH_HELPER::<MIN, MAX, IS_INCLUSIVE> }, _>(const |i| MIN + i as $num_t)
             };
 
-            const RANGE_INCLUSIVE_LENGTH<const START: $num_t, const LAST: $num_t>: usize = const {
-                match <$num_t as ::core::convert::TryInto<usize>>::try_into(LAST - START) {
-                    Err(_) => panic!(),
-                    Ok(len) => len + 1_usize,
-                }
-            };
+            pub const RANGE<const START: $num_t, const END: $num_t>: &[$num_t] = RANGE_HELPER::<START, END, false>;
+            pub const RANGE_FROM<const START: $num_t>: &[$num_t] = RANGE_HELPER::<START, { $num_t::MAX }, true>;
+            pub const RANGE_INCLUSIVE<const START: $num_t, const LAST: $num_t>: &[$num_t] = RANGE_HELPER::<START, LAST, true>;
 
-            pub const RANGE_INCLUSIVE<const START: $num_t, const LAST: $num_t>: &[$num_t] = const {
-                &core::array::from_fn::<$num_t, { RANGE_INCLUSIVE_LENGTH::<START, LAST> }, _>(const |i| START + i as $num_t)
-            };
+
 
             pub(crate) const SLICEINATOR<const N: $num_t>: &[$num_t] = const {
                 &[N]
