@@ -92,27 +92,6 @@ macro_rules! impl_ints {
                 onion.const_make_global()
             };
 
-            // TODO: make this less ugly
-            // pub const UNION2<const SETS: &'static [&'static [$num_t]]>: &[$num_t] = const {
-            //     let mut n = 0;
-            //     let mut i: usize = 0;
-            //     while i < SETS.len() {
-            //         n += SETS[i].len();
-            //         i += 1
-            //     }
-            //     let mut x = unsafe { core::intrinsics::const_allocate(std::mem::size_of::<$num_t>() * n, std::mem::align_of::<$num_t>())}.cast::<$num_t>();
-            //     let x2 = x;
-            //     let mut i: usize = 0;
-            //     while i < SETS.len() {
-            //         unsafe {
-            //             x.copy_from_nonoverlapping(SETS[i].as_ptr(), SETS[i].len()) ;
-            //             x =   x.add(SETS[i].len())
-            //         };
-            //         i += 1
-            //     }
-            //     unsafe { std::slice::from_raw_parts(core::intrinsics::const_make_global(x2 as _) as _, n)}
-            // };
-
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, union) } {
