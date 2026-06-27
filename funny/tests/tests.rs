@@ -58,7 +58,7 @@ mod tests {
 
     #[test]
     fn bleh() {
-        let _r1: SetU8![4] = SetU8::NEW::<4>;
+        let _r1: SetU8<{ &[4] }> = SetU8::NEW::<4>;
     }
 
     #[test]
@@ -66,5 +66,13 @@ mod tests {
         let _r1: SetU32<
             { set_u32::UNION::<{ &[set_u32::RANGE::<0, 2>, set_u32::RANGE::<4, 5>] }> },
         > = SetU32::<{ &[0, 1, 2, 4, 5] }>::new(2).unwrap();
+    }
+
+    #[test]
+    fn onion2() {
+        use funny::set_u32::*;
+
+        let _r1: SetU32![Union![RANGE::<0, 2>, RANGE::<4, 5>]] =
+            <SetU32![0, 1, 2, 4, 5]>::new(2).unwrap();
     }
 }

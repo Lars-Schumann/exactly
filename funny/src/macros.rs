@@ -1,5 +1,5 @@
 macro_rules! impl_ints {
-    (the_dolla: $d:tt, $([inner_type: $num_t:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, type_macro_name: $type_macro_name:ident, extra_mod: $extra_mod:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
+    (the_dolla: $d:tt, $([inner_type: $num_t:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
 
         #[derive(Debug, Copy, Clone,)]
         #[repr(transparent)]
@@ -50,7 +50,7 @@ macro_rules! impl_ints {
                 normalized.const_make_global()
             }};
 
-            const RANGE_LENGTH<const MIN: $num_t, const MAX: $num_t>: usize = const {
+            const RANGE_INCLUSIVE_LENGTH<const MIN: $num_t, const MAX: $num_t>: usize = const {
                 match <$num_t as ::core::convert::TryInto<usize>>::try_into(MAX - MIN) {
                     Err(_) => panic!(),
                     Ok(len) => len + 1_usize,
@@ -58,7 +58,7 @@ macro_rules! impl_ints {
             };
 
             pub const RANGE<const MIN: $num_t, const MAX: $num_t>: &[$num_t] = const {
-                &core::array::from_fn::<$num_t, { RANGE_LENGTH::<MIN, MAX> }, _>(const |i| MIN + i as $num_t)
+                &core::array::from_fn::<$num_t, { RANGE_INCLUSIVE_LENGTH::<MIN, MAX> }, _>(const |i| MIN + i as $num_t)
             };
 
             pub(crate) const SLICEINATOR<const N: $num_t>: &[$num_t] = const {
@@ -101,10 +101,20 @@ macro_rules! impl_ints {
             //     }
             //     unsafe { std::slice::from_raw_parts(core::intrinsics::const_make_global(x2 as _) as _, n)}
             // };
+
+            #[cfg_attr(doc, doc_hidden)]
+            #[macro_export]
+            macro_rules! ${ concat($private_macro_prefix, union) } {
+                ($d($set:expr),+ $d(,)?) => {
+                    $d crate::$extra_mod::UNION::<{ &[$d($set, )+] }>
+                };
+            }
+            pub use ${ concat($private_macro_prefix, union) } as Union;
         }
 
         impl $wrap_t_name<{ const { &[] } }> {
             pub const NEW<const NUM: $num_t>: $wrap_t_name<{ $extra_mod::SLICEINATOR::<NUM> }> = const {
+                // TODO this is fucked up
                 unsafe { ::core::mem::transmute(NUM) }
             };
         }
@@ -185,8 +195,11 @@ macro_rules! impl_ints {
 
         #[macro_export]
         macro_rules! $wrap_t_name {
+            ($set:expr) => {
+                $d crate::$wrap_t_name::<{ $set }>
+            };
             ($d($elem:expr),+ $d(,)?) => {
-                $d crate::$wrap_t_name<{ &[$d($elem, )+] }>
+                $d crate::$wrap_t_name::<{ &[$d($elem, )+] }>
             };
         }
 
