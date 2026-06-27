@@ -50,6 +50,17 @@ macro_rules! impl_ints {
                 normalized.const_make_global()
             }};
 
+            const RANGE_LENGTH<const MIN: $num_t, const MAX: $num_t>: usize = const {
+                match <$num_t as ::core::convert::TryInto<usize>>::try_into(MAX - MIN) {
+                    Err(_) => panic!(),
+                    Ok(len) => len,
+                }
+            };
+
+            pub const RANGE<const MIN: $num_t, const MAX: $num_t>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { RANGE_LENGTH::<MIN, MAX> }, _>(const |i| MIN + i as $num_t)
+            };
+
             const RANGE_INCLUSIVE_LENGTH<const MIN: $num_t, const MAX: $num_t>: usize = const {
                 match <$num_t as ::core::convert::TryInto<usize>>::try_into(MAX - MIN) {
                     Err(_) => panic!(),
@@ -57,7 +68,7 @@ macro_rules! impl_ints {
                 }
             };
 
-            pub const RANGE<const MIN: $num_t, const MAX: $num_t>: &[$num_t] = const {
+            pub const RANGE_INCLUSIVE<const MIN: $num_t, const MAX: $num_t>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { RANGE_INCLUSIVE_LENGTH::<MIN, MAX> }, _>(const |i| MIN + i as $num_t)
             };
 
@@ -110,6 +121,18 @@ macro_rules! impl_ints {
                 };
             }
             pub use ${ concat($private_macro_prefix, union) } as Union;
+
+            #[cfg_attr(doc, doc_hidden)]
+            #[macro_export]
+            macro_rules! ${ concat($private_macro_prefix, range) } {
+                ($start:literal..$end:literal) => {
+                    $d crate::$extra_mod::RANGE::<$start, $end>
+                };
+                ($start:literal..=$end:literal) => {
+                    $d crate::$extra_mod::RANGE_INCLUSIVE::<$start, $end>
+                };
+            }
+            pub use ${ concat($private_macro_prefix, range) } as Range;
         }
 
         impl $wrap_t_name<{ const { &[] } }> {

@@ -50,8 +50,9 @@ mod tests {
 
     #[test]
     fn huge() {
-        let r1: SetU16<{ set_u16::RANGE::<0, 4> }> = SetU16::new(1).unwrap();
-        let r2: SetU16<{ set_u16::RANGE::<10, 12> }> = SetU16::new(10).unwrap();
+        use set_u16::*;
+        let r1: SetU16![Range![0..=4]] = SetU16::new(1).unwrap();
+        let r2: SetU16![Range![10..=12]] = SetU16::new(10).unwrap();
 
         let _q: SetU16![0, 10, 11, 12, 20, 22, 24, 30, 33, 36, 40, 44, 48] = (r1 * r2).normalize();
     }
@@ -63,16 +64,16 @@ mod tests {
 
     #[test]
     fn onion() {
-        let _r1: SetU32<
-            { set_u32::UNION::<{ &[set_u32::RANGE::<0, 2>, set_u32::RANGE::<4, 5>] }> },
-        > = SetU32::<{ &[0, 1, 2, 4, 5] }>::new(2).unwrap();
+        use funny::set_u32::*;
+        let _r1: SetU32![Union![Range![0..=2], Range![4..=5]]] =
+            <SetU32![0, 1, 2, 4, 5]>::new(2).unwrap();
     }
 
     #[test]
     fn onion2() {
         use funny::set_u32::*;
 
-        let _r1: SetU32![Union![RANGE::<0, 2>, RANGE::<4, 5>]] =
+        let _r1: SetU32![Union![Range![0..=2], Range![4..=5]]] =
             <SetU32![0, 1, 2, 4, 5]>::new(2).unwrap();
     }
 }
