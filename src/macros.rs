@@ -102,7 +102,7 @@ macro_rules! impl_ints {
             macro_rules! ${ concat($private_macro_prefix, range) } {
                 ( $start:literal ..  $end:literal  ) => { $d crate::$extra_mod::RANGE::             <$start, $end>  };
                 ( $start:literal ..                ) => { $d crate::$extra_mod::RANGE_FROM::        <$start>        };
-                // (                ..                ) => { $d crate::$extra_mod::RANGE_FULL                          };
+                // (                ..             ) => { $d crate::$extra_mod::RANGE_FULL                          };
                 ( $start:literal ..= $last:literal ) => { $d crate::$extra_mod::RANGE_INCLUSIVE::   <$start, $last> };
                 (                ..  $end:literal  ) => { $d crate::$extra_mod::RANGE_TO::          <$end>          };
                 (                ..= $last:literal ) => { $d crate::$extra_mod::RANGE_TO_INCLUSIVE::<$last>         };
