@@ -88,4 +88,36 @@ mod tests {
         assert_eq!(Range![..-125], &[-128, -127, -126]);
         assert_eq!(Range![..=-125], &[-128, -127, -126, -125]);
     }
+
+    #[test]
+    fn intersections() {
+        use set_i8::Intersection;
+        use set_i8::Range;
+        use set_i8::SORT;
+
+        // Intersection on one set should be the identity
+        assert_eq!(Intersection![Range![-3..27]], Range![-3..27]);
+
+        // Intersection of one set with itself should be the identity
+        assert_eq!(
+            Intersection![Range![-3..27], Range![-3..27],],
+            Range![-3..27]
+        );
+
+        // Intersection with the "full" set should be the identity
+        assert_eq!(
+            Intersection![Range![-3..27], Range![-128..=127]],
+            Range![-3..27]
+        );
+
+        assert_eq!(
+            SORT::<{ Intersection![Range![1..=20], Range![10..=30]] }>,
+            Range![10..=20]
+        );
+
+        assert_eq!(
+            SORT::<{ Intersection![Range![10..=50], Range![20..=100], Range![30..=40]] }>,
+            Range![30..=40]
+        );
+    }
 }

@@ -1,5 +1,5 @@
 macro_rules! impl_ints {
-    (the_dolla: $d:tt, $([inner_type: $num_t:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
+    (the_dolla: $d:tt, $([inner_type: $num_t:ident, largest_num_t_with_same_signedness: $largest_num_t_with_same_signedness:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
 
         #[derive(Debug, Copy, Clone,)]
         #[repr(transparent)]
@@ -21,7 +21,7 @@ macro_rules! impl_ints {
             pub(super) const DIV<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { PRODUCT_OF_LENGTHS::<A, B> }, _>(const |i| A[i / B.len()] / B[i % B.len()])
             };
-            pub(super) const SORT<const SET: &'static[$num_t]>: &[$num_t] = const {
+            pub const SORT<const SET: &'static[$num_t]>: &[$num_t] = const {
                 let arr: [$num_t; LEN::<SET>] = match SET.try_into() {
                     Ok(arr) => arr,
                     Err(_) => unreachable!()
@@ -51,14 +51,14 @@ macro_rules! impl_ints {
             }};
 
             const RANGE_LENGTH_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: usize = const {
-                match <$num_t as ::core::convert::TryInto<usize>>::try_into(MAX.strict_sub(MIN)) {
+                match <$largest_num_t_with_same_signedness as ::core::convert::TryInto<usize>>::try_into($largest_num_t_with_same_signedness::from(MAX).strict_sub($largest_num_t_with_same_signedness::from(MIN))) {
                     Err(_) => panic!(),
                     Ok(len) => len.strict_add(usize::from(IS_INCLUSIVE)),
                 }
             };
 
-            const RANGE_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: &[$num_t] = const {
-                &core::array::from_fn::<$num_t, { RANGE_LENGTH_HELPER::<MIN, MAX, IS_INCLUSIVE> }, _>(const |i| MIN + i as $num_t)
+            pub const RANGE_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { RANGE_LENGTH_HELPER::<MIN, MAX, IS_INCLUSIVE> }, _>(const |i| $num_t::try_from($largest_num_t_with_same_signedness::from(MIN) + <usize as TryInto<$largest_num_t_with_same_signedness>>::try_into(i).ok().unwrap()).ok().unwrap())
             };
 
             pub const RANGE             <const START: $num_t, const END : $num_t>: &[$num_t] = RANGE_HELPER::<                START ,                 END   , false >;
@@ -88,6 +88,86 @@ macro_rules! impl_ints {
                 onion.const_make_global()
             };
 
+            pub const INTERSECTION<const SETS: &'static [&'static [$num_t]]>: &[$num_t] = const { 'out: {
+                let [first_set, ..] = SETS else {
+                    break 'out &[];
+                };
+
+                let mut smallest_set_index = 0;
+                let mut smallest_set_length = first_set.len();
+
+                let mut i: usize = 1;
+
+                while i < SETS.len() {
+                    let current_set_length = SETS[i].len();
+                    if current_set_length < smallest_set_length {
+                        smallest_set_length = current_set_length;
+                        smallest_set_index = i;
+                    }
+                    i += 1;
+                }
+
+                let mut intersection: Vec<$num_t> = Vec::with_capacity(smallest_set_length);
+
+                let mut k: usize = 0;
+
+                while k < smallest_set_length {
+                    intersection.push(SETS[smallest_set_index][k]);
+                    k += 1;
+                }
+
+                let mut j: usize = 0;
+
+                while j < SETS.len() {
+                    if j == smallest_set_index {
+                        j += 1;
+                        continue;
+                    }
+                    intersection_of(&mut intersection, SETS[j]);
+                    j += 1;
+                }
+
+                intersection.const_make_global()
+            }};
+
+            const fn intersection_of(running_intersection: &mut Vec<$num_t>, new_set: &[$num_t]) {
+                let mut i: usize = 0;
+
+                'outer: while i < running_intersection.len() {
+                    let mut j: usize = 0;
+                    while j < new_set.len() {
+                        if running_intersection[i] == new_set[j] {
+                            i += 1;
+                            continue 'outer;
+                        }
+                        j += 1;
+                    }
+                    swap_remove(running_intersection, i);
+                }
+            }
+
+            const fn swap_remove(_self: &mut Vec<$num_t>, index: usize) -> $num_t {
+
+                const fn assert_failed(_index: usize, _len: usize) -> ! {
+                    panic!("swap_remove index should be < len but isn't");
+                }
+
+                let len = _self.len();
+                if index >= len {
+                    assert_failed(index, len);
+                }
+                unsafe {
+                    // We replace self[index] with the last element. Note that if the
+                    // bounds check above succeeds there must be a last element (which
+                    // can be self[index] itself).
+                    let value = core::ptr::read(_self.as_ptr().add(index));
+                    let base_ptr = _self.as_mut_ptr();
+                    core::ptr::copy(base_ptr.add(len - 1), base_ptr.add(index), 1);
+                    _self.set_len(len - 1);
+                    value
+                }
+            }
+
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, union) } {
@@ -96,6 +176,15 @@ macro_rules! impl_ints {
                 };
             }
             pub use ${ concat($private_macro_prefix, union) } as Union;
+
+            #[cfg_attr(doc, doc(hidden))]
+            #[macro_export]
+            macro_rules! ${ concat($private_macro_prefix, intersection) } {
+                ($d($set:expr),+ $d(,)?) => {
+                    $d crate::$extra_mod::INTERSECTION::<{ &[$d($set, )+] }>
+                };
+            }
+            pub use ${ concat($private_macro_prefix, intersection) } as Intersection;
 
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
