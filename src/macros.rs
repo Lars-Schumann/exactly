@@ -61,11 +61,12 @@ macro_rules! impl_ints {
                 &core::array::from_fn::<$num_t, { RANGE_LENGTH_HELPER::<MIN, MAX, IS_INCLUSIVE> }, _>(const |i| MIN + i as $num_t)
             };
 
-            pub const RANGE<const START: $num_t, const END: $num_t>: &[$num_t] = RANGE_HELPER::<START, END, false>;
-            pub const RANGE_FROM<const START: $num_t>: &[$num_t] = RANGE_HELPER::<START, { $num_t::MAX }, true>;
-            pub const RANGE_INCLUSIVE<const START: $num_t, const LAST: $num_t>: &[$num_t] = RANGE_HELPER::<START, LAST, true>;
-
-
+            pub const RANGE             <const START: $num_t, const END: $num_t >: &[$num_t] = RANGE_HELPER::<START                 , END                    , false >;
+            pub const RANGE_FROM        <const START: $num_t                    >: &[$num_t] = RANGE_HELPER::<START                 , const { $num_t::MAX }  , true  >;
+            pub const RANGE_FULL        <                                       >: &[$num_t] = RANGE_HELPER::<const { $num_t::MIN } , const { $num_t::MAX }  , true  >;
+            pub const RANGE_INCLUSIVE   <const START: $num_t, const LAST: $num_t>: &[$num_t] = RANGE_HELPER::<START                 , LAST                   , true  >;
+            pub const RANGE_TO          <                     const END: $num_t >: &[$num_t] = RANGE_HELPER::<const { $num_t::MIN } , END                    , false >;
+            pub const RANGE_TO_INCLUSIVE<                     const END: $num_t >: &[$num_t] = RANGE_HELPER::<const { $num_t::MIN } , END                    , true  >;
 
             pub(crate) const SLICEINATOR<const N: $num_t>: &[$num_t] = const {
                 &[N]
