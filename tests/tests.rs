@@ -77,4 +77,15 @@ mod tests {
         let _r1: SetU32![Union![Range![0..=2], Range![4..=5]]] =
             <SetU32![0, 1, 2, 4, 5]>::new(2).unwrap();
     }
+
+    #[test]
+    fn ranges() {
+        use set_i8::Range;
+
+        assert_eq!(Range![-3..2], &[-3, -2, -1, 0, 1]);
+        assert_eq!(Range![125..], &[125, 126, 127]);
+        assert_eq!(Range![-3..=2], &[-3, -2, -1, 0, 1, 2]);
+        assert_eq!(Range![..-125], &[-128, -127, -126]);
+        assert_eq!(Range![..=-125], &[-128, -127, -126, -125]);
+    }
 }
