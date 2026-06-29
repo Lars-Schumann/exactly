@@ -201,8 +201,7 @@ macro_rules! impl_ints {
 
         impl $wrap_t_name<{ const { &[] } }> {
             pub const NEW<const NUM: $num_t>: $wrap_t_name<{ $extra_mod::SLICEINATOR::<NUM> }> = const {
-                // TODO this is fucked up
-                unsafe { ::core::mem::transmute(NUM) }
+                const { $wrap_t_name::new(NUM).expect("This should be infallible, please file a bug report.") }
             };
         }
 
