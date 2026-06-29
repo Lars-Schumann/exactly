@@ -207,6 +207,12 @@ macro_rules! impl_ints {
 
         impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
 
+            pub const SET: &'static [$num_t] = SET;
+
+            pub const fn set(self) -> &'static [$num_t] {
+                SET
+            }
+
             pub const fn new(value: $num_t) -> Option<Self> {
                 match Self::includes(value) {
                     true => Some(unsafe { Self::new_unchecked(value) }),
