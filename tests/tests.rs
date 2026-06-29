@@ -120,4 +120,19 @@ mod tests {
             Range![30..=40]
         );
     }
+
+    #[test]
+    fn widen() {
+        // {5} is a subset of 5
+        let _: SetU32<{ &[5] }> = SetU32::NEW::<5>.widen();
+
+        // {4} is a subset of {1, 2, 3}
+        let _: SetU32![1, 2, 3] = SetU32::NEW::<3>.widen();
+
+        // {6, 4} is a subset of {3, 4, 5, 6}
+        let _: SetU32![3, 4, 5, 6] = <SetU32![6, 4]>::new(6).unwrap().widen();
+
+        // {4, 4, 4} is a subset of {4}, for now? subject to change?
+        let _: SetU32<{ &[4] }> = <SetU32![4, 4, 4]>::new(4).unwrap().widen();
+    }
 }

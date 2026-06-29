@@ -168,6 +168,29 @@ macro_rules! impl_ints {
                 }
             }
 
+            pub const fn is_subset(sub: &[$num_t], supr: &[$num_t]) -> bool {
+                const fn contains(set: &[$num_t], elem: $num_t) -> bool {
+                    let mut i: usize = 0;
+
+                    while i < set.len() {
+                        if set[i] == elem {
+                            return true;
+                        }
+                        i += 1;
+                    }
+                    false
+                }
+                let mut i: usize = 0;
+
+                while i < sub.len() {
+                    if !contains(supr, sub[i]) {
+                        return false;
+                    }
+                    i += 1;
+                }
+                true
+            }
+
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, union) } {
@@ -250,6 +273,14 @@ macro_rules! impl_ints {
 
             pub const fn normalize(self) -> $wrap_t_name<{ $extra_mod::NORMALIZE::<SET> }> {
                 unsafe { $wrap_t_name::new_unchecked(self.inner()) }
+            }
+
+            pub const fn widen<const SUPER_SET: &'static [$num_t]>(self) -> $wrap_t_name<SUPER_SET> {
+                const { assert!($extra_mod::is_subset(SET, SUPER_SET)); }
+
+                unsafe {
+                    $wrap_t_name::new_unchecked(self.inner())
+                }
             }
         }
 
