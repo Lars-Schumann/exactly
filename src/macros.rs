@@ -260,7 +260,7 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     }
 
     pub const fn new(value: $num_t) -> Option<Self> {
-        match Self::includes(value) {
+        match Self::contains(value) {
             true => Some(unsafe { Self::new_unchecked(value) }),
             false => None,
         }
@@ -269,15 +269,15 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     /// # Safety
     ///
     /// One of the following conditions must hold, they are all logically equivalent:
-    /// 1. `Self::includes(value)` must be `true`
-    /// 2. `Self::SET` includes `value`
+    /// 1. `Self::contains(value)` must be `true`
+    /// 2. `Self::SET` contains `value`
     /// 3. `Self::new(value)` returns `Some(_)`
     pub const unsafe fn new_unchecked(value: $num_t) -> Self {
-        debug_assert!(Self::includes(value));
+        debug_assert!(Self::contains(value));
         Self(value)
     }
 
-    pub const fn includes(value: $num_t) -> bool {
+    pub const fn contains(value: $num_t) -> bool {
         let mut i: usize = 0;
 
         while i < SET.len() {
@@ -307,7 +307,7 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     }
 
     pub const fn cast<const NEW_SET: &'static [$num_t]>(self) -> Option<$wrap_t_name<NEW_SET>> {
-        match $wrap_t_name::<NEW_SET>::includes(self.inner()) {
+        match $wrap_t_name::<NEW_SET>::contains(self.inner()) {
             false => None,
             true => Some( unsafe { self.cast_unchecked() } )
         }
@@ -317,8 +317,8 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     " # Safety\n",
     "\n",
     " One of the following conditions must hold, they are all logically equivalent:\n",
-    " 1. `", stringify!($wrap_t_name), "::<NEW_SET>::includes(self.inner())` must be `true`\n",
-    " 2. `NEW_SET` includes `value`\n",
+    " 1. `", stringify!($wrap_t_name), "::<NEW_SET>::contains(self.inner())` must be `true`\n",
+    " 2. `NEW_SET` contains `value`\n",
     " 3. `Self::cast::<NEW_SET>::(value)` returns `Some(_)`"
     )]
     pub const unsafe fn cast_unchecked<const NEW_SET: &'static [$num_t]>(self) -> $wrap_t_name<NEW_SET> {
