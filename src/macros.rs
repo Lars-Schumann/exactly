@@ -72,10 +72,6 @@ macro_rules! impl_ints {
                 &[N]
             };
 
-            pub(crate) const SLICEINATOR2<const A: &'static [$num_t], const B: &'static [$num_t]>: &[&[$num_t]] = const {
-                &[A, B]
-            };
-
             pub const UNION<const SETS: &'static [&'static [$num_t]]>: &[$num_t] = const {
                 let mut onion: Vec<$num_t> = Vec::new();
                 let mut i: usize = 0;
@@ -133,13 +129,6 @@ macro_rules! impl_ints {
 
                 intersection.const_make_global()
             }};
-
-            pub const IS_INTERSECTION_EMPTY<const SET_A: &'static [$num_t], const SET_B: &'static [$num_t]>: bool= const {
-                match INTERSECTION::<{ SLICEINATOR2::<SET_A, SET_B> }> {
-                    [] => true,
-                    [_, ..] => false
-                }
-            };
 
             const fn intersection_of(running_intersection: &mut Vec<$num_t>, new_set: &[$num_t]) {
                 let mut i: usize = 0;
@@ -303,13 +292,6 @@ macro_rules! impl_ints {
             ///
             /// TODO
             pub const unsafe fn cast_unchecked<const NEW_SET: &'static [$num_t]>(self) -> $wrap_t_name<NEW_SET> {
-                const {
-                    match $extra_mod::IS_INTERSECTION_EMPTY::<SET, NEW_SET> {
-                        false => { /* everything is fine */},
-                        true => panic!("Tried to cast between two sets that have no intersection, this would be unconditional UB")
-                    }
-
-                }
                 unsafe { $wrap_t_name::new_unchecked(self.inner()) }
             }
         }
