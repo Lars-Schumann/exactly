@@ -22,6 +22,10 @@ pub mod $extra_mod {
         &core::array::from_fn::<$num_t, { PRODUCT_OF_LENGTHS::<A, B> }, _>(const |i| A[i / B.len()] / B[i % B.len()])
     };
 
+    pub(super) const REM<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+        &core::array::from_fn::<$num_t, { PRODUCT_OF_LENGTHS::<A, B> }, _>(const |i| A[i / B.len()] % B[i % B.len()])
+    };
+
     pub const SORT<const SET: &'static[$num_t]>: &[$num_t] = const {
         let arr: [$num_t; LEN::<SET>] = match SET.try_into() {
             Ok(arr) => arr,
@@ -329,6 +333,14 @@ impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> ::core::ops
 
     fn div(self, rhs: $wrap_t_name<B_SET>) -> Self::Output {
         unsafe { $wrap_t_name::new_unchecked(self.inner() / rhs.inner()) }
+    }
+}
+
+impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> ::core::ops::Rem<$wrap_t_name<B_SET>> for $wrap_t_name<A_SET> {
+        type Output = $wrap_t_name<{ $extra_mod::DIV::<{ A_SET }, { B_SET }> }>;
+
+    fn rem(self, rhs: $wrap_t_name<B_SET>) -> Self::Output {
+        unsafe { $wrap_t_name::new_unchecked(self.inner() % rhs.inner()) }
     }
 }
 
