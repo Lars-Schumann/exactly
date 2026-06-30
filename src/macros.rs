@@ -337,7 +337,7 @@ impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> ::core::ops
 }
 
 impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> ::core::ops::Rem<$wrap_t_name<B_SET>> for $wrap_t_name<A_SET> {
-        type Output = $wrap_t_name<{ $extra_mod::DIV::<{ A_SET }, { B_SET }> }>;
+        type Output = $wrap_t_name<{ $extra_mod::REM::<{ A_SET }, { B_SET }> }>;
 
     fn rem(self, rhs: $wrap_t_name<B_SET>) -> Self::Output {
         unsafe { $wrap_t_name::new_unchecked(self.inner() % rhs.inner()) }
