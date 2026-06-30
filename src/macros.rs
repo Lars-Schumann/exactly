@@ -98,6 +98,43 @@ pub mod $extra_mod {
     };
 
     pub const INTERSECTION<const SETS: &'static [&'static [$num_t]]>: &[$num_t] = const { 'out: {
+        const fn swap_remove(_self: &mut ::alloc::vec::Vec<$num_t>, index: usize) -> $num_t {
+
+            const fn assert_failed(_index: usize, _len: usize) -> ! {
+                panic!("swap_remove index should be < len but isn't");
+            }
+
+            let len = _self.len();
+            if index >= len {
+                assert_failed(index, len);
+            }
+            unsafe {
+                // We replace self[index] with the last element. Note that if the
+                // bounds check above succeeds there must be a last element (which
+                // can be self[index] itself).
+                let value = core::ptr::read(_self.as_ptr().add(index));
+                let base_ptr = _self.as_mut_ptr();
+                core::ptr::copy(base_ptr.add(len - 1), base_ptr.add(index), 1);
+                _self.set_len(len - 1);
+                value
+            }
+        }
+        const fn intersection_of(running_intersection: &mut ::alloc::vec::Vec<$num_t>, new_set: &[$num_t]) {
+            let mut i: usize = 0;
+
+                'outer: while i < running_intersection.len() {
+                let mut j: usize = 0;
+                while j < new_set.len() {
+                    if running_intersection[i] == new_set[j] {
+                        i += 1;
+                        continue 'outer;
+                    }
+                    j += 1;
+                }
+                swap_remove(running_intersection, i);
+            }
+        }
+
         use ::alloc::vec::Vec;
         let [first_set, ..] = SETS else {
             break 'out &[];
@@ -139,44 +176,6 @@ pub mod $extra_mod {
 
         intersection.const_make_global()
     }};
-
-    const fn intersection_of(running_intersection: &mut ::alloc::vec::Vec<$num_t>, new_set: &[$num_t]) {
-        let mut i: usize = 0;
-
-            'outer: while i < running_intersection.len() {
-            let mut j: usize = 0;
-            while j < new_set.len() {
-                if running_intersection[i] == new_set[j] {
-                    i += 1;
-                    continue 'outer;
-                }
-                j += 1;
-            }
-            swap_remove(running_intersection, i);
-        }
-    }
-
-    const fn swap_remove(_self: &mut ::alloc::vec::Vec<$num_t>, index: usize) -> $num_t {
-
-        const fn assert_failed(_index: usize, _len: usize) -> ! {
-            panic!("swap_remove index should be < len but isn't");
-        }
-
-        let len = _self.len();
-        if index >= len {
-            assert_failed(index, len);
-        }
-        unsafe {
-            // We replace self[index] with the last element. Note that if the
-            // bounds check above succeeds there must be a last element (which
-            // can be self[index] itself).
-            let value = core::ptr::read(_self.as_ptr().add(index));
-            let base_ptr = _self.as_mut_ptr();
-            core::ptr::copy(base_ptr.add(len - 1), base_ptr.add(index), 1);
-            _self.set_len(len - 1);
-            value
-        }
-    }
 
     pub const fn is_subset(sub: &[$num_t], supr: &[$num_t]) -> bool {
         const fn contains(set: &[$num_t], elem: $num_t) -> bool {
