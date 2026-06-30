@@ -12,7 +12,8 @@
     const_destruct,
     macro_metavar_expr_concat,
     const_result_trait_fn,
-    const_index
+    const_index,
+    const_ops
 )]
 #![allow(incomplete_features)]
 #![allow(long_running_const_eval)]
