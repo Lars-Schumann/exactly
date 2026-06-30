@@ -44,9 +44,6 @@
           alias msrv="cargo msrv find --linear -- cargo test"
 
           alias bct="cargo clean && cargo bench --package exactly --features bench_compile_time --timings -- --no-capture"
-
-          export RUSTFLAGS="-Znext-solver=globally"
-          export RUSTDOCFLAGS="-Znext-solver=globally"
         '';
       };
     };
