@@ -135,4 +135,15 @@ mod tests {
         // {4, 4, 4} is a subset of {4}, for now? subject to change?
         let _: SetU32<{ &[4] }> = <SetU32![4, 4, 4]>::new(4).unwrap().widen();
     }
+
+    #[test]
+    fn cast() {
+        let _: SetU32<{ &[5] }> = SetU32::NEW::<5>.cast().unwrap();
+
+        let _: SetU32![1, 2, 3] = SetU32::NEW::<3>.cast().unwrap();
+
+        let _: SetU32![1, 2] = <SetU32![1, 2, 3]>::new(2).unwrap().cast().unwrap();
+
+        // let _: SetU32![1, 2] = <SetU32![3, 4]>::new(4).unwrap().cast().unwrap();
+    }
 }
