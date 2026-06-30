@@ -13,17 +13,31 @@ pub mod $extra_mod {
     macro_rules! define_cartesian_ops {
         ($d([const_name: $const_name:ident, op: $op:tt]),+ $d(,)?) => {$d(
             pub(super) const $const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
-                &core::array::from_fn::<$num_t, { CARTESIAN_LENGTH::<A, B> }, _>(const |i| A[i / B.len()] $op B[i % B.len()])
+                &core::array::from_fn::<$num_t, { CARTESIAN_LENGTH::<A, B> }, _>(
+                    const |i| {
+                        let a = A[i / B.len()];
+                        let b = B[i % B.len()];
+                        a $op b
+                    }
+                )
             };
         )+}
     }
 
     define_cartesian_ops! {
-        [const_name: CARTESIAN_ADD, op: +],
-        [const_name: CARTESIAN_SUB, op: -],
-        [const_name: CARTESIAN_MUL, op: *],
-        [const_name: CARTESIAN_DIV, op: /],
-        [const_name: CARTESIAN_REM, op: %],
+        [const_name: CARTESIAN_ADD      , op: + ],
+        [const_name: CARTESIAN_SUB      , op: - ],
+        [const_name: CARTESIAN_MUL      , op: * ],
+        [const_name: CARTESIAN_DIV      , op: / ],
+
+        [const_name: CARTESIAN_REM      , op: % ],
+
+        [const_name: CARTESIAN_BIT_AND  , op: & ],
+        [const_name: CARTESIAN_BIT_OR   , op: | ],
+        [const_name: CARTESIAN_BIT_XOR  , op: ^ ],
+
+        [const_name: CARTESIAN_SHL      , op: <<],
+        [const_name: CARTESIAN_SHR      , op: >>],
     }
 
 
@@ -317,11 +331,19 @@ macro_rules! impl_ops {
 }
 
 impl_ops! {
-    [op_trait: ::core::ops::Add, op_fn_name: add, output_const: CARTESIAN_ADD, op: +],
-    [op_trait: ::core::ops::Sub, op_fn_name: sub, output_const: CARTESIAN_SUB, op: -],
-    [op_trait: ::core::ops::Mul, op_fn_name: mul, output_const: CARTESIAN_MUL, op: *],
-    [op_trait: ::core::ops::Div, op_fn_name: div, output_const: CARTESIAN_DIV, op: /],
-    [op_trait: ::core::ops::Rem, op_fn_name: rem, output_const: CARTESIAN_REM, op: %],
+    [op_trait: ::core::ops::Add     , op_fn_name: add   , output_const: CARTESIAN_ADD       , op: + ],
+    [op_trait: ::core::ops::Sub     , op_fn_name: sub   , output_const: CARTESIAN_SUB       , op: - ],
+    [op_trait: ::core::ops::Mul     , op_fn_name: mul   , output_const: CARTESIAN_MUL       , op: * ],
+    [op_trait: ::core::ops::Div     , op_fn_name: div   , output_const: CARTESIAN_DIV       , op: / ],
+
+    [op_trait: ::core::ops::Rem     , op_fn_name: rem   , output_const: CARTESIAN_REM       , op: % ],
+
+    [op_trait: ::core::ops::BitAnd  , op_fn_name: bitand, output_const: CARTESIAN_BIT_AND   , op: & ],
+    [op_trait: ::core::ops::BitOr   , op_fn_name: bitor , output_const: CARTESIAN_BIT_OR    , op: | ],
+    [op_trait: ::core::ops::BitXor  , op_fn_name: bitxor, output_const: CARTESIAN_BIT_XOR   , op: ^ ],
+
+    [op_trait: ::core::ops::Shl     , op_fn_name: shl   , output_const: CARTESIAN_SHL       , op: <<],
+    [op_trait: ::core::ops::Shr     , op_fn_name: shr   , output_const: CARTESIAN_SHR       , op: >>],
 }
 
 #[macro_export]
