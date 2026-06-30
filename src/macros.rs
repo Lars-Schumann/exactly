@@ -268,7 +268,10 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
 
     /// # Safety
     ///
-    /// TODO
+    /// One of the following conditions must hold, they are all logically equivalent:
+    /// 1. `Self::includes(value)` must be `true`
+    /// 2. `Self::SET` includes `value`
+    /// 3. `Self::new(value)` returns `Some(_)`
     pub const unsafe fn new_unchecked(value: $num_t) -> Self {
         debug_assert!(Self::includes(value));
         Self(value)
@@ -310,9 +313,14 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
         }
     }
 
-    /// # Safety
-    ///
-    /// TODO
+    #[doc = concat!(
+    " # Safety\n",
+    "\n",
+    " One of the following conditions must hold, they are all logically equivalent:\n",
+    " 1. `", stringify!($wrap_t_name), "::<NEW_SET>::includes(self.inner())` must be `true`\n",
+    " 2. `NEW_SET` includes `value`\n",
+    " 3. `Self::cast::<NEW_SET>::(value)` returns `Some(_)`"
+    )]
     pub const unsafe fn cast_unchecked<const NEW_SET: &'static [$num_t]>(self) -> $wrap_t_name<NEW_SET> {
         unsafe { $wrap_t_name::new_unchecked(self.inner()) }
     }
