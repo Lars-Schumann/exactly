@@ -10,7 +10,7 @@ pub mod $extra_mod {
     const LEN<const SET: &'static[$num_t]>: usize = const { SET.len()};
     const CARTESIAN_LENGTH<const A: &'static[$num_t], const B: &'static[$num_t]>: usize = const { A.len() * B.len() };
 
-    macro_rules! def_stuff {
+    macro_rules! define_cartesian_ops {
         ($d([const_name: $const_name:ident, op: $op:tt]),+ $d(,)?) => {$d(
             pub(super) const $const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { CARTESIAN_LENGTH::<A, B> }, _>(const |i| A[i / B.len()] $op B[i % B.len()])
@@ -18,7 +18,7 @@ pub mod $extra_mod {
         )+}
     }
 
-    def_stuff! {
+    define_cartesian_ops! {
         [const_name: CARTESIAN_ADD, op: +],
         [const_name: CARTESIAN_SUB, op: -],
         [const_name: CARTESIAN_MUL, op: *],
