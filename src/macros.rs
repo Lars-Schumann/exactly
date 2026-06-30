@@ -29,6 +29,7 @@ macro_rules! impl_ints {
                 &::compile_time_sort::$sort_fn_name(arr)
             };
             pub(super) const NORMALIZE<const SET: &'static[$num_t]>: &[$num_t] = const { 'out: {
+                use ::alloc::vec::Vec;
                 let set_sorted = SORT::<SET>;
                 let mut normalized: Vec<$num_t> = Vec::new();
 
@@ -73,6 +74,7 @@ macro_rules! impl_ints {
             };
 
             pub const UNION<const SETS: &'static [&'static [$num_t]]>: &[$num_t] = const {
+                use ::alloc::vec::Vec;
                 let mut onion: Vec<$num_t> = Vec::new();
                 let mut i: usize = 0;
 
@@ -89,6 +91,7 @@ macro_rules! impl_ints {
             };
 
             pub const INTERSECTION<const SETS: &'static [&'static [$num_t]]>: &[$num_t] = const { 'out: {
+                use ::alloc::vec::Vec;
                 let [first_set, ..] = SETS else {
                     break 'out &[];
                 };
@@ -130,7 +133,7 @@ macro_rules! impl_ints {
                 intersection.const_make_global()
             }};
 
-            const fn intersection_of(running_intersection: &mut Vec<$num_t>, new_set: &[$num_t]) {
+            const fn intersection_of(running_intersection: &mut ::alloc::vec::Vec<$num_t>, new_set: &[$num_t]) {
                 let mut i: usize = 0;
 
                 'outer: while i < running_intersection.len() {
@@ -146,7 +149,7 @@ macro_rules! impl_ints {
                 }
             }
 
-            const fn swap_remove(_self: &mut Vec<$num_t>, index: usize) -> $num_t {
+            const fn swap_remove(_self: &mut ::alloc::vec::Vec<$num_t>, index: usize) -> $num_t {
 
                 const fn assert_failed(_index: usize, _len: usize) -> ! {
                     panic!("swap_remove index should be < len but isn't");
