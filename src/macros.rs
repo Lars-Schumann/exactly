@@ -26,6 +26,20 @@ pub mod $extra_mod {
         )+}
     }
 
+    macro_rules! define_cartesian_fns {
+        ($d([const_name: $const_name:ident, fn: $fn:path]),+ $d(,)?) => {$d(
+            pub(super) const $const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { CARTESIAN_LENGTH::<A, B> }, _>(
+                    const |i| {
+                        let a = A[i / B.len()];
+                        let b = B[i % B.len()];
+                        $fn(a, b)
+                    }
+                )
+            };
+        )+}
+    }
+
     define_cartesian_ops! {
         [const_name: CARTESIAN_ADD      , op: + ],
         [const_name: CARTESIAN_SUB      , op: - ],
@@ -40,6 +54,18 @@ pub mod $extra_mod {
 
         [const_name: CARTESIAN_SHL      , op: <<],
         [const_name: CARTESIAN_SHR      , op: >>],
+    }
+
+    define_cartesian_fns! {
+        [const_name: CARTESIAN_STRICT_ADD   , fn: ::core::primitive::$num_t::strict_add],
+        [const_name: CARTESIAN_STRICT_SUB   , fn: ::core::primitive::$num_t::strict_sub],
+        [const_name: CARTESIAN_STRICT_MUL   , fn: ::core::primitive::$num_t::strict_mul],
+        [const_name: CARTESIAN_STRICT_DIV   , fn: ::core::primitive::$num_t::strict_div],
+
+        [const_name: CARTESIAN_WRAPPING_ADD , fn: ::core::primitive::$num_t::wrapping_add],
+        [const_name: CARTESIAN_WRAPPING_SUB , fn: ::core::primitive::$num_t::wrapping_sub],
+        [const_name: CARTESIAN_WRAPPING_MUL , fn: ::core::primitive::$num_t::wrapping_mul],
+        [const_name: CARTESIAN_WRAPPING_DIV , fn: ::core::primitive::$num_t::wrapping_div],
     }
 
 
