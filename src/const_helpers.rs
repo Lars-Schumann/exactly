@@ -2,7 +2,7 @@ use ::alloc::vec::Vec;
 use ::core::marker::Destruct;
 use ::core::ops::Not::not;
 
-const fn ext_slice_contains<T>(slice: &[T], elem: &T) -> bool
+pub(crate) const fn ext_slice_contains<T>(slice: &[T], elem: &T) -> bool
 where
     T: [const] PartialEq + [const] Destruct,
 {

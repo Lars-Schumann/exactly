@@ -198,15 +198,7 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     }
 
     pub const fn contains(value: $num_t) -> bool {
-        let mut i: usize = 0;
-
-        while i < SET.len() {
-            if SET[i] == value {
-                return true;
-            }
-            i += 1;
-        }
-        false
+        crate::const_helpers::ext_slice_contains(SET, &value)
     }
 
     pub const fn inner(self) -> $num_t {
