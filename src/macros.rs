@@ -238,7 +238,7 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     }
 }
 
-macro_rules! impl_ops {
+macro_rules! ${concat(impl_ops_, $num_t)} {
     ($d([op_trait: $d(::$op_trait:ident)+, op_fn_name: $op_fn_name:ident, output_const: $output_const:ident, op: $op:tt]),+ $d(,)?) => {$d(
         impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> $d(::$op_trait)+<$wrap_t_name<B_SET> > for $wrap_t_name<A_SET> {
             type Output = $wrap_t_name<{ $extra_mod::$output_const::<{ A_SET }, { B_SET }> }>;
@@ -250,7 +250,7 @@ macro_rules! impl_ops {
     )+}
 }
 
-impl_ops! {
+${concat(impl_ops_, $num_t)}! {
     [op_trait: ::core::ops::Add     , op_fn_name: add   , output_const: CARTESIAN_ADD       , op: + ],
     [op_trait: ::core::ops::Sub     , op_fn_name: sub   , output_const: CARTESIAN_SUB       , op: - ],
     [op_trait: ::core::ops::Mul     , op_fn_name: mul   , output_const: CARTESIAN_MUL       , op: * ],
