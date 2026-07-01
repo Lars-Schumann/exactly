@@ -219,7 +219,7 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     /// 2. `Self::SET` contains `value`
     /// 3. `Self::new(value)` returns `Some(_)`
     pub const unsafe fn new_unchecked(value: $num_t) -> Self {
-        debug_assert!(Self::contains(value));
+        debug_assert!(Self::contains(value), concat!("Tried to create a ", stringify!($wrap_t_name)," with a value thats not contained in its SET, this is UB."));
         Self(value)
     }
 
@@ -240,7 +240,12 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     }
 
     pub const fn widen<const SUPER_SET: &'static [$num_t]>(self) -> $wrap_t_name<SUPER_SET> {
-        const { assert!(crate::const_helpers::ext_slice_is_subset(SET, SUPER_SET)); }
+        const {
+            assert!(
+                crate::const_helpers::ext_slice_is_subset(SET, SUPER_SET),
+                concat!("Tried to widen a ", stringify!($wrap_t_name),", which failed because the target's SET isn't a superset of the original.")
+            );
+        }
         unsafe { self.cast_unchecked() }
     }
 
