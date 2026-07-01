@@ -1,3 +1,33 @@
+macro_rules! define_cartesian_ops {
+    ($([num_t: $num_t:ident, const_name: $const_name:ident, op: $op:tt]),+ $(,)?) => {$(
+        pub(super) const $const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+            &core::array::from_fn::<$num_t, { CARTESIAN_LENGTH::<A, B> }, _>(
+                const |i| {
+                    let a = A[i / B.len()];
+                    let b = B[i % B.len()];
+                    a $op b
+                }
+            )
+        };
+    )+}
+}
+pub(crate) use define_cartesian_ops;
+
+macro_rules! define_cartesian_fns {
+    ($([num_t: $num_t:ident, const_name: $const_name:ident, fn: $fn:path]),+ $(,)?) => {$(
+        pub(super) const $const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+            &core::array::from_fn::<$num_t, { CARTESIAN_LENGTH::<A, B> }, _>(
+                const |i| {
+                    let a = A[i / B.len()];
+                    let b = B[i % B.len()];
+                    $fn(a, b)
+                }
+            )
+        };
+    )+}
+}
+pub(crate) use define_cartesian_fns;
+
 macro_rules! impl_ints {
 (the_dolla: $d:tt, $([inner_type: $num_t:ident, largest_num_t_with_same_signedness: $largest_num_t_with_same_signedness:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
 
@@ -12,60 +42,32 @@ pub mod $extra_mod {
     const LEN<const SET: &'static[$num_t]>: usize = const { SET.len()};
     const CARTESIAN_LENGTH<const A: &'static[$num_t], const B: &'static[$num_t]>: usize = const { A.len() * B.len() };
 
-    macro_rules! define_cartesian_ops {
-        ($d([const_name: $const_name:ident, op: $op:tt]),+ $d(,)?) => {$d(
-            pub(super) const $const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
-                &core::array::from_fn::<$num_t, { CARTESIAN_LENGTH::<A, B> }, _>(
-                    const |i| {
-                        let a = A[i / B.len()];
-                        let b = B[i % B.len()];
-                        a $op b
-                    }
-                )
-            };
-        )+}
+    crate::macros::define_cartesian_ops! {
+        [num_t: $num_t, const_name: CARTESIAN_ADD      , op: + ],
+        [num_t: $num_t, const_name: CARTESIAN_SUB      , op: - ],
+        [num_t: $num_t, const_name: CARTESIAN_MUL      , op: * ],
+        [num_t: $num_t, const_name: CARTESIAN_DIV      , op: / ],
+
+        [num_t: $num_t, const_name: CARTESIAN_REM      , op: % ],
+
+        [num_t: $num_t, const_name: CARTESIAN_BIT_AND  , op: & ],
+        [num_t: $num_t, const_name: CARTESIAN_BIT_OR   , op: | ],
+        [num_t: $num_t, const_name: CARTESIAN_BIT_XOR  , op: ^ ],
+
+        [num_t: $num_t, const_name: CARTESIAN_SHL      , op: <<],
+        [num_t: $num_t, const_name: CARTESIAN_SHR      , op: >>],
     }
 
-    macro_rules! define_cartesian_fns {
-        ($d([const_name: $const_name:ident, fn: $fn:path]),+ $d(,)?) => {$d(
-            pub(super) const $const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
-                &core::array::from_fn::<$num_t, { CARTESIAN_LENGTH::<A, B> }, _>(
-                    const |i| {
-                        let a = A[i / B.len()];
-                        let b = B[i % B.len()];
-                        $fn(a, b)
-                    }
-                )
-            };
-        )+}
-    }
+    crate::macros::define_cartesian_fns! {
+        [num_t: $num_t, const_name: CARTESIAN_STRICT_ADD   , fn: ::core::primitive::$num_t::strict_add],
+        [num_t: $num_t, const_name: CARTESIAN_STRICT_SUB   , fn: ::core::primitive::$num_t::strict_sub],
+        [num_t: $num_t, const_name: CARTESIAN_STRICT_MUL   , fn: ::core::primitive::$num_t::strict_mul],
+        [num_t: $num_t, const_name: CARTESIAN_STRICT_DIV   , fn: ::core::primitive::$num_t::strict_div],
 
-    define_cartesian_ops! {
-        [const_name: CARTESIAN_ADD      , op: + ],
-        [const_name: CARTESIAN_SUB      , op: - ],
-        [const_name: CARTESIAN_MUL      , op: * ],
-        [const_name: CARTESIAN_DIV      , op: / ],
-
-        [const_name: CARTESIAN_REM      , op: % ],
-
-        [const_name: CARTESIAN_BIT_AND  , op: & ],
-        [const_name: CARTESIAN_BIT_OR   , op: | ],
-        [const_name: CARTESIAN_BIT_XOR  , op: ^ ],
-
-        [const_name: CARTESIAN_SHL      , op: <<],
-        [const_name: CARTESIAN_SHR      , op: >>],
-    }
-
-    define_cartesian_fns! {
-        [const_name: CARTESIAN_STRICT_ADD   , fn: ::core::primitive::$num_t::strict_add],
-        [const_name: CARTESIAN_STRICT_SUB   , fn: ::core::primitive::$num_t::strict_sub],
-        [const_name: CARTESIAN_STRICT_MUL   , fn: ::core::primitive::$num_t::strict_mul],
-        [const_name: CARTESIAN_STRICT_DIV   , fn: ::core::primitive::$num_t::strict_div],
-
-        [const_name: CARTESIAN_WRAPPING_ADD , fn: ::core::primitive::$num_t::wrapping_add],
-        [const_name: CARTESIAN_WRAPPING_SUB , fn: ::core::primitive::$num_t::wrapping_sub],
-        [const_name: CARTESIAN_WRAPPING_MUL , fn: ::core::primitive::$num_t::wrapping_mul],
-        [const_name: CARTESIAN_WRAPPING_DIV , fn: ::core::primitive::$num_t::wrapping_div],
+        [num_t: $num_t, const_name: CARTESIAN_WRAPPING_ADD , fn: ::core::primitive::$num_t::wrapping_add],
+        [num_t: $num_t, const_name: CARTESIAN_WRAPPING_SUB , fn: ::core::primitive::$num_t::wrapping_sub],
+        [num_t: $num_t, const_name: CARTESIAN_WRAPPING_MUL , fn: ::core::primitive::$num_t::wrapping_mul],
+        [num_t: $num_t, const_name: CARTESIAN_WRAPPING_DIV , fn: ::core::primitive::$num_t::wrapping_div],
     }
 
 
