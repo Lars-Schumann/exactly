@@ -1,21 +1,20 @@
 #![feature(
+    adt_const_params,
+    const_array,
+    const_closures,
+    const_cmp,
+    const_convert,
+    const_destruct,
+    const_heap,
+    const_index,
+    const_result_trait_fn,
     const_trait_impl,
     generic_const_args,
     generic_const_items,
-    min_generic_const_args,
-    adt_const_params,
-    unsized_const_params,
-    const_closures,
-    const_array,
-    const_convert,
-    const_heap,
-    const_destruct,
+    import_trait_associated_functions,
     macro_metavar_expr_concat,
-    const_result_trait_fn,
-    const_index,
-    const_ops,
-    const_cmp,
-    import_trait_associated_functions
+    min_generic_const_args,
+    unsized_const_params
 )]
 #![allow(incomplete_features)]
 #![allow(long_running_const_eval)]
