@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     fn bleh() {
-        let _r1: SetU8<{ &[4] }> = SetU8::NEW::<4>;
+        let _r1: SetU8![4] = SetU8::NEW::<4>;
     }
 
     #[test]

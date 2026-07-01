@@ -276,6 +276,9 @@ impl_ops! {
 
 #[macro_export]
 macro_rules! $wrap_t_name {
+    ($elem:literal) => {
+        $d crate::$wrap_t_name::<{ &[$elem] }>
+    };
     ($set:expr) => {
         $d crate::$wrap_t_name::<{ $set }>
     };
