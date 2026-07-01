@@ -41,6 +41,15 @@ macro_rules! impl_ops {
 }
 pub(crate) use impl_ops;
 
+macro_rules! impl_fns {
+    ($([num_t: $num_t:ident, wrap_t_name: $wrap_t_name:ident, extra_mod: $extra_mod:ident, fn_name: $fn_name:ident, output_const: $output_const:ident]),+ $(,)?) => {$(
+        pub fn $fn_name<const RHS_SET: &'static [$num_t]>(self, rhs: $wrap_t_name<RHS_SET>) -> $wrap_t_name<{ $extra_mod::$output_const::<{ SET }, { RHS_SET }> }> {
+            unsafe { $wrap_t_name::new_unchecked(::core::primitive::$num_t::$fn_name(self.inner(), rhs.inner())) }
+        }
+    )+}
+}
+pub(crate) use impl_fns;
+
 macro_rules! impl_ints {
 (the_dolla: $d:tt, $([inner_type: $num_t:ident, largest_num_t_with_same_signedness: $largest_num_t_with_same_signedness:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
 
@@ -281,6 +290,18 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     )]
     pub const unsafe fn cast_unchecked<const NEW_SET: &'static [$num_t]>(self) -> $wrap_t_name<NEW_SET> {
         unsafe { $wrap_t_name::new_unchecked(self.inner()) }
+    }
+
+    crate::macros::impl_fns! {
+        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: strict_add   , output_const: CARTESIAN_STRICT_ADD],
+        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: strict_sub   , output_const: CARTESIAN_STRICT_SUB],
+        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: strict_mul   , output_const: CARTESIAN_STRICT_MUL],
+        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: strict_div   , output_const: CARTESIAN_STRICT_DIV],
+
+        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: wrapping_add , output_const: CARTESIAN_WRAPPING_ADD],
+        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: wrapping_sub , output_const: CARTESIAN_WRAPPING_SUB],
+        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: wrapping_mul , output_const: CARTESIAN_WRAPPING_MUL],
+        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: wrapping_div , output_const: CARTESIAN_WRAPPING_DIV],
     }
 }
 
