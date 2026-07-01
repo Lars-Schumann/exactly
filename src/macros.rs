@@ -6,6 +6,8 @@ macro_rules! impl_ints {
 pub struct $wrap_t_name<const SET: &'static [$num_t]>($num_t);
 
 pub mod $extra_mod {
+    use ::alloc::vec::Vec;
+    use crate::const_helpers::ext_vec_reduce_to_intersection_with;
 
     const LEN<const SET: &'static[$num_t]>: usize = const { SET.len()};
     const CARTESIAN_LENGTH<const A: &'static[$num_t], const B: &'static[$num_t]>: usize = const { A.len() * B.len() };
@@ -50,7 +52,6 @@ pub mod $extra_mod {
     };
 
     pub(super) const NORMALIZE<const SET: &'static[$num_t]>: &[$num_t] = const { 'out: {
-        use ::alloc::vec::Vec;
         let set_sorted = SORT::<SET>;
         let mut normalized: Vec<$num_t> = Vec::new();
 
@@ -95,7 +96,6 @@ pub mod $extra_mod {
     };
 
     pub const UNION<const SETS: &'static [&'static [$num_t]]>: &[$num_t] = const {
-        use ::alloc::vec::Vec;
         let mut onion: Vec<$num_t> = Vec::new();
         let mut i: usize = 0;
 
@@ -112,107 +112,27 @@ pub mod $extra_mod {
     };
 
     pub const INTERSECTION<const SETS: &'static [&'static [$num_t]]>: &[$num_t] = const { 'out: {
-        const fn swap_remove(_self: &mut ::alloc::vec::Vec<$num_t>, index: usize) -> $num_t {
-
-            const fn assert_failed(_index: usize, _len: usize) -> ! {
-                panic!("swap_remove index should be < len but isn't");
-            }
-
-            let len = _self.len();
-            if index >= len {
-                assert_failed(index, len);
-            }
-            unsafe {
-                // We replace self[index] with the last element. Note that if the
-                // bounds check above succeeds there must be a last element (which
-                // can be self[index] itself).
-                let value = core::ptr::read(_self.as_ptr().add(index));
-                let base_ptr = _self.as_mut_ptr();
-                core::ptr::copy(base_ptr.add(len - 1), base_ptr.add(index), 1);
-                _self.set_len(len - 1);
-                value
-            }
-        }
-        const fn intersection_of(running_intersection: &mut ::alloc::vec::Vec<$num_t>, new_set: &[$num_t]) {
-            let mut i: usize = 0;
-
-                'outer: while i < running_intersection.len() {
-                let mut j: usize = 0;
-                while j < new_set.len() {
-                    if running_intersection[i] == new_set[j] {
-                        i += 1;
-                        continue 'outer;
-                    }
-                    j += 1;
-                }
-                swap_remove(running_intersection, i);
-            }
-        }
-
-        use ::alloc::vec::Vec;
         let [first_set, ..] = SETS else {
             break 'out &[];
         };
 
-        let mut smallest_set_index = 0;
-        let mut smallest_set_length = first_set.len();
+        let mut intersection: Vec<$num_t> = Vec::with_capacity(first_set.len());
 
-        let mut i: usize = 1;
-
-        while i < SETS.len() {
-            let current_set_length = SETS[i].len();
-            if current_set_length < smallest_set_length {
-                smallest_set_length = current_set_length;
-                smallest_set_index = i;
-            }
+        let mut i: usize = 0;
+        while i < first_set.len() {
+            intersection.push(first_set[i]);
             i += 1;
         }
 
-        let mut intersection: Vec<$num_t> = Vec::with_capacity(smallest_set_length);
-
-        let mut k: usize = 0;
-
-        while k < smallest_set_length {
-            intersection.push(SETS[smallest_set_index][k]);
-            k += 1;
-        }
-
-        let mut j: usize = 0;
+        let mut j: usize = 1;
 
         while j < SETS.len() {
-            if j == smallest_set_index {
-                j += 1;
-                continue;
-            }
-            intersection_of(&mut intersection, SETS[j]);
+            ext_vec_reduce_to_intersection_with(&mut intersection, SETS[j]);
             j += 1;
         }
 
         intersection.const_make_global()
     }};
-
-    pub const fn is_subset(sub: &[$num_t], supr: &[$num_t]) -> bool {
-        const fn contains(set: &[$num_t], elem: $num_t) -> bool {
-            let mut i: usize = 0;
-
-            while i < set.len() {
-                if set[i] == elem {
-                    return true;
-                }
-                i += 1;
-            }
-            false
-        }
-        let mut i: usize = 0;
-
-        while i < sub.len() {
-            if !contains(supr, sub[i]) {
-                return false;
-            }
-            i += 1;
-        }
-        true
-    }
 
     #[cfg_attr(doc, doc(hidden))]
     #[macro_export]
@@ -302,7 +222,7 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     }
 
     pub const fn widen<const SUPER_SET: &'static [$num_t]>(self) -> $wrap_t_name<SUPER_SET> {
-        const { assert!($extra_mod::is_subset(SET, SUPER_SET)); }
+        const { assert!(crate::const_helpers::ext_slice_is_subset(SET, SUPER_SET)); }
         unsafe { self.cast_unchecked() }
     }
 

@@ -13,7 +13,9 @@
     macro_metavar_expr_concat,
     const_result_trait_fn,
     const_index,
-    const_ops
+    const_ops,
+    const_cmp,
+    import_trait_associated_functions
 )]
 #![allow(incomplete_features)]
 #![allow(long_running_const_eval)]
@@ -21,6 +23,7 @@
 #![no_std]
 extern crate alloc;
 
+mod const_helpers;
 mod macros;
 
 macros::impl_ints! {
