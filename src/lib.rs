@@ -7,6 +7,7 @@
     const_destruct,
     const_heap,
     const_index,
+    const_ops,
     const_result_trait_fn,
     const_trait_impl,
     generic_const_args,
