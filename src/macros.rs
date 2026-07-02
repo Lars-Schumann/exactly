@@ -16,7 +16,7 @@ macro_rules! ops_implinator {
 
         }
 
-        impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> $(::$op_trait)+<$wrap_t_name<B_SET> > for $wrap_t_name<A_SET> {
+        const impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> $(::$op_trait)+<$wrap_t_name<B_SET> > for $wrap_t_name<A_SET> {
 
             type Output = $wrap_t_name<{ ${concat(__mod_,$wrap_t_name,_,$cartesian_const_name)}::$cartesian_const_name::<{ A_SET }, { B_SET }> }>;
 
@@ -47,7 +47,7 @@ macro_rules! implinator {
 
         }
 
-        impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
+        const impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
 
             pub fn $fn_name<const RHS_SET: &'static [$num_t]>(self, rhs: $wrap_t_name<RHS_SET>) -> $wrap_t_name<{ ${concat(__mod_,$wrap_t_name,_,$cartesian_const_name)}::$cartesian_const_name::<{ SET }, { RHS_SET }> }> {
                 unsafe { $wrap_t_name::new_unchecked($fn_path(self.inner(), rhs.inner())) }
