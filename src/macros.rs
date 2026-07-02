@@ -50,6 +50,36 @@ macro_rules! impl_fns {
 }
 pub(crate) use impl_fns;
 
+macro_rules! implinator {
+    ($([wrap_t_name: $wrap_t_name:ident, num_t: $num_t:ident, extra_mod: $extra_mod: ident, cartesian_const_name: $cartesian_const_name:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+
+        #[expect(nonstandard_style)]
+        mod ${concat(__mod_,$wrap_t_name,_,$cartesian_const_name)} {
+
+            pub(crate) const $cartesian_const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { crate::$extra_mod::CARTESIAN_LENGTH::<A, B> }, _>(
+                    const |i| {
+                        let a = A[i / B.len()];
+                        let b = B[i % B.len()];
+                        $fn_path(a, b)
+                    }
+                )
+            };
+
+        }
+
+        impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
+
+            pub fn $fn_name<const RHS_SET: &'static [$num_t]>(self, rhs: $wrap_t_name<RHS_SET>) -> $wrap_t_name<{ ${concat(__mod_,$wrap_t_name,_,$cartesian_const_name)}::$cartesian_const_name::<{ SET }, { RHS_SET }> }> {
+                unsafe { $wrap_t_name::new_unchecked($fn_path(self.inner(), rhs.inner())) }
+            }
+
+        }
+
+    )+}
+}
+pub(crate) use implinator;
+
 macro_rules! impl_ints {
 (the_dolla: $d:tt, $([inner_type: $num_t:ident, largest_num_t_with_same_signedness: $largest_num_t_with_same_signedness:ident, wrap_t_name: $wrap_t_name:ident, range_fn_name: $range_fn_name:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident, sort_fn_name: $sort_fn_name:ident],)*) => {$(
 
@@ -62,7 +92,7 @@ pub mod $extra_mod {
     use crate::const_helpers::ext_vec_reduce_to_intersection_with;
 
     const LEN<const SET: &'static[$num_t]>: usize = const { SET.len()};
-    const CARTESIAN_LENGTH<const A: &'static[$num_t], const B: &'static[$num_t]>: usize = const { A.len() * B.len() };
+    pub(crate) const CARTESIAN_LENGTH<const A: &'static[$num_t], const B: &'static[$num_t]>: usize = const { A.len() * B.len() };
 
     crate::macros::define_cartesian_ops! {
         [num_t: $num_t, const_name: CARTESIAN_ADD      , op: + ],
@@ -332,6 +362,10 @@ macro_rules! $wrap_t_name {
     ($d($elem:expr),+ $d(,)?) => {
         $d crate::$wrap_t_name::<{ &[$d($elem, )+] }>
     };
+}
+
+crate::macros::implinator! {
+    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: GLORP, fn_name: glorp, fn_path: ::core::primitive::$num_t::wrapping_add],
 }
 
 )*}
