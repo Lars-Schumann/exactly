@@ -72,3 +72,60 @@ pub(crate) const fn ext_vec_reduce_to_intersection_with<T>(
         ext_vec_swap_remove(running_intersection, i);
     }
 }
+
+pub(crate) const fn sort<T: [const] Ord, const N: usize>(mut a: [T; N]) -> [T; N] {
+    let mut start = N / 2;
+    while start > 0 {
+        start -= 1;
+
+        let mut root = start;
+        loop {
+            let left = 2 * root + 1;
+            if left >= N {
+                break;
+            }
+
+            let mut child = left;
+            let right = left + 1;
+            if right < N && a[child] < a[right] {
+                child = right;
+            }
+
+            if a[root] < a[child] {
+                a.swap(root, child);
+                root = child;
+            } else {
+                break;
+            }
+        }
+    }
+
+    let mut end = N;
+    while end > 1 {
+        end -= 1;
+        a.swap(0, end);
+
+        let mut root = 0;
+        loop {
+            let left = 2 * root + 1;
+            if left >= end {
+                break;
+            }
+
+            let mut child = left;
+            let right = left + 1;
+            if right < end && a[child] < a[right] {
+                child = right;
+            }
+
+            if a[root] < a[child] {
+                a.swap(root, child);
+                root = child;
+            } else {
+                break;
+            }
+        }
+    }
+
+    a
+}

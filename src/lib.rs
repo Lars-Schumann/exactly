@@ -10,12 +10,14 @@
     const_ops,
     const_result_trait_fn,
     const_trait_impl,
+    freeze,
     generic_const_args,
     generic_const_items,
+    generic_const_parameter_types,
     import_trait_associated_functions,
     macro_metavar_expr_concat,
     min_generic_const_args,
-    unsized_const_params
+    unsized_const_params,
 )]
 #![allow(incomplete_features)]
 #![allow(long_running_const_eval)]
@@ -23,6 +25,7 @@
 #![no_std]
 extern crate alloc;
 
+pub(crate) mod base;
 mod const_helpers;
 mod macros;
 

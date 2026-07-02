@@ -193,9 +193,11 @@ pub mod $extra_mod {
         (                ..= $last:literal ) => { $d crate::$extra_mod::RANGE_TO_INCLUSIVE::<$last>         };
     }
     pub use ${ concat($private_macro_prefix, range) } as Range;
+
+    pub(crate) const EMPTY: &[$num_t] = &[];
 }
 
-impl $wrap_t_name<{ const { &[] } }> {
+impl $wrap_t_name<{ $extra_mod::EMPTY }> {
     pub const NEW<const NUM: $num_t>: $wrap_t_name<{ $extra_mod::SLICEINATOR::<NUM> }> = const {
         const { $wrap_t_name::new(NUM).expect("This should be infallible, please file a bug report.") }
     };
