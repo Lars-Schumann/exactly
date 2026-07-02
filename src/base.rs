@@ -16,7 +16,7 @@ pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + 'static, const SET
     &crate::const_helpers::sort(arr)
 };
 
-pub(super) const NORMALIZE<T: Copy + const Ord + ConstParamTy_ + Freeze + const Destruct + 'static, const SET: &'static[T]>: &[T] = const { 'out: {
+pub const NORMALIZE<T: Copy + const Ord + ConstParamTy_ + Freeze + const Destruct + 'static, const SET: &'static[T]>: &[T] = const { 'out: {
         let set_sorted = SORT::<T, SET>;
         let mut normalized: Vec<T> = Vec::new();
 
