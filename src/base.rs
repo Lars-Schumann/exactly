@@ -1,12 +1,14 @@
-use core::marker::ConstParamTy_ as CPT;
+use core::marker::ConstParamTy_;
 use core::marker::Destruct;
 use core::marker::Freeze;
 
 use alloc::vec::Vec;
 
-const LEN<T: CPT + 'static, const SET: &'static[T]>: usize = const { SET.len()};
+pub(crate) mod base_macros;
 
-pub const SORT<T: Copy + const Ord + Freeze + CPT + 'static, const SET: &'static[T]>: &[T]= const {
+const LEN<T: ConstParamTy_ + 'static, const SET: &'static[T]>: usize = const { SET.len()};
+
+pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + 'static, const SET: &'static[T]>: &[T]= const {
     let arr: [T; LEN::<T, SET>] = match SET.try_into() {
         Ok(arr) => arr,
         Err(_) => unreachable!()
@@ -14,8 +16,7 @@ pub const SORT<T: Copy + const Ord + Freeze + CPT + 'static, const SET: &'static
     &crate::const_helpers::sort(arr)
 };
 
-#[expect(unused)]
-pub(super) const NORMALIZE<T: Copy + const Ord + CPT + Freeze + const Destruct + 'static, const SET: &'static[T]>: &[T] = const { 'out: {
+pub(super) const NORMALIZE<T: Copy + const Ord + ConstParamTy_ + Freeze + const Destruct + 'static, const SET: &'static[T]>: &[T] = const { 'out: {
         let set_sorted = SORT::<T, SET>;
         let mut normalized: Vec<T> = Vec::new();
 
@@ -37,14 +38,13 @@ pub(super) const NORMALIZE<T: Copy + const Ord + CPT + Freeze + const Destruct +
         normalized.const_make_global()
     }};
 
-#[expect(unused)]
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
-pub struct Set<T: CPT + 'static, const SET: &'static [T]>(T);
+pub struct Set<T: ConstParamTy_ + 'static, const SET: &'static [T]>(T);
 
 impl<T, const SET: &'static [T]> Set<T, SET>
 where
-    T: Copy + const Ord + Freeze + CPT + const Destruct + 'static,
+    T: Copy + const Ord + Freeze + ConstParamTy_ + const Destruct + 'static,
 {
     pub const SET: &'static [T] = SET;
 
@@ -54,10 +54,7 @@ where
 
     pub const fn new(value: T) -> Option<Self> {
         match Self::contains(&value) {
-            true => Some(
-                // SAFETY: we just checked precondition #1
-                unsafe { Self::new_unchecked(value) },
-            ),
+            true => Some(unsafe { Self::new_unchecked(value) }),
             false => None,
         }
     }
@@ -101,25 +98,33 @@ where
                 )
             );
         }
-        // SAFETY: since self.inner() is a member of SET and we just asserted that
-        // SET is a subset of SUPER_SET, self.inner() must also be a member of
-        // SUPER_SET (precondition #2)
         unsafe { self.cast_unchecked() }
     }
 
     pub const fn cast<const NEW_SET: &'static [T]>(self) -> Option<Set<T, NEW_SET>> {
         match Set::<T, NEW_SET>::contains(&self.inner()) {
             false => None,
-            true => Some(
-                // SAFETY: we just checked precondition #1
-                unsafe { self.cast_unchecked() },
-            ),
+            true => Some(unsafe { self.cast_unchecked() }),
         }
     }
 
     pub const unsafe fn cast_unchecked<const NEW_SET: &'static [T]>(self) -> Set<T, NEW_SET> {
-        // SAFETY: the preconditions of this function guarantee that the preconditions
-        // of new_unchecked will hold.
         unsafe { Set::new_unchecked(self.inner()) }
     }
+}
+
+base_macros::impl_ints! {
+    the_dolla: $,
+    [inner_type: u8,    largest_num_t_with_same_signedness: u128, wrap_t_name: SetU8,         private_macro_prefix: ඞ__private_macro_set_u8_,    extra_mod: set_u8    ],
+    [inner_type: u16,   largest_num_t_with_same_signedness: u128, wrap_t_name: SetU16,       private_macro_prefix: ඞ__private_macro_set_u16_,   extra_mod: set_u16   ],
+    [inner_type: u32,   largest_num_t_with_same_signedness: u128, wrap_t_name: SetU32,       private_macro_prefix: ඞ__private_macro_set_u32_,   extra_mod: set_u32   ],
+    [inner_type: u64,   largest_num_t_with_same_signedness: u128, wrap_t_name: SetU64,       private_macro_prefix: ඞ__private_macro_set_u64_,   extra_mod: set_u64   ],
+    [inner_type: u128,  largest_num_t_with_same_signedness: u128, wrap_t_name: SetU128,     private_macro_prefix: ඞ__private_macro_set_u128_,  extra_mod: set_u128  ],
+    [inner_type: usize, largest_num_t_with_same_signedness: usize,wrap_t_name: SetUsize,   private_macro_prefix: ඞ__private_macro_set_usize_, extra_mod: set_usize ],
+    [inner_type: i8,    largest_num_t_with_same_signedness: i128, wrap_t_name: SetI8,         private_macro_prefix: ඞ__private_macro_set_i8_,    extra_mod: set_i8    ],
+    [inner_type: i16,   largest_num_t_with_same_signedness: i128, wrap_t_name: SetI16,       private_macro_prefix: ඞ__private_macro_set_i16_,   extra_mod: set_i16   ],
+    [inner_type: i32,   largest_num_t_with_same_signedness: i128, wrap_t_name: SetI32,       private_macro_prefix: ඞ__private_macro_set_i32_,   extra_mod: set_i32   ],
+    [inner_type: i64,   largest_num_t_with_same_signedness: i128, wrap_t_name: SetI64,       private_macro_prefix: ඞ__private_macro_set_i64_,   extra_mod: set_i64   ],
+    [inner_type: i128,  largest_num_t_with_same_signedness: i128, wrap_t_name: SetI128,     private_macro_prefix: ඞ__private_macro_set_i128_,  extra_mod: set_i128  ],
+    [inner_type: isize, largest_num_t_with_same_signedness: isize,wrap_t_name: SetIsize,   private_macro_prefix: ඞ__private_macro_set_isize_, extra_mod: set_isize ],
 }

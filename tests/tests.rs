@@ -146,4 +146,19 @@ mod tests {
 
         // let _: SetU32![1, 2] = <SetU32![3, 4]>::new(4).unwrap().cast().unwrap();
     }
+
+    #[test]
+    fn generic() {
+        use exactly::base::Set;
+
+        let a: Set<u8, { &[5, 4] }> = Set::new(5).unwrap();
+        let b: Set<u8, { &[1, 2] }> = Set::new(2).unwrap();
+
+        let _c: Set<u8, { &[5, 6, 7] }> = (b + a).normalize();
+
+        let x: Set<isize, { &[5, 4] }> = Set::new(5).unwrap();
+        let y: Set<isize, { &[1, 2] }> = Set::new(2).unwrap();
+
+        let _z: Set<isize, { &[4, 5, 8, 10] }> = (x * y).normalize();
+    }
 }
