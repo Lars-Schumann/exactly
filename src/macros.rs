@@ -13,21 +13,6 @@ macro_rules! define_cartesian_ops {
 }
 pub(crate) use define_cartesian_ops;
 
-macro_rules! define_cartesian_fns {
-    ($([num_t: $num_t:ident, const_name: $const_name:ident, fn: $fn:path]),+ $(,)?) => {$(
-        pub(super) const $const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
-            &core::array::from_fn::<$num_t, { CARTESIAN_LENGTH::<A, B> }, _>(
-                const |i| {
-                    let a = A[i / B.len()];
-                    let b = B[i % B.len()];
-                    $fn(a, b)
-                }
-            )
-        };
-    )+}
-}
-pub(crate) use define_cartesian_fns;
-
 macro_rules! impl_ops {
     ($([num_t: $num_t:ident, wrap_t_name: $wrap_t_name:ident, extra_mod: $extra_mod:ident, op_trait: $(::$op_trait:ident)+, op_fn_name: $op_fn_name:ident, output_const: $output_const:ident, op: $op:tt]),+ $(,)?) => {$(
         impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> $(::$op_trait)+<$wrap_t_name<B_SET> > for $wrap_t_name<A_SET> {
@@ -40,15 +25,6 @@ macro_rules! impl_ops {
     )+}
 }
 pub(crate) use impl_ops;
-
-macro_rules! impl_fns {
-    ($([num_t: $num_t:ident, wrap_t_name: $wrap_t_name:ident, extra_mod: $extra_mod:ident, fn_name: $fn_name:ident, output_const: $output_const:ident]),+ $(,)?) => {$(
-        pub fn $fn_name<const RHS_SET: &'static [$num_t]>(self, rhs: $wrap_t_name<RHS_SET>) -> $wrap_t_name<{ $extra_mod::$output_const::<{ SET }, { RHS_SET }> }> {
-            unsafe { $wrap_t_name::new_unchecked(::core::primitive::$num_t::$fn_name(self.inner(), rhs.inner())) }
-        }
-    )+}
-}
-pub(crate) use impl_fns;
 
 macro_rules! implinator {
     ($([wrap_t_name: $wrap_t_name:ident, num_t: $num_t:ident, extra_mod: $extra_mod: ident, cartesian_const_name: $cartesian_const_name:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
@@ -109,19 +85,6 @@ pub mod $extra_mod {
         [num_t: $num_t, const_name: CARTESIAN_SHL      , op: <<],
         [num_t: $num_t, const_name: CARTESIAN_SHR      , op: >>],
     }
-
-    crate::macros::define_cartesian_fns! {
-        [num_t: $num_t, const_name: CARTESIAN_STRICT_ADD   , fn: ::core::primitive::$num_t::strict_add],
-        [num_t: $num_t, const_name: CARTESIAN_STRICT_SUB   , fn: ::core::primitive::$num_t::strict_sub],
-        [num_t: $num_t, const_name: CARTESIAN_STRICT_MUL   , fn: ::core::primitive::$num_t::strict_mul],
-        [num_t: $num_t, const_name: CARTESIAN_STRICT_DIV   , fn: ::core::primitive::$num_t::strict_div],
-
-        [num_t: $num_t, const_name: CARTESIAN_WRAPPING_ADD , fn: ::core::primitive::$num_t::wrapping_add],
-        [num_t: $num_t, const_name: CARTESIAN_WRAPPING_SUB , fn: ::core::primitive::$num_t::wrapping_sub],
-        [num_t: $num_t, const_name: CARTESIAN_WRAPPING_MUL , fn: ::core::primitive::$num_t::wrapping_mul],
-        [num_t: $num_t, const_name: CARTESIAN_WRAPPING_DIV , fn: ::core::primitive::$num_t::wrapping_div],
-    }
-
 
     pub const SORT<const SET: &'static[$num_t]>: &[$num_t] = const {
         let arr: [$num_t; LEN::<SET>] = match SET.try_into() {
@@ -321,18 +284,6 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     pub const unsafe fn cast_unchecked<const NEW_SET: &'static [$num_t]>(self) -> $wrap_t_name<NEW_SET> {
         unsafe { $wrap_t_name::new_unchecked(self.inner()) }
     }
-
-    crate::macros::impl_fns! {
-        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: strict_add   , output_const: CARTESIAN_STRICT_ADD],
-        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: strict_sub   , output_const: CARTESIAN_STRICT_SUB],
-        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: strict_mul   , output_const: CARTESIAN_STRICT_MUL],
-        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: strict_div   , output_const: CARTESIAN_STRICT_DIV],
-
-        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: wrapping_add , output_const: CARTESIAN_WRAPPING_ADD],
-        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: wrapping_sub , output_const: CARTESIAN_WRAPPING_SUB],
-        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: wrapping_mul , output_const: CARTESIAN_WRAPPING_MUL],
-        [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, fn_name: wrapping_div , output_const: CARTESIAN_WRAPPING_DIV],
-    }
 }
 
 crate::macros::impl_ops! {
@@ -365,7 +316,15 @@ macro_rules! $wrap_t_name {
 }
 
 crate::macros::implinator! {
-    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: GLORP, fn_name: glorp, fn_path: ::core::primitive::$num_t::wrapping_add],
+    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_ADD    , fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add],
+    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_SUB    , fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub],
+    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_MUL    , fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul],
+    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_DIV    , fn_name: strict_div   , fn_path: ::core::primitive::$num_t::strict_div],
+
+    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_ADD  , fn_name: wrapping_add , fn_path: ::core::primitive::$num_t::wrapping_add],
+    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_SUB  , fn_name: wrapping_sub , fn_path: ::core::primitive::$num_t::wrapping_sub],
+    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_MUL  , fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul],
+    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_DIV  , fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div],
 }
 
 )*}
