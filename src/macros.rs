@@ -211,7 +211,10 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
 
     pub const fn new(value: $num_t) -> Option<Self> {
         match Self::contains(value) {
-            true => Some(unsafe { Self::new_unchecked(value) }),
+            true => Some(
+                // SAFETY: we just checked precondition #1
+                unsafe { Self::new_unchecked(value) }
+            ),
             false => None,
         }
     }
@@ -236,10 +239,16 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     }
 
     pub const fn sort(self) -> $wrap_t_name<{ $extra_mod::SORT::<SET> }> {
+        // SAFETY: we trust that SORT does not eliminate any elements of SET
+        // and since SET contains self.inner(), the sorted set will also contain
+        // self.inner() (precondition #2)
         unsafe { self.cast_unchecked() }
     }
 
     pub const fn normalize(self) -> $wrap_t_name<{ $extra_mod::NORMALIZE::<SET> }> {
+        // SAFETY: we trust that NORMALIZE does not eliminate elements of SET
+        // and since SET contains self.inner(), the normalized set will also contain
+        // self.inner() (precondition #2)
         unsafe { self.cast_unchecked() }
     }
 
@@ -250,13 +259,19 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
                 concat!("Tried to widen a ", stringify!($wrap_t_name),", which failed because the target's SET isn't a superset of the original.")
             );
         }
+        // SAFETY: since self.inner() is a member of SET and we just asserted that
+        // SET is a subset of SUPER_SET, self.inner() must also be a member of
+        // SUPER_SET (precondition #2)
         unsafe { self.cast_unchecked() }
     }
 
     pub const fn cast<const NEW_SET: &'static [$num_t]>(self) -> Option<$wrap_t_name<NEW_SET>> {
         match $wrap_t_name::<NEW_SET>::contains(self.inner()) {
             false => None,
-            true => Some( unsafe { self.cast_unchecked() } )
+            true => Some(
+                // SAFETY: we just checked precondition #1
+                unsafe { self.cast_unchecked() }
+            )
         }
     }
 
@@ -269,6 +284,8 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     " 3. `Self::cast::<NEW_SET>::(value)` returns `Some(_)`"
     )]
     pub const unsafe fn cast_unchecked<const NEW_SET: &'static [$num_t]>(self) -> $wrap_t_name<NEW_SET> {
+        // SAFETY: the preconditions of this function guarantee that the preconditions
+        // of new_unchecked will hold.
         unsafe { $wrap_t_name::new_unchecked(self.inner()) }
     }
 }
