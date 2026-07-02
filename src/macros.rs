@@ -114,12 +114,12 @@ pub mod $extra_mod {
         &core::array::from_fn::<$num_t, { RANGE_LENGTH_HELPER::<MIN, MAX, IS_INCLUSIVE> }, _>(const |i| $num_t::try_from($largest_num_t_with_same_signedness::from(MIN) + <usize as TryInto<$largest_num_t_with_same_signedness>>::try_into(i).ok().unwrap()).ok().unwrap())
     };
 
-    pub const RANGE             <const START: $num_t, const END : $num_t>: &[$num_t] = RANGE_HELPER::<                START ,                 END   , false >;
-    pub const RANGE_FROM        <const START: $num_t                    >: &[$num_t] = RANGE_HELPER::<                START ,{const { $num_t::MAX }}, true  >;
-    // pub const RANGE_FULL     <                                       >: &[$num_t] = RANGE_HELPER::<const { $num_t::MIN } ,{const { $num_t::MAX }}, true  >;
-    pub const RANGE_INCLUSIVE   <const START: $num_t, const LAST: $num_t>: &[$num_t] = RANGE_HELPER::<                START ,                 LAST  , true  >;
-    pub const RANGE_TO          <                     const END : $num_t>: &[$num_t] = RANGE_HELPER::<{const{ $num_t::MIN }},                 END   , false >;
-    pub const RANGE_TO_INCLUSIVE<                     const LAST: $num_t>: &[$num_t] = RANGE_HELPER::<{const{ $num_t::MIN }},                 LAST  , true  >;
+    pub const RANGE             <const MIN: $num_t, const MAX: $num_t>: &[$num_t] = RANGE_HELPER::<                MIN ,                 MAX   , false >;
+    pub const RANGE_FROM        <const MIN: $num_t                   >: &[$num_t] = RANGE_HELPER::<                MIN ,{const { $num_t::MAX }}, true  >;
+    // RANGE_FULL omitted
+    pub const RANGE_INCLUSIVE   <const MIN: $num_t, const MAX: $num_t>: &[$num_t] = RANGE_HELPER::<                MIN ,                 MAX   , true  >;
+    pub const RANGE_TO          <                   const MAX: $num_t>: &[$num_t] = RANGE_HELPER::<{const{ $num_t::MIN }},               MAX   , false >;
+    pub const RANGE_TO_INCLUSIVE<                   const MAX: $num_t>: &[$num_t] = RANGE_HELPER::<{const{ $num_t::MIN }},               MAX   , true  >;
 
     pub(crate) const SLICEINATOR<const N: $num_t>: &[$num_t] = const {
         &[N]
