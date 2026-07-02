@@ -1,30 +1,33 @@
-macro_rules! define_cartesian_ops {
-    ($([num_t: $num_t:ident, const_name: $const_name:ident, op: $op:tt]),+ $(,)?) => {$(
-        pub(super) const $const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
-            &core::array::from_fn::<$num_t, { CARTESIAN_LENGTH::<A, B> }, _>(
-                const |i| {
-                    let a = A[i / B.len()];
-                    let b = B[i % B.len()];
-                    a $op b
-                }
-            )
-        };
-    )+}
-}
-pub(crate) use define_cartesian_ops;
+macro_rules! ops_implinator {
+    ($([num_t: $num_t:ident, wrap_t_name: $wrap_t_name:ident, extra_mod: $extra_mod:ident, op_trait: $(::$op_trait:ident)+, trait_fn_name: $trait_fn_name:ident, cartesian_const_name: $cartesian_const_name:ident, op: $op:tt]),+ $(,)?) => {$(
 
-macro_rules! impl_ops {
-    ($([num_t: $num_t:ident, wrap_t_name: $wrap_t_name:ident, extra_mod: $extra_mod:ident, op_trait: $(::$op_trait:ident)+, op_fn_name: $op_fn_name:ident, output_const: $output_const:ident, op: $op:tt]),+ $(,)?) => {$(
+        #[expect(nonstandard_style)]
+        mod ${concat(__mod_,$wrap_t_name,_,$cartesian_const_name)} {
+
+            pub(crate) const $cartesian_const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { crate::$extra_mod::CARTESIAN_LENGTH::<A, B> }, _>(
+                    const |i| {
+                        let a = A[i / B.len()];
+                        let b = B[i % B.len()];
+                        a $op b
+                    }
+                )
+            };
+
+        }
+
         impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> $(::$op_trait)+<$wrap_t_name<B_SET> > for $wrap_t_name<A_SET> {
-            type Output = $wrap_t_name<{ $extra_mod::$output_const::<{ A_SET }, { B_SET }> }>;
 
-            fn $op_fn_name(self, rhs: $wrap_t_name<B_SET>) -> Self::Output {
+            type Output = $wrap_t_name<{ ${concat(__mod_,$wrap_t_name,_,$cartesian_const_name)}::$cartesian_const_name::<{ A_SET }, { B_SET }> }>;
+
+            fn $trait_fn_name(self, rhs: $wrap_t_name<B_SET>) -> Self::Output {
                 unsafe { $wrap_t_name::new_unchecked(self.inner() $op rhs.inner()) }
             }
+
         }
     )+}
 }
-pub(crate) use impl_ops;
+pub(crate) use ops_implinator;
 
 macro_rules! implinator {
     ($([wrap_t_name: $wrap_t_name:ident, num_t: $num_t:ident, extra_mod: $extra_mod: ident, cartesian_const_name: $cartesian_const_name:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
@@ -69,22 +72,6 @@ pub mod $extra_mod {
 
     const LEN<const SET: &'static[$num_t]>: usize = const { SET.len()};
     pub(crate) const CARTESIAN_LENGTH<const A: &'static[$num_t], const B: &'static[$num_t]>: usize = const { A.len() * B.len() };
-
-    crate::macros::define_cartesian_ops! {
-        [num_t: $num_t, const_name: CARTESIAN_ADD      , op: + ],
-        [num_t: $num_t, const_name: CARTESIAN_SUB      , op: - ],
-        [num_t: $num_t, const_name: CARTESIAN_MUL      , op: * ],
-        [num_t: $num_t, const_name: CARTESIAN_DIV      , op: / ],
-
-        [num_t: $num_t, const_name: CARTESIAN_REM      , op: % ],
-
-        [num_t: $num_t, const_name: CARTESIAN_BIT_AND  , op: & ],
-        [num_t: $num_t, const_name: CARTESIAN_BIT_OR   , op: | ],
-        [num_t: $num_t, const_name: CARTESIAN_BIT_XOR  , op: ^ ],
-
-        [num_t: $num_t, const_name: CARTESIAN_SHL      , op: <<],
-        [num_t: $num_t, const_name: CARTESIAN_SHR      , op: >>],
-    }
 
     pub const SORT<const SET: &'static[$num_t]>: &[$num_t] = const {
         let arr: [$num_t; LEN::<SET>] = match SET.try_into() {
@@ -286,21 +273,6 @@ impl<const SET: &'static [$num_t]> $wrap_t_name<SET> {
     }
 }
 
-crate::macros::impl_ops! {
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Add     , op_fn_name: add   , output_const: CARTESIAN_ADD       , op: + ],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Sub     , op_fn_name: sub   , output_const: CARTESIAN_SUB       , op: - ],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Mul     , op_fn_name: mul   , output_const: CARTESIAN_MUL       , op: * ],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Div     , op_fn_name: div   , output_const: CARTESIAN_DIV       , op: / ],
-
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Rem     , op_fn_name: rem   , output_const: CARTESIAN_REM       , op: % ],
-
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::BitAnd  , op_fn_name: bitand, output_const: CARTESIAN_BIT_AND   , op: & ],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::BitOr   , op_fn_name: bitor , output_const: CARTESIAN_BIT_OR    , op: | ],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::BitXor  , op_fn_name: bitxor, output_const: CARTESIAN_BIT_XOR   , op: ^ ],
-
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Shl     , op_fn_name: shl   , output_const: CARTESIAN_SHL       , op: <<],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Shr     , op_fn_name: shr   , output_const: CARTESIAN_SHR       , op: >>],
-}
 
 #[macro_export]
 macro_rules! $wrap_t_name {
@@ -325,6 +297,23 @@ crate::macros::implinator! {
     [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_SUB  , fn_name: wrapping_sub , fn_path: ::core::primitive::$num_t::wrapping_sub],
     [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_MUL  , fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul],
     [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_DIV  , fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div],
+}
+
+crate::macros::ops_implinator! {
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Add     , trait_fn_name: add   , cartesian_const_name: CARTESIAN_ADD       , op: + ],
+
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Sub     , trait_fn_name: sub   , cartesian_const_name: CARTESIAN_SUB       , op: - ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Mul     , trait_fn_name: mul   , cartesian_const_name: CARTESIAN_MUL       , op: * ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Div     , trait_fn_name: div   , cartesian_const_name: CARTESIAN_DIV       , op: / ],
+
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Rem     , trait_fn_name: rem   , cartesian_const_name: CARTESIAN_REM       , op: % ],
+
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::BitAnd  , trait_fn_name: bitand, cartesian_const_name: CARTESIAN_BIT_AND   , op: & ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::BitOr   , trait_fn_name: bitor , cartesian_const_name: CARTESIAN_BIT_OR    , op: | ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::BitXor  , trait_fn_name: bitxor, cartesian_const_name: CARTESIAN_BIT_XOR   , op: ^ ],
+
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Shl     , trait_fn_name: shl   , cartesian_const_name: CARTESIAN_SHL       , op: <<],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Shr     , trait_fn_name: shr   , cartesian_const_name: CARTESIAN_SHR       , op: >>],
 }
 
 )*}
