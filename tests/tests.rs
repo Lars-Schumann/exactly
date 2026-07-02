@@ -161,4 +161,15 @@ mod tests {
 
         let _z: Set<isize, { &[4, 5, 8, 10] }> = (x * y).normalize();
     }
+
+    #[test]
+    fn generic2() {
+        use exactly::base::Set;
+        use exactly::base::set_u16::Range;
+
+        let a: Set<u16, { Range![1..=4] }> = Set::new(5).unwrap();
+        let b: Set<u16, { Range![2..=6] }> = Set::new(2).unwrap();
+
+        let _c: Set<u16, { Range![3..=10] }> = (a + b).normalize();
+    }
 }

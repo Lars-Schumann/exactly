@@ -17,26 +17,26 @@ pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + 'static, const SET
 };
 
 pub const NORMALIZE<T: Copy + const Ord + ConstParamTy_ + Freeze + const Destruct + 'static, const SET: &'static[T]>: &[T] = const { 'out: {
-        let set_sorted = SORT::<T, SET>;
-        let mut normalized: Vec<T> = Vec::new();
+    let set_sorted = SORT::<T, SET>;
+    let mut normalized: Vec<T> = Vec::new();
 
-        let [first, ..] = set_sorted else {
-            break 'out &[]
-        };
+    let [first, ..] = set_sorted else {
+        break 'out &[]
+    };
 
-        normalized.push(*first);
+    normalized.push(*first);
 
-        let mut i: usize = 1;
+    let mut i: usize = 1;
 
-        while i < set_sorted.len() {
-            let (previous, current) = (set_sorted[i - 1], set_sorted[i]);
-            if previous != current {
-                normalized.push(current)
-            }
-            i += 1;
+    while i < set_sorted.len() {
+        let (previous, current) = (set_sorted[i - 1], set_sorted[i]);
+        if previous != current {
+            normalized.push(current)
         }
-        normalized.const_make_global()
-    }};
+        i += 1;
+    }
+    normalized.const_make_global()
+}};
 
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
@@ -115,16 +115,16 @@ where
 
 base_macros::impl_ints! {
     the_dolla: $,
-    [inner_type: u8,    largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU8,      private_macro_prefix: ඞ__private_macro_set_u8_,    extra_mod: set_u8    ],
-    [inner_type: u16,   largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU16,     private_macro_prefix: ඞ__private_macro_set_u16_,   extra_mod: set_u16   ],
-    [inner_type: u32,   largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU32,     private_macro_prefix: ඞ__private_macro_set_u32_,   extra_mod: set_u32   ],
-    [inner_type: u64,   largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU64,     private_macro_prefix: ඞ__private_macro_set_u64_,   extra_mod: set_u64   ],
-    [inner_type: u128,  largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU128,    private_macro_prefix: ඞ__private_macro_set_u128_,  extra_mod: set_u128  ],
-    [inner_type: usize, largest_num_t_with_same_signedness: usize,  wrap_t_name: SetUsize,   private_macro_prefix: ඞ__private_macro_set_usize_, extra_mod: set_usize ],
-    [inner_type: i8,    largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI8,      private_macro_prefix: ඞ__private_macro_set_i8_,    extra_mod: set_i8    ],
-    [inner_type: i16,   largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI16,     private_macro_prefix: ඞ__private_macro_set_i16_,   extra_mod: set_i16   ],
-    [inner_type: i32,   largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI32,     private_macro_prefix: ඞ__private_macro_set_i32_,   extra_mod: set_i32   ],
-    [inner_type: i64,   largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI64,     private_macro_prefix: ඞ__private_macro_set_i64_,   extra_mod: set_i64   ],
-    [inner_type: i128,  largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI128,    private_macro_prefix: ඞ__private_macro_set_i128_,  extra_mod: set_i128  ],
-    [inner_type: isize, largest_num_t_with_same_signedness: isize,  wrap_t_name: SetIsize,   private_macro_prefix: ඞ__private_macro_set_isize_, extra_mod: set_isize ],
+    [inner_type: u8,    largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU8,      private_macro_prefix: ඞඞ__private_macro_set_u8_,    extra_mod: set_u8    ],
+    [inner_type: u16,   largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU16,     private_macro_prefix: ඞඞ__private_macro_set_u16_,   extra_mod: set_u16   ],
+    [inner_type: u32,   largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU32,     private_macro_prefix: ඞඞ__private_macro_set_u32_,   extra_mod: set_u32   ],
+    [inner_type: u64,   largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU64,     private_macro_prefix: ඞඞ__private_macro_set_u64_,   extra_mod: set_u64   ],
+    [inner_type: u128,  largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU128,    private_macro_prefix: ඞඞ__private_macro_set_u128_,  extra_mod: set_u128  ],
+    [inner_type: usize, largest_num_t_with_same_signedness: usize,  wrap_t_name: SetUsize,   private_macro_prefix: ඞඞ__private_macro_set_usize_, extra_mod: set_usize ],
+    [inner_type: i8,    largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI8,      private_macro_prefix: ඞඞ__private_macro_set_i8_,    extra_mod: set_i8    ],
+    [inner_type: i16,   largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI16,     private_macro_prefix: ඞඞ__private_macro_set_i16_,   extra_mod: set_i16   ],
+    [inner_type: i32,   largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI32,     private_macro_prefix: ඞඞ__private_macro_set_i32_,   extra_mod: set_i32   ],
+    [inner_type: i64,   largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI64,     private_macro_prefix: ඞඞ__private_macro_set_i64_,   extra_mod: set_i64   ],
+    [inner_type: i128,  largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI128,    private_macro_prefix: ඞඞ__private_macro_set_i128_,  extra_mod: set_i128  ],
+    [inner_type: isize, largest_num_t_with_same_signedness: isize,  wrap_t_name: SetIsize,   private_macro_prefix: ඞඞ__private_macro_set_isize_, extra_mod: set_isize ],
 }

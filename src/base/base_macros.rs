@@ -62,6 +62,32 @@ pub(crate) use ops_implinator;
 macro_rules! impl_ints {
     (the_dolla: $d:tt, $([inner_type: $num_t:ident, largest_num_t_with_same_signedness: $largest_num_t_with_same_signedness:ident, wrap_t_name: $wrap_t_name:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
 
+        pub mod $extra_mod {
+
+            const RANGE_LENGTH_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: usize = const {
+                match <$largest_num_t_with_same_signedness as ::core::convert::TryInto<usize>>::try_into($largest_num_t_with_same_signedness::from(MAX).strict_sub($largest_num_t_with_same_signedness::from(MIN))) {
+                    Err(_) => panic!(),
+                    Ok(len) => len.strict_add(usize::from(IS_INCLUSIVE)),
+                }
+            };
+
+            pub const RANGE_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: &[$num_t] = const {
+                &core::array::from_fn::<$num_t, { RANGE_LENGTH_HELPER::<MIN, MAX, IS_INCLUSIVE> }, _>(const |i| $num_t::try_from($largest_num_t_with_same_signedness::from(MIN) + <usize as TryInto<$largest_num_t_with_same_signedness>>::try_into(i).ok().unwrap()).ok().unwrap())
+            };
+
+            #[cfg_attr(doc, doc(hidden))]
+            #[macro_export]
+            macro_rules! ${ concat($private_macro_prefix, range) } {
+                ( $start:literal ..  $end:literal  ) => { $d crate::$extra_mod::RANGE::             <$start, $end>  };
+                ( $start:literal ..                ) => { $d crate::$extra_mod::RANGE_FROM::        <$start>        };
+                // (                ..             ) => { $d crate::$extra_mod::RANGE_FULL                          };
+                ( $start:literal ..= $last:literal ) => { $d crate::$extra_mod::RANGE_INCLUSIVE::   <$start, $last> };
+                (                ..  $end:literal  ) => { $d crate::$extra_mod::RANGE_TO::          <$end>          };
+                (                ..= $last:literal ) => { $d crate::$extra_mod::RANGE_TO_INCLUSIVE::<$last>         };
+            }
+            pub use ${ concat($private_macro_prefix, range) } as Range;
+
+        }
         base_macros::implinator! {
             [num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_ADD    , fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
             [num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_SUB    , fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub    ],
