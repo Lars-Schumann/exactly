@@ -1,5 +1,5 @@
 macro_rules! ops_implinator {
-    ($([num_t: $num_t:ident, wrap_t_name: $wrap_t_name:ident, extra_mod: $extra_mod:ident, op_trait: $(::$op_trait:ident)+, trait_fn_name: $trait_fn_name:ident, cartesian_const_name: $cartesian_const_name:ident, op: $op:tt]),+ $(,)?) => {$(
+    ($([num_t: $num_t:ident, wrap_t_name: $wrap_t_name:ident, extra_mod: $extra_mod:ident, cartesian_const_name: $cartesian_const_name:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
 
         #[expect(nonstandard_style)]
         mod ${concat(__mod_,$wrap_t_name,_,$cartesian_const_name)} {
@@ -30,7 +30,7 @@ macro_rules! ops_implinator {
 pub(crate) use ops_implinator;
 
 macro_rules! implinator {
-    ($([wrap_t_name: $wrap_t_name:ident, num_t: $num_t:ident, extra_mod: $extra_mod: ident, cartesian_const_name: $cartesian_const_name:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+    ($([num_t: $num_t:ident, wrap_t_name: $wrap_t_name:ident, extra_mod: $extra_mod: ident, cartesian_const_name: $cartesian_const_name:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         #[expect(nonstandard_style)]
         mod ${concat(__mod_,$wrap_t_name,_,$cartesian_const_name)} {
@@ -288,32 +288,31 @@ macro_rules! $wrap_t_name {
 }
 
 crate::macros::implinator! {
-    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_ADD    , fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add],
-    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_SUB    , fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub],
-    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_MUL    , fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul],
-    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_DIV    , fn_name: strict_div   , fn_path: ::core::primitive::$num_t::strict_div],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_ADD    , fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_SUB    , fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub    ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_MUL    , fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul    ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_DIV    , fn_name: strict_div   , fn_path: ::core::primitive::$num_t::strict_div    ],
 
-    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_ADD  , fn_name: wrapping_add , fn_path: ::core::primitive::$num_t::wrapping_add],
-    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_SUB  , fn_name: wrapping_sub , fn_path: ::core::primitive::$num_t::wrapping_sub],
-    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_MUL  , fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul],
-    [wrap_t_name: $wrap_t_name, num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_DIV  , fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_ADD  , fn_name: wrapping_add , fn_path: ::core::primitive::$num_t::wrapping_add  ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_SUB  , fn_name: wrapping_sub , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_MUL  , fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_DIV  , fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div  ],
 }
 
 crate::macros::ops_implinator! {
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Add     , trait_fn_name: add   , cartesian_const_name: CARTESIAN_ADD       , op: + ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_ADD           , trait_fn_name: add    , op_trait: ::core::ops::Add     , op: +  ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_SUB           , trait_fn_name: sub    , op_trait: ::core::ops::Sub     , op: -  ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_MUL           , trait_fn_name: mul    , op_trait: ::core::ops::Mul     , op: *  ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_DIV           , trait_fn_name: div    , op_trait: ::core::ops::Div     , op: /  ],
 
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Sub     , trait_fn_name: sub   , cartesian_const_name: CARTESIAN_SUB       , op: - ],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Mul     , trait_fn_name: mul   , cartesian_const_name: CARTESIAN_MUL       , op: * ],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Div     , trait_fn_name: div   , cartesian_const_name: CARTESIAN_DIV       , op: / ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_REM           , trait_fn_name: rem    , op_trait: ::core::ops::Rem     , op: %  ],
 
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Rem     , trait_fn_name: rem   , cartesian_const_name: CARTESIAN_REM       , op: % ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_BIT_AND       , trait_fn_name: bitand , op_trait: ::core::ops::BitAnd  , op: &  ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_BIT_OR        , trait_fn_name: bitor  , op_trait: ::core::ops::BitOr   , op: |  ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_BIT_XOR       , trait_fn_name: bitxor , op_trait: ::core::ops::BitXor  , op: ^  ],
 
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::BitAnd  , trait_fn_name: bitand, cartesian_const_name: CARTESIAN_BIT_AND   , op: & ],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::BitOr   , trait_fn_name: bitor , cartesian_const_name: CARTESIAN_BIT_OR    , op: | ],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::BitXor  , trait_fn_name: bitxor, cartesian_const_name: CARTESIAN_BIT_XOR   , op: ^ ],
-
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Shl     , trait_fn_name: shl   , cartesian_const_name: CARTESIAN_SHL       , op: <<],
-    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, op_trait: ::core::ops::Shr     , trait_fn_name: shr   , cartesian_const_name: CARTESIAN_SHR       , op: >>],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_SHL           , trait_fn_name: shl    , op_trait: ::core::ops::Shl     , op: << ],
+    [num_t: $num_t, wrap_t_name: $wrap_t_name, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_SHR           , trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
 }
 
 )*}
