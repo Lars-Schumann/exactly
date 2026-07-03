@@ -79,8 +79,8 @@ pub const INTERSECTION<T: Freeze  + 'static + ConstParamTy_  + Copy  + const Par
 pub(crate) const EMPTY<T: 'static>: &[T] = &[];
 
 pub(crate) const SLICEINATOR<T: 'static + ConstParamTy_  + Freeze, const NUM: T>: &[T] = const {
-        &[NUM]
-    };
+    &[NUM]
+};
 
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
@@ -107,8 +107,8 @@ where
 
     pub const fn new(value: T) -> Option<Self> {
         match Self::contains(&value) {
-            true => Some(unsafe { Self::new_unchecked(value) }),
             false => None,
+            true => Some(unsafe { Self::new_unchecked(value) }),
         }
     }
 
