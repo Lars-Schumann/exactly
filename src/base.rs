@@ -40,6 +40,10 @@ pub const NORMALIZE<T: Copy + const Ord + ConstParamTy_ + Freeze + const Destruc
 
 pub(crate) const EMPTY<T: 'static>: &[T] = &[];
 
+pub(crate) const SLICEINATOR<T: 'static + ConstParamTy_  + Freeze, const NUM: T>: &[T] = const {
+        &[NUM]
+    };
+
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct Set<T: ConstParamTy_ + 'static, const SET: &'static [T]>(T);
@@ -48,7 +52,7 @@ impl<T> Set<T, { EMPTY::<T> }>
 where
     T: Copy + const Ord + Freeze + ConstParamTy_ + const Destruct + 'static,
 {
-    pub const NEW<const NUM: T>: Set<T, { SLICEINATOR::<NUM> }> = const {
+    pub const NEW<const NUM: T>: Set<T, { SLICEINATOR::<T,NUM> }> = const {
         const { Set::new(NUM).expect("This should be infallible, please file a bug report.") }
     };
 }
