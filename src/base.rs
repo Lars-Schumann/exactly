@@ -4,8 +4,6 @@ use core::marker::Freeze;
 
 use alloc::vec::Vec;
 
-pub(crate) mod base_macros;
-
 const LEN<T: ConstParamTy_ + 'static, const SET: &'static[T]>: usize = const { SET.len()};
 pub(crate) const CARTESIAN_LENGTH<T: ConstParamTy_ + 'static, const A: &'static[T], const B: &'static[T]>: usize = const { A.len() * B.len() };
 

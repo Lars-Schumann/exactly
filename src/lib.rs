@@ -28,7 +28,9 @@ extern crate alloc;
 pub mod base;
 mod const_helpers;
 
-base::base_macros::impl_ints! {
+mod macros;
+
+macros::impl_ints! {
     the_dolla: $,
     [inner_type: u8,    t_alias: SetU8,     largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU8,      private_macro_prefix: ඞඞ__private_macro_set_u8_,    extra_mod: set_u8    ],
     [inner_type: u16,   t_alias: SetU16,    largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU16,     private_macro_prefix: ඞඞ__private_macro_set_u16_,   extra_mod: set_u16   ],
