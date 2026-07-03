@@ -60,15 +60,15 @@ macro_rules! ops_implinator {
 pub(crate) use ops_implinator;
 
 macro_rules! impl_ints {
-    (the_dolla: $d:tt, $([num_t: $num_t:ident, t_alias: $t_alias:ident, wide_num_t: $largest_num_t_with_same_signedness:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
+    (the_dolla: $d:tt, $([num_t: $num_t:ident, t_alias: $t_alias:ident, wide_num_t: $wide_num_t:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
 
         pub type $t_alias<const SET: &'static [$num_t]> = base::Set<$num_t, SET>;
 
         pub mod $extra_mod {
 
             const RANGE_LENGTH_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: usize = const {
-                let wide_min = $largest_num_t_with_same_signedness::from(MIN);
-                let wide_max = $largest_num_t_with_same_signedness::from(MAX);
+                let wide_min = $wide_num_t::from(MIN);
+                let wide_max = $wide_num_t::from(MAX);
                 let exclusive_length = wide_max.strict_sub(wide_min);
                 let exclusive_length: usize = usize::try_from(exclusive_length).ok().expect("Range length could not be converted into a usize.");
                 let inclusive_addition: usize = usize::from(IS_INCLUSIVE);
@@ -76,11 +76,11 @@ macro_rules! impl_ints {
             };
 
             pub const RANGE_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: &[$num_t] = const {
-                let wide_min = $largest_num_t_with_same_signedness::from(MIN);
+                let wide_min = $wide_num_t::from(MIN);
 
                 &core::array::from_fn::<$num_t, { RANGE_LENGTH_HELPER::<MIN, MAX, IS_INCLUSIVE> }, _>(
                     const |i| {
-                        let wide_index = $largest_num_t_with_same_signedness::try_from(i).ok().expect("");
+                        let wide_index = $wide_num_t::try_from(i).ok().expect("");
                         $num_t::try_from(wide_min + wide_index).ok().unwrap()
                     }
                 )
