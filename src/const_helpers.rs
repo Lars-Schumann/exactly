@@ -1,6 +1,12 @@
 use ::alloc::vec::Vec;
 use ::core::marker::Destruct;
-use ::core::ops::Not::not;
+
+const fn not(value: bool) -> bool {
+    match value {
+        true => false,
+        false => true,
+    }
+}
 
 pub(crate) const fn ext_slice_contains<T>(slice: &[T], elem: &T) -> bool
 where

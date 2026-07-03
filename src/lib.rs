@@ -14,7 +14,7 @@
     generic_const_args,
     generic_const_items,
     generic_const_parameter_types,
-    import_trait_associated_functions,
+    //import_trait_associated_functions,
     macro_metavar_expr_concat,
     min_generic_const_args,
     unsized_const_params
