@@ -39,43 +39,43 @@ pub const NORMALIZE<T: Copy + const Ord + ConstParamTy_ + Freeze + const Destruc
 }};
 
 pub const UNION<T: Freeze  + 'static + ConstParamTy_  + Copy, const SETS: &'static [&'static [T]]>: &[T] = const {
-        let mut onion: Vec<T> = Vec::new();
-        let mut i: usize = 0;
+    let mut onion: Vec<T> = Vec::new();
+    let mut i: usize = 0;
 
-        while i < SETS.len() {
-            let mut j: usize = 0;
-            while j < SETS[i].len() {
-                onion.push(SETS[i][j]);
-                j += 1;
-            }
-            i += 1;
-        }
-
-        onion.const_make_global()
-    };
-
-pub const INTERSECTION<T: Freeze  + 'static + ConstParamTy_  + Copy  + const PartialEq  + const Destruct, const SETS: &'static [&'static [T]]>: &[T] = const { 'out: {
-        let [first_set, ..] = SETS else {
-            break 'out &[];
-        };
-
-        let mut intersection: Vec<T> = Vec::with_capacity(first_set.len());
-
-        let mut i: usize = 0;
-        while i < first_set.len() {
-            intersection.push(first_set[i]);
-            i += 1;
-        }
-
-        let mut j: usize = 1;
-
-        while j < SETS.len() {
-            crate::const_helpers::ext_vec_reduce_to_intersection_with(&mut intersection, SETS[j]);
+    while i < SETS.len() {
+        let mut j: usize = 0;
+        while j < SETS[i].len() {
+            onion.push(SETS[i][j]);
             j += 1;
         }
+        i += 1;
+    }
 
-        intersection.const_make_global()
-    }};
+    onion.const_make_global()
+};
+
+pub const INTERSECTION<T: Freeze  + 'static + ConstParamTy_  + Copy  + const PartialEq  + const Destruct, const SETS: &'static [&'static [T]]>: &[T] = const { 'out: {
+    let [first_set, ..] = SETS else {
+        break 'out &[];
+    };
+
+    let mut intersection: Vec<T> = Vec::with_capacity(first_set.len());
+
+    let mut i: usize = 0;
+    while i < first_set.len() {
+        intersection.push(first_set[i]);
+        i += 1;
+    }
+
+    let mut j: usize = 1;
+
+    while j < SETS.len() {
+        crate::const_helpers::ext_vec_reduce_to_intersection_with(&mut intersection, SETS[j]);
+        j += 1;
+    }
+
+    intersection.const_make_global()
+}};
 
 pub(crate) const EMPTY<T: 'static>: &[T] = &[];
 

@@ -89,6 +89,24 @@ macro_rules! impl_ints {
             }
             pub use ${ concat($private_macro_prefix, range) } as Range;
 
+            #[cfg_attr(doc, doc(hidden))]
+            #[macro_export]
+            macro_rules! ${ concat($private_macro_prefix, union) } {
+                ($d($set:expr),+ $d(,)?) => {
+                    $d crate::$extra_mod::UNION::<{ &[$d($set, )+] }>
+                };
+            }
+            pub use ${ concat($private_macro_prefix, union) } as Union;
+
+            #[cfg_attr(doc, doc(hidden))]
+            #[macro_export]
+            macro_rules! ${ concat($private_macro_prefix, intersection) } {
+                ($d($set:expr),+ $d(,)?) => {
+                    $d crate::$extra_mod::INTERSECTION::<{ &[$d($set, )+] }>
+                };
+            }
+            pub use ${ concat($private_macro_prefix, intersection) } as Intersection;
+
         }
         base_macros::implinator! {
             [num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_ADD    , fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
