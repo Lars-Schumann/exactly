@@ -60,7 +60,9 @@ macro_rules! ops_implinator {
 pub(crate) use ops_implinator;
 
 macro_rules! impl_ints {
-    (the_dolla: $d:tt, $([inner_type: $num_t:ident, largest_num_t_with_same_signedness: $largest_num_t_with_same_signedness:ident, wrap_t_name: $wrap_t_name:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
+    (the_dolla: $d:tt, $([inner_type: $num_t:ident, t_alias: $t_alias:ident, largest_num_t_with_same_signedness: $largest_num_t_with_same_signedness:ident, wrap_t_name: $wrap_t_name:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
+
+        pub type $t_alias<const SET: &'static [$num_t]> = Set<$num_t, SET>;
 
         pub mod $extra_mod {
 
