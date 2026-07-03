@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     fn bleh() {
-        let _r1: SetU8![4] = SetU8::NEW::<4>;
+        let _r1: SetU8![4] = SetU8::new(4).unwrap();
     }
 
     #[test]
@@ -91,9 +91,9 @@ mod tests {
 
     #[test]
     fn intersections() {
+        use base::SORT;
         use set_i8::Intersection;
         use set_i8::Range;
-        use set_i8::SORT;
 
         // Intersection on one set should be the identity
         assert_eq!(Intersection![Range![-3..27]], Range![-3..27]);
@@ -111,12 +111,12 @@ mod tests {
         );
 
         assert_eq!(
-            SORT::<{ Intersection![Range![1..=20], Range![10..=30]] }>,
+            SORT::<i8, { Intersection![Range![1..=20], Range![10..=30]] }>,
             Range![10..=20]
         );
 
         assert_eq!(
-            SORT::<{ Intersection![Range![10..=50], Range![20..=100], Range![30..=40]] }>,
+            SORT::<i8, { Intersection![Range![10..=50], Range![20..=100], Range![30..=40]] }>,
             Range![30..=40]
         );
     }
@@ -124,10 +124,10 @@ mod tests {
     #[test]
     fn widen() {
         // {5} is a subset of 5
-        let _: SetU32<{ &[5] }> = SetU32::NEW::<5>.widen();
+        let _: SetU32<{ &[5] }> = <SetU32![5]>::new(5).unwrap().widen();
 
         // {4} is a subset of {1, 2, 3}
-        let _: SetU32![1, 2, 3] = SetU32::NEW::<3>.widen();
+        let _: SetU32![1, 2, 3] = <SetU32![3]>::new(3).unwrap().widen();
 
         // {6, 4} is a subset of {3, 4, 5, 6}
         let _: SetU32![3, 4, 5, 6] = <SetU32![6, 4]>::new(6).unwrap().widen();
@@ -138,9 +138,9 @@ mod tests {
 
     #[test]
     fn cast() {
-        let _: SetU32<{ &[5] }> = SetU32::NEW::<5>.cast().unwrap();
+        let _: SetU32<{ &[5] }> = <SetU32![1, 5]>::new(5).unwrap().cast().unwrap();
 
-        let _: SetU32![1, 2, 3] = SetU32::NEW::<3>.cast().unwrap();
+        let _: SetU32![1, 2, 3] = <SetU32![1, 2, 5]>::new(2).unwrap().cast().unwrap();
 
         let _: SetU32![1, 2] = <SetU32![1, 2, 3]>::new(2).unwrap().cast().unwrap();
 
@@ -165,9 +165,9 @@ mod tests {
     #[test]
     fn generic2() {
         use exactly::base::Set;
-        use exactly::base::set_u16::Range;
+        use exactly::set_u16::Range;
 
-        let a: Set<u16, { Range![1..=4] }> = Set::new(5).unwrap();
+        let a: Set<u16, { Range![1..=4] }> = Set::new(4).unwrap();
         let b: Set<u16, { Range![2..=6] }> = Set::new(2).unwrap();
 
         let _c: Set<u16, { Range![3..=10] }> = (a + b).normalize();

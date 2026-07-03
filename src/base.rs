@@ -7,6 +7,7 @@ use alloc::vec::Vec;
 pub(crate) mod base_macros;
 
 const LEN<T: ConstParamTy_ + 'static, const SET: &'static[T]>: usize = const { SET.len()};
+pub(crate) const CARTESIAN_LENGTH<T: ConstParamTy_ + 'static, const A: &'static[T], const B: &'static[T]>: usize = const { A.len() * B.len() };
 
 pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + 'static, const SET: &'static[T]>: &[T]= const {
     let arr: [T; LEN::<T, SET>] = match SET.try_into() {
@@ -165,20 +166,4 @@ where
     pub const unsafe fn cast_unchecked<const NEW_SET: &'static [T]>(self) -> Set<T, NEW_SET> {
         unsafe { Set::new_unchecked(self.inner()) }
     }
-}
-
-base_macros::impl_ints! {
-    the_dolla: $,
-    [inner_type: u8,    t_alias: SetU8,     largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU8,      private_macro_prefix: ඞඞ__private_macro_set_u8_,    extra_mod: set_u8    ],
-    [inner_type: u16,   t_alias: SetU16,    largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU16,     private_macro_prefix: ඞඞ__private_macro_set_u16_,   extra_mod: set_u16   ],
-    [inner_type: u32,   t_alias: SetU32,    largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU32,     private_macro_prefix: ඞඞ__private_macro_set_u32_,   extra_mod: set_u32   ],
-    [inner_type: u64,   t_alias: SetU64,    largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU64,     private_macro_prefix: ඞඞ__private_macro_set_u64_,   extra_mod: set_u64   ],
-    [inner_type: u128,  t_alias: SetU128,   largest_num_t_with_same_signedness: u128,   wrap_t_name: SetU128,    private_macro_prefix: ඞඞ__private_macro_set_u128_,  extra_mod: set_u128  ],
-    [inner_type: usize, t_alias: SetUsize,  largest_num_t_with_same_signedness: usize,  wrap_t_name: SetUsize,   private_macro_prefix: ඞඞ__private_macro_set_usize_, extra_mod: set_usize ],
-    [inner_type: i8,    t_alias: SetI8,     largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI8,      private_macro_prefix: ඞඞ__private_macro_set_i8_,    extra_mod: set_i8    ],
-    [inner_type: i16,   t_alias: SetI16,    largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI16,     private_macro_prefix: ඞඞ__private_macro_set_i16_,   extra_mod: set_i16   ],
-    [inner_type: i32,   t_alias: SetI32,    largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI32,     private_macro_prefix: ඞඞ__private_macro_set_i32_,   extra_mod: set_i32   ],
-    [inner_type: i64,   t_alias: SetI64,    largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI64,     private_macro_prefix: ඞඞ__private_macro_set_i64_,   extra_mod: set_i64   ],
-    [inner_type: i128,  t_alias: SetI128,   largest_num_t_with_same_signedness: i128,   wrap_t_name: SetI128,    private_macro_prefix: ඞඞ__private_macro_set_i128_,  extra_mod: set_i128  ],
-    [inner_type: isize, t_alias: SetIsize,  largest_num_t_with_same_signedness: isize,  wrap_t_name: SetIsize,   private_macro_prefix: ඞඞ__private_macro_set_isize_, extra_mod: set_isize ],
 }
