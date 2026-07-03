@@ -115,11 +115,7 @@ where
     pub const unsafe fn new_unchecked(value: T) -> Self {
         debug_assert!(
             Self::contains(&value),
-            concat!(
-                "Tried to create a ",
-                stringify!($wrap_t_name),
-                " with a value thats not contained in its SET, this is UB."
-            )
+            "Tried to create a Set with a value thats not contained in its SET, this is UB."
         );
         Self(value)
     }
@@ -144,11 +140,7 @@ where
         const {
             assert!(
                 crate::const_helpers::ext_slice_is_subset(SET, SUPER_SET),
-                concat!(
-                    "Tried to widen a ",
-                    stringify!($wrap_t_name),
-                    ", which failed because the target's SET isn't a superset of the original."
-                )
+                "Tried to widen a Set which failed because the target's SET isn't a superset of the original."
             );
         }
         unsafe { self.cast_unchecked() }
