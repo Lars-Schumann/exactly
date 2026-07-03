@@ -107,8 +107,8 @@ where
 
     pub const fn new(value: T) -> Option<Self> {
         match Self::contains(&value) {
-            false => None,
             true => Some(unsafe { Self::new_unchecked(value) }),
+            false => None,
         }
     }
 
@@ -148,8 +148,8 @@ where
 
     pub const fn cast<const NEW_SET: &'static [T]>(self) -> Option<Set<T, NEW_SET>> {
         match Set::<T, NEW_SET>::contains(&self.inner()) {
-            false => None,
             true => Some(unsafe { self.cast_unchecked() }),
+            false => None,
         }
     }
 
