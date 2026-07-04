@@ -14,39 +14,35 @@ macro_rules! if_signed {
 }
 pub(crate) use if_signed;
 
-macro_rules! impl_simple_binary_fns {
-    ($([inner_t: $inner_t:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+macro_rules! impl_simple_unary_ops {
+    ($([inner_t: $inner_t:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
-        mod ${concat(ඞඞ__,$inner_t,_,$fn_name)} {
+        mod ${concat(ඞඞ__,$inner_t,_,$trait_fn_name)} {
             use crate::base::Set;
 
-            const CARTESIAN<const A: &'static[$inner_t], const B: &'static[$inner_t]>: &[$inner_t] = const {
-                &core::array::from_fn::<$inner_t, { crate::base::CARTESIAN_LENGTH::<$inner_t, A, B> }, _>(
+            const CODOMAIN<const A: &'static[$inner_t]>: &[$inner_t] = const {
+                &core::array::from_fn::<$inner_t, { crate::base::LENGTH::<$inner_t, A> }, _>(
                     const |i| {
-                        let b_len: usize = B.len();
-                        let a_index: usize = i.strict_div(b_len);
-                        let b_index: usize = i.strict_rem(b_len);
-                        let a: $inner_t = A[a_index];
-                        let b: $inner_t = B[b_index];
-                        $fn_path(a, b)
+                        let a: $inner_t = A[i];
+                        $op a
                     }
                 )
             };
 
-            const impl<const SET: &'static [$inner_t]> Set<$inner_t, SET> {
-                pub fn $fn_name<const RHS_SET: &'static [$inner_t]>(self, rhs: Set<$inner_t, RHS_SET>) -> Set<$inner_t, { CARTESIAN::<{ SET }, { RHS_SET }> }> {
+            const impl<const SET: &'static [$inner_t]> $(::$op_trait)+ for Set<$inner_t, SET> {
+                type Output = Set<$inner_t, { CODOMAIN::<{ SET }> }>;
+
+                fn $trait_fn_name(self) -> Self::Output {
                     let self_inner: $inner_t = self.inner();
-                    let rhs_inner: $inner_t = rhs.inner();
-                    let res_inner: $inner_t = $fn_path(self_inner, rhs_inner);
+                    let res_inner: $inner_t = $op self_inner;
                     unsafe { Set::new_unchecked(res_inner) }
                 }
             }
         }
-
     )+}
 }
-pub(crate) use impl_simple_binary_fns;
+pub(crate) use impl_simple_unary_ops;
 
 macro_rules! impl_simple_binary_ops {
     ($([inner_t: $inner_t:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
@@ -55,7 +51,7 @@ macro_rules! impl_simple_binary_ops {
         mod ${concat(ඞඞ__,$inner_t,_,$trait_fn_name)} {
             use crate::base::Set;
 
-            const CARTESIAN<const A: &'static[$inner_t], const B: &'static[$inner_t]>: &[$inner_t] = const {
+            const CODOMAIN<const A: &'static[$inner_t], const B: &'static[$inner_t]>: &[$inner_t] = const {
                 &core::array::from_fn::<$inner_t, { crate::base::CARTESIAN_LENGTH::<$inner_t, A, B> }, _>(
                     const |i| {
                         let b_len: usize = B.len();
@@ -69,7 +65,7 @@ macro_rules! impl_simple_binary_ops {
             };
 
             const impl<const A_SET: &'static [$inner_t], const B_SET: &'static [$inner_t]> $(::$op_trait)+<Set<$inner_t,B_SET> > for Set<$inner_t, A_SET> {
-                type Output = Set<$inner_t, { CARTESIAN::<{ A_SET }, { B_SET }> }>;
+                type Output = Set<$inner_t, { CODOMAIN::<{ A_SET }, { B_SET }> }>;
 
                 fn $trait_fn_name(self, rhs: Set<$inner_t, B_SET>) -> Self::Output {
                     let self_inner: $inner_t = self.inner();
@@ -82,6 +78,40 @@ macro_rules! impl_simple_binary_ops {
     )+}
 }
 pub(crate) use impl_simple_binary_ops;
+
+macro_rules! impl_simple_binary_fns {
+    ($([inner_t: $inner_t:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+
+        #[expect(non_snake_case)]
+        mod ${concat(ඞඞ__,$inner_t,_,$fn_name)} {
+            use crate::base::Set;
+
+            const CODOMAIN<const A: &'static[$inner_t], const B: &'static[$inner_t]>: &[$inner_t] = const {
+                &core::array::from_fn::<$inner_t, { crate::base::CARTESIAN_LENGTH::<$inner_t, A, B> }, _>(
+                    const |i| {
+                        let b_len: usize = B.len();
+                        let a_index: usize = i.strict_div(b_len);
+                        let b_index: usize = i.strict_rem(b_len);
+                        let a: $inner_t = A[a_index];
+                        let b: $inner_t = B[b_index];
+                        $fn_path(a, b)
+                    }
+                )
+            };
+
+            const impl<const SET: &'static [$inner_t]> Set<$inner_t, SET> {
+                pub fn $fn_name<const RHS_SET: &'static [$inner_t]>(self, rhs: Set<$inner_t, RHS_SET>) -> Set<$inner_t, { CODOMAIN::<{ SET }, { RHS_SET }> }> {
+                    let self_inner: $inner_t = self.inner();
+                    let rhs_inner: $inner_t = rhs.inner();
+                    let res_inner: $inner_t = $fn_path(self_inner, rhs_inner);
+                    unsafe { Set::new_unchecked(res_inner) }
+                }
+            }
+        }
+
+    )+}
+}
+pub(crate) use impl_simple_binary_fns;
 
 macro_rules! impl_ints {
     (the_dolla: $d:tt, $([num_t: $num_t:ident, t_alias: $t_alias:ident, wide_num_t: $wide_num_t:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
@@ -162,23 +192,13 @@ macro_rules! impl_ints {
             };
         }
 
-        macros::impl_simple_binary_fns! {
-            [inner_t: $num_t, fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
-            [inner_t: $num_t, fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub    ],
-            [inner_t: $num_t, fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul    ],
-            [inner_t: $num_t, fn_name: strict_div   , fn_path: ::core::primitive::$num_t::strict_div    ],
+        macros::if_signed!{ $num_t, { macros::impl_simple_unary_ops! {
+            [inner_t: $num_t, trait_fn_name: neg    , op_trait: ::core::ops::Neg     , op: -  ],
+        }}}
 
-            [inner_t: $num_t, fn_name: wrapping_add , fn_path: ::core::primitive::$num_t::wrapping_add  ],
-            [inner_t: $num_t, fn_name: wrapping_sub , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
-            [inner_t: $num_t, fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
-            [inner_t: $num_t, fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div  ],
+        macros::impl_simple_unary_ops! {
+            [inner_t: $num_t, trait_fn_name: not    , op_trait: ::core::ops::Not     , op: !  ],
         }
-
-        // macros::if_signed!{ $num_t, {
-        //     macros::impl_binary_fns! {
-        //         [inner_t: $num_t, fn_name: strict_abs , fn_path: ::core::primitive::$num_t::strict_abs  ],
-        //     }
-        // }}
 
         macros::impl_simple_binary_ops! {
             [inner_t: $num_t, trait_fn_name: add    , op_trait: ::core::ops::Add     , op: +  ],
@@ -194,6 +214,19 @@ macro_rules! impl_ints {
 
             [inner_t: $num_t, trait_fn_name: shl    , op_trait: ::core::ops::Shl     , op: << ],
             [inner_t: $num_t, trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
+        }
+
+
+        macros::impl_simple_binary_fns! {
+            [inner_t: $num_t, fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
+            [inner_t: $num_t, fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub    ],
+            [inner_t: $num_t, fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul    ],
+            [inner_t: $num_t, fn_name: strict_div   , fn_path: ::core::primitive::$num_t::strict_div    ],
+
+            [inner_t: $num_t, fn_name: wrapping_add , fn_path: ::core::primitive::$num_t::wrapping_add  ],
+            [inner_t: $num_t, fn_name: wrapping_sub , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
+            [inner_t: $num_t, fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
+            [inner_t: $num_t, fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div  ],
         }
 
     )*}
