@@ -1,7 +1,8 @@
 macro_rules! impl_methods {
     ($([num_t: $num_t:ident, cartesian_const_name: $cartesian_const_name:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
-        mod ${concat(__,$num_t,_,$fn_name)} {
+        #[expect(non_snake_case)]
+        mod ${concat(ඞඞ__,$num_t,_,$fn_name)} {
             use crate::base::Set;
 
             pub(crate) const $cartesian_const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
@@ -35,7 +36,8 @@ pub(crate) use impl_methods;
 macro_rules! impl_ops {
     ($([num_t: $num_t:ident, cartesian_const_name: $cartesian_const_name:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
 
-        mod ${concat(__,$num_t,_,$trait_fn_name)} {
+        #[expect(non_snake_case)]
+        mod ${concat(ඞඞ__,$num_t,_,$trait_fn_name)} {
             use crate::base::Set;
 
             pub(crate) const $cartesian_const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
