@@ -79,6 +79,35 @@ macro_rules! impl_simple_binary_ops {
 }
 pub(crate) use impl_simple_binary_ops;
 
+macro_rules! impl_simple_unary_fns {
+    ($([inner_t: $inner_t:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+
+        #[expect(non_snake_case)]
+        mod ${concat(ඞඞ__,$inner_t,_,$fn_name)} {
+            use crate::base::Set;
+
+            const CODOMAIN<const A: &'static[$inner_t]>: &[$inner_t] = const {
+                &core::array::from_fn::<$inner_t, { crate::base::LENGTH::<$inner_t, A> }, _>(
+                    const |i| {
+                        let a: $inner_t = A[i];
+                        $fn_path(a)
+                    }
+                )
+            };
+
+            const impl<const SET: &'static [$inner_t]> Set<$inner_t, SET> {
+                pub fn $fn_name(self) -> Set<$inner_t, { CODOMAIN::<{ SET }> }> {
+                    let self_inner: $inner_t = self.inner();
+                    let res_inner: $inner_t = $fn_path(self_inner);
+                    unsafe { Set::new_unchecked(res_inner) }
+                }
+            }
+        }
+
+    )+}
+}
+pub(crate) use impl_simple_unary_fns;
+
 macro_rules! impl_simple_binary_fns {
     ($([inner_t: $inner_t:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
@@ -216,6 +245,9 @@ macro_rules! impl_ints {
             [inner_t: $num_t, trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
         }
 
+        macros::if_signed!{ $num_t, { macros::impl_simple_unary_fns! {
+            [inner_t: $num_t, fn_name: strict_abs   , fn_path: ::core::primitive::$num_t::strict_abs    ],
+        }}}
 
         macros::impl_simple_binary_fns! {
             [inner_t: $num_t, fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
