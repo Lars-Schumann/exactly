@@ -250,6 +250,7 @@ macro_rules! impl_ints {
         }
 
         macros::if_signed!{ $num_t, { macros::impl_simple_unary_fns! {
+            [inner_t: $num_t, fn_name: abs          , fn_path: ::core::primitive::$num_t::abs           ],
             [inner_t: $num_t, fn_name: strict_abs   , fn_path: ::core::primitive::$num_t::strict_abs    ],
         }}}
 
