@@ -106,12 +106,12 @@ macro_rules! impl_ints {
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, range) } {
-                ( $start:literal ..  $end:literal  ) => { $d crate::$extra_mod::RANGE::             <$start, $end>  };
-                ( $start:literal ..                ) => { $d crate::$extra_mod::RANGE_FROM::        <$start>        };
-                // RANGE_FULL omitted                          };
-                ( $start:literal ..= $last:literal ) => { $d crate::$extra_mod::RANGE_INCLUSIVE::   <$start, $last> };
-                (                ..  $end:literal  ) => { $d crate::$extra_mod::RANGE_TO::          <$end>          };
-                (                ..= $last:literal ) => { $d crate::$extra_mod::RANGE_TO_INCLUSIVE::<$last>         };
+                ( $min:literal ..  $max:literal ) => { $d crate::$extra_mod::RANGE::             <$min, $max> };
+                ( $min:literal ..               ) => { $d crate::$extra_mod::RANGE_FROM::        <$min      > };
+                // RANGE_FULL omitted
+                ( $min:literal ..= $max:literal ) => { $d crate::$extra_mod::RANGE_INCLUSIVE::   <$min, $max> };
+                (              ..  $max:literal ) => { $d crate::$extra_mod::RANGE_TO::          <      $max> };
+                (              ..= $max:literal ) => { $d crate::$extra_mod::RANGE_TO_INCLUSIVE::<      $max> };
             }
             pub use ${ concat($private_macro_prefix, range) } as Range;
 
