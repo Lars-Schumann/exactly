@@ -7,8 +7,11 @@ macro_rules! impl_methods {
             pub(crate) const $cartesian_const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { crate::base::CARTESIAN_LENGTH::<$num_t, A, B> }, _>(
                     const |i| {
-                        let a = A[i / B.len()];
-                        let b = B[i % B.len()];
+                        let b_len: usize = B.len();
+                        let a_index: usize = i.strict_div(b_len);
+                        let b_index: usize = i.strict_rem(b_len);
+                        let a: $num_t = A[a_index];
+                        let b: $num_t = B[b_index];
                         $fn_path(a, b)
                     }
                 )
@@ -16,7 +19,10 @@ macro_rules! impl_methods {
 
             const impl<const SET: &'static [$num_t]> Set<$num_t, SET> {
                 pub fn $fn_name<const RHS_SET: &'static [$num_t]>(self, rhs: Set<$num_t, RHS_SET>) -> Set<$num_t, { $cartesian_const_name::<{ SET }, { RHS_SET }> }> {
-                    unsafe { Set::new_unchecked($fn_path(self.inner(), rhs.inner())) }
+                    let self_inner: $num_t = self.inner();
+                    let rhs_inner: $num_t = rhs.inner();
+                    let res_inner: $num_t = $fn_path(self_inner, rhs_inner);
+                    unsafe { Set::new_unchecked(res_inner) }
                 }
             }
 
@@ -35,8 +41,11 @@ macro_rules! impl_ops {
             pub(crate) const $cartesian_const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { crate::base::CARTESIAN_LENGTH::<$num_t, A, B> }, _>(
                     const |i| {
-                        let a = A[i / B.len()];
-                        let b = B[i % B.len()];
+                        let b_len: usize = B.len();
+                        let a_index: usize = i.strict_div(b_len);
+                        let b_index: usize = i.strict_rem(b_len);
+                        let a: $num_t = A[a_index];
+                        let b: $num_t = B[b_index];
                         a $op b
                     }
                 )
@@ -46,7 +55,10 @@ macro_rules! impl_ops {
                 type Output = Set<$num_t, { $cartesian_const_name::<{ A_SET }, { B_SET }> }>;
 
                 fn $trait_fn_name(self, rhs: Set<$num_t, B_SET>) -> Self::Output {
-                    unsafe { Set::new_unchecked(self.inner() $op rhs.inner()) }
+                    let self_inner: $num_t = self.inner();
+                    let rhs_inner: $num_t = rhs.inner();
+                    let res_inner: $num_t = self_inner $op rhs_inner;
+                    unsafe { Set::new_unchecked(res_inner) }
                 }
             }
 
