@@ -1,4 +1,4 @@
-macro_rules! implinator {
+macro_rules! impl_methods {
     ($([num_t: $num_t:ident, extra_mod: $extra_mod:ident, cartesian_const_name: $cartesian_const_name:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         mod ${concat(__,$num_t,_,$fn_name)} {
@@ -24,9 +24,9 @@ macro_rules! implinator {
 
     )+}
 }
-pub(crate) use implinator;
+pub(crate) use impl_methods;
 
-macro_rules! ops_implinator {
+macro_rules! impl_ops {
     ($([num_t: $num_t:ident, extra_mod: $extra_mod:ident, cartesian_const_name: $cartesian_const_name:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
 
         mod ${concat(__,$num_t,_,$trait_fn_name)} {
@@ -53,7 +53,7 @@ macro_rules! ops_implinator {
         }
     )+}
 }
-pub(crate) use ops_implinator;
+pub(crate) use impl_ops;
 
 macro_rules! impl_ints {
     (the_dolla: $d:tt, $([num_t: $num_t:ident, t_alias: $t_alias:ident, wide_num_t: $wide_num_t:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
@@ -134,7 +134,7 @@ macro_rules! impl_ints {
             };
         }
 
-        macros::implinator! {
+        macros::impl_methods! {
             [num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_ADD    , fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
             [num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_SUB    , fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub    ],
             [num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_STRICT_MUL    , fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul    ],
@@ -146,7 +146,7 @@ macro_rules! impl_ints {
             [num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_WRAPPING_DIV  , fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div  ],
         }
 
-        macros::ops_implinator! {
+        macros::impl_ops! {
             [num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_ADD      , trait_fn_name: add    , op_trait: ::core::ops::Add     , op: +  ],
             [num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_SUB      , trait_fn_name: sub    , op_trait: ::core::ops::Sub     , op: -  ],
             [num_t: $num_t, extra_mod: $extra_mod, cartesian_const_name: CARTESIAN_MUL      , trait_fn_name: mul    , op_trait: ::core::ops::Mul     , op: *  ],
