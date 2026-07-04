@@ -26,7 +26,6 @@ macro_rules! impl_methods {
                     unsafe { Set::new_unchecked(res_inner) }
                 }
             }
-
         }
 
     )+}
@@ -63,7 +62,6 @@ macro_rules! impl_ops {
                     unsafe { Set::new_unchecked(res_inner) }
                 }
             }
-
         }
     )+}
 }
