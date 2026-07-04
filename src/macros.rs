@@ -1,28 +1,28 @@
 macro_rules! impl_methods {
-    ($([num_t: $num_t:ident, cartesian_const_name: $cartesian_const_name:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+    ($([inner_t: $inner_t:ident, cartesian_const_name: $cartesian_const_name:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
-        mod ${concat(ඞඞ__,$num_t,_,$fn_name)} {
+        mod ${concat(ඞඞ__,$inner_t,_,$fn_name)} {
             use crate::base::Set;
 
-            pub(crate) const $cartesian_const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
-                &core::array::from_fn::<$num_t, { crate::base::CARTESIAN_LENGTH::<$num_t, A, B> }, _>(
+            pub(crate) const $cartesian_const_name<const A: &'static[$inner_t], const B: &'static[$inner_t]>: &[$inner_t] = const {
+                &core::array::from_fn::<$inner_t, { crate::base::CARTESIAN_LENGTH::<$inner_t, A, B> }, _>(
                     const |i| {
                         let b_len: usize = B.len();
                         let a_index: usize = i.strict_div(b_len);
                         let b_index: usize = i.strict_rem(b_len);
-                        let a: $num_t = A[a_index];
-                        let b: $num_t = B[b_index];
+                        let a: $inner_t = A[a_index];
+                        let b: $inner_t = B[b_index];
                         $fn_path(a, b)
                     }
                 )
             };
 
-            const impl<const SET: &'static [$num_t]> Set<$num_t, SET> {
-                pub fn $fn_name<const RHS_SET: &'static [$num_t]>(self, rhs: Set<$num_t, RHS_SET>) -> Set<$num_t, { $cartesian_const_name::<{ SET }, { RHS_SET }> }> {
-                    let self_inner: $num_t = self.inner();
-                    let rhs_inner: $num_t = rhs.inner();
-                    let res_inner: $num_t = $fn_path(self_inner, rhs_inner);
+            const impl<const SET: &'static [$inner_t]> Set<$inner_t, SET> {
+                pub fn $fn_name<const RHS_SET: &'static [$inner_t]>(self, rhs: Set<$inner_t, RHS_SET>) -> Set<$inner_t, { $cartesian_const_name::<{ SET }, { RHS_SET }> }> {
+                    let self_inner: $inner_t = self.inner();
+                    let rhs_inner: $inner_t = rhs.inner();
+                    let res_inner: $inner_t = $fn_path(self_inner, rhs_inner);
                     unsafe { Set::new_unchecked(res_inner) }
                 }
             }
@@ -34,32 +34,32 @@ macro_rules! impl_methods {
 pub(crate) use impl_methods;
 
 macro_rules! impl_ops {
-    ($([num_t: $num_t:ident, cartesian_const_name: $cartesian_const_name:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
+    ($([inner_t: $inner_t:ident, cartesian_const_name: $cartesian_const_name:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
-        mod ${concat(ඞඞ__,$num_t,_,$trait_fn_name)} {
+        mod ${concat(ඞඞ__,$inner_t,_,$trait_fn_name)} {
             use crate::base::Set;
 
-            pub(crate) const $cartesian_const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
-                &core::array::from_fn::<$num_t, { crate::base::CARTESIAN_LENGTH::<$num_t, A, B> }, _>(
+            pub(crate) const $cartesian_const_name<const A: &'static[$inner_t], const B: &'static[$inner_t]>: &[$inner_t] = const {
+                &core::array::from_fn::<$inner_t, { crate::base::CARTESIAN_LENGTH::<$inner_t, A, B> }, _>(
                     const |i| {
                         let b_len: usize = B.len();
                         let a_index: usize = i.strict_div(b_len);
                         let b_index: usize = i.strict_rem(b_len);
-                        let a: $num_t = A[a_index];
-                        let b: $num_t = B[b_index];
+                        let a: $inner_t = A[a_index];
+                        let b: $inner_t = B[b_index];
                         a $op b
                     }
                 )
             };
 
-            const impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> $(::$op_trait)+<Set<$num_t,B_SET> > for Set<$num_t, A_SET> {
-                type Output = Set<$num_t, { $cartesian_const_name::<{ A_SET }, { B_SET }> }>;
+            const impl<const A_SET: &'static [$inner_t], const B_SET: &'static [$inner_t]> $(::$op_trait)+<Set<$inner_t,B_SET> > for Set<$inner_t, A_SET> {
+                type Output = Set<$inner_t, { $cartesian_const_name::<{ A_SET }, { B_SET }> }>;
 
-                fn $trait_fn_name(self, rhs: Set<$num_t, B_SET>) -> Self::Output {
-                    let self_inner: $num_t = self.inner();
-                    let rhs_inner: $num_t = rhs.inner();
-                    let res_inner: $num_t = self_inner $op rhs_inner;
+                fn $trait_fn_name(self, rhs: Set<$inner_t, B_SET>) -> Self::Output {
+                    let self_inner: $inner_t = self.inner();
+                    let rhs_inner: $inner_t = rhs.inner();
+                    let res_inner: $inner_t = self_inner $op rhs_inner;
                     unsafe { Set::new_unchecked(res_inner) }
                 }
             }
@@ -149,31 +149,31 @@ macro_rules! impl_ints {
         }
 
         macros::impl_methods! {
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_STRICT_ADD  , fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_STRICT_SUB  , fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub    ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_STRICT_MUL  , fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul    ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_STRICT_DIV  , fn_name: strict_div   , fn_path: ::core::primitive::$num_t::strict_div    ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_STRICT_ADD  , fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_STRICT_SUB  , fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub    ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_STRICT_MUL  , fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul    ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_STRICT_DIV  , fn_name: strict_div   , fn_path: ::core::primitive::$num_t::strict_div    ],
 
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_WRAPPING_ADD, fn_name: wrapping_add , fn_path: ::core::primitive::$num_t::wrapping_add  ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_WRAPPING_SUB, fn_name: wrapping_sub , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_WRAPPING_MUL, fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_WRAPPING_DIV, fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_WRAPPING_ADD, fn_name: wrapping_add , fn_path: ::core::primitive::$num_t::wrapping_add  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_WRAPPING_SUB, fn_name: wrapping_sub , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_WRAPPING_MUL, fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_WRAPPING_DIV, fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div  ],
         }
 
         macros::impl_ops! {
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_ADD         , trait_fn_name: add    , op_trait: ::core::ops::Add     , op: +  ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_SUB         , trait_fn_name: sub    , op_trait: ::core::ops::Sub     , op: -  ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_MUL         , trait_fn_name: mul    , op_trait: ::core::ops::Mul     , op: *  ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_DIV         , trait_fn_name: div    , op_trait: ::core::ops::Div     , op: /  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_ADD         , trait_fn_name: add    , op_trait: ::core::ops::Add     , op: +  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_SUB         , trait_fn_name: sub    , op_trait: ::core::ops::Sub     , op: -  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_MUL         , trait_fn_name: mul    , op_trait: ::core::ops::Mul     , op: *  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_DIV         , trait_fn_name: div    , op_trait: ::core::ops::Div     , op: /  ],
 
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_REM         , trait_fn_name: rem    , op_trait: ::core::ops::Rem     , op: %  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_REM         , trait_fn_name: rem    , op_trait: ::core::ops::Rem     , op: %  ],
 
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_BIT_AND     , trait_fn_name: bitand , op_trait: ::core::ops::BitAnd  , op: &  ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_BIT_OR      , trait_fn_name: bitor  , op_trait: ::core::ops::BitOr   , op: |  ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_BIT_XOR     , trait_fn_name: bitxor , op_trait: ::core::ops::BitXor  , op: ^  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_BIT_AND     , trait_fn_name: bitand , op_trait: ::core::ops::BitAnd  , op: &  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_BIT_OR      , trait_fn_name: bitor  , op_trait: ::core::ops::BitOr   , op: |  ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_BIT_XOR     , trait_fn_name: bitxor , op_trait: ::core::ops::BitXor  , op: ^  ],
 
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_SHL         , trait_fn_name: shl    , op_trait: ::core::ops::Shl     , op: << ],
-            [num_t: $num_t, cartesian_const_name: CARTESIAN_SHR         , trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_SHL         , trait_fn_name: shl    , op_trait: ::core::ops::Shl     , op: << ],
+            [inner_t: $num_t, cartesian_const_name: CARTESIAN_SHR         , trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
         }
 
     )*}
