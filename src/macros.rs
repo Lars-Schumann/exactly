@@ -1,8 +1,8 @@
 macro_rules! implinator {
     ($([num_t: $num_t:ident, extra_mod: $extra_mod:ident, cartesian_const_name: $cartesian_const_name:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
-        #[expect(nonstandard_style)]
-        mod ${concat(__mod_,$num_t,_,$cartesian_const_name)} {
+        mod ${concat(__,$num_t,_,$fn_name)} {
+            use crate::base::Set;
 
             pub(crate) const $cartesian_const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { crate::base::CARTESIAN_LENGTH::<$num_t, A, B> }, _>(
@@ -14,12 +14,10 @@ macro_rules! implinator {
                 )
             };
 
-        }
-
-        const impl<const SET: &'static [$num_t]> base::Set<$num_t, SET> {
-
-            pub fn $fn_name<const RHS_SET: &'static [$num_t]>(self, rhs: base::Set<$num_t, RHS_SET>) -> base::Set<$num_t, { ${concat(__mod_,$num_t,_,$cartesian_const_name)}::$cartesian_const_name::<{ SET }, { RHS_SET }> }> {
-                unsafe { base::Set::new_unchecked($fn_path(self.inner(), rhs.inner())) }
+            const impl<const SET: &'static [$num_t]> Set<$num_t, SET> {
+                pub fn $fn_name<const RHS_SET: &'static [$num_t]>(self, rhs: Set<$num_t, RHS_SET>) -> Set<$num_t, { $cartesian_const_name::<{ SET }, { RHS_SET }> }> {
+                    unsafe { Set::new_unchecked($fn_path(self.inner(), rhs.inner())) }
+                }
             }
 
         }
@@ -31,8 +29,8 @@ pub(crate) use implinator;
 macro_rules! ops_implinator {
     ($([num_t: $num_t:ident, extra_mod: $extra_mod:ident, cartesian_const_name: $cartesian_const_name:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
 
-        #[expect(nonstandard_style)]
-        mod ${concat(__mod_,$num_t,_,$cartesian_const_name)} {
+        mod ${concat(__,$num_t,_,$trait_fn_name)} {
+            use crate::base::Set;
 
             pub(crate) const $cartesian_const_name<const A: &'static[$num_t], const B: &'static[$num_t]>: &[$num_t] = const {
                 &core::array::from_fn::<$num_t, { crate::base::CARTESIAN_LENGTH::<$num_t, A, B> }, _>(
@@ -44,14 +42,12 @@ macro_rules! ops_implinator {
                 )
             };
 
-        }
+            const impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> $(::$op_trait)+<Set<$num_t,B_SET> > for Set<$num_t, A_SET> {
+                type Output = Set<$num_t, { $cartesian_const_name::<{ A_SET }, { B_SET }> }>;
 
-        const impl<const A_SET: &'static [$num_t], const B_SET: &'static [$num_t]> $(::$op_trait)+<base::Set<$num_t,B_SET> > for base::Set<$num_t, A_SET> {
-
-            type Output = base::Set<$num_t, { ${concat(__mod_,$num_t,_,$cartesian_const_name)}::$cartesian_const_name::<{ A_SET }, { B_SET }> }>;
-
-            fn $trait_fn_name(self, rhs: base::Set<$num_t, B_SET>) -> Self::Output {
-                unsafe { base::Set::new_unchecked(self.inner() $op rhs.inner()) }
+                fn $trait_fn_name(self, rhs: Set<$num_t, B_SET>) -> Self::Output {
+                    unsafe { Set::new_unchecked(self.inner() $op rhs.inner()) }
+                }
             }
 
         }
