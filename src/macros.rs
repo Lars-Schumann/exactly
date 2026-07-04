@@ -48,7 +48,7 @@ macro_rules! impl_simple_binary_fns {
 }
 pub(crate) use impl_simple_binary_fns;
 
-macro_rules! impl_ops {
+macro_rules! impl_simple_binary_ops {
     ($([inner_t: $inner_t:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
@@ -81,7 +81,7 @@ macro_rules! impl_ops {
         }
     )+}
 }
-pub(crate) use impl_ops;
+pub(crate) use impl_simple_binary_ops;
 
 macro_rules! impl_ints {
     (the_dolla: $d:tt, $([num_t: $num_t:ident, t_alias: $t_alias:ident, wide_num_t: $wide_num_t:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
@@ -180,7 +180,7 @@ macro_rules! impl_ints {
         //     }
         // }}
 
-        macros::impl_ops! {
+        macros::impl_simple_binary_ops! {
             [inner_t: $num_t, trait_fn_name: add    , op_trait: ::core::ops::Add     , op: +  ],
             [inner_t: $num_t, trait_fn_name: sub    , op_trait: ::core::ops::Sub     , op: -  ],
             [inner_t: $num_t, trait_fn_name: mul    , op_trait: ::core::ops::Mul     , op: *  ],
