@@ -221,13 +221,13 @@ macro_rules! impl_ints {
             };
         }
 
-        macros::if_signed!{ $num_t, { macros::impl_simple_unary_ops! {
-            [inner_t: $num_t, trait_fn_name: neg    , op_trait: ::core::ops::Neg     , op: -  ],
-        }}}
-
         macros::impl_simple_unary_ops! {
             [inner_t: $num_t, trait_fn_name: not    , op_trait: ::core::ops::Not     , op: !  ],
         }
+
+        macros::if_signed!{ $num_t, { macros::impl_simple_unary_ops! {
+            [inner_t: $num_t, trait_fn_name: neg    , op_trait: ::core::ops::Neg     , op: -  ],
+        }}}
 
         macros::impl_simple_binary_ops! {
             [inner_t: $num_t, trait_fn_name: add    , op_trait: ::core::ops::Add     , op: +  ],
@@ -243,6 +243,10 @@ macro_rules! impl_ints {
 
             [inner_t: $num_t, trait_fn_name: shl    , op_trait: ::core::ops::Shl     , op: << ],
             [inner_t: $num_t, trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
+        }
+
+        macros::impl_simple_unary_fns! {
+            [inner_t: $num_t, fn_name: reverse_bits , fn_path: ::core::primitive::$num_t::reverse_bits  ],
         }
 
         macros::if_signed!{ $num_t, { macros::impl_simple_unary_fns! {
