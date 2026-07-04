@@ -1,4 +1,20 @@
-macro_rules! impl_methods {
+macro_rules! if_signed {
+    (u8,    {$($tt:tt)+}) => { /* nothing */};
+    (u16,   {$($tt:tt)+}) => { /* nothing */};
+    (u32,   {$($tt:tt)+}) => { /* nothing */};
+    (u64,   {$($tt:tt)+}) => { /* nothing */};
+    (u128,  {$($tt:tt)+}) => { /* nothing */};
+    (usize, {$($tt:tt)+}) => { /* nothing */};
+    (i8,    {$($tt:tt)+}) => {$($tt)+};
+    (i16,   {$($tt:tt)+}) => {$($tt)+};
+    (i32,   {$($tt:tt)+}) => {$($tt)+};
+    (i64,   {$($tt:tt)+}) => {$($tt)+};
+    (i128,  {$($tt:tt)+}) => {$($tt)+};
+    (isize, {$($tt:tt)+}) => {$($tt)+};
+}
+pub(crate) use if_signed;
+
+macro_rules! impl_simple_binary_fns {
     ($([inner_t: $inner_t:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
@@ -30,7 +46,7 @@ macro_rules! impl_methods {
 
     )+}
 }
-pub(crate) use impl_methods;
+pub(crate) use impl_simple_binary_fns;
 
 macro_rules! impl_ops {
     ($([inner_t: $inner_t:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
@@ -146,7 +162,7 @@ macro_rules! impl_ints {
             };
         }
 
-        macros::impl_methods! {
+        macros::impl_simple_binary_fns! {
             [inner_t: $num_t, fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
             [inner_t: $num_t, fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub    ],
             [inner_t: $num_t, fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul    ],
@@ -157,6 +173,12 @@ macro_rules! impl_ints {
             [inner_t: $num_t, fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
             [inner_t: $num_t, fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div  ],
         }
+
+        // macros::if_signed!{ $num_t, {
+        //     macros::impl_binary_fns! {
+        //         [inner_t: $num_t, fn_name: strict_abs , fn_path: ::core::primitive::$num_t::strict_abs  ],
+        //     }
+        // }}
 
         macros::impl_ops! {
             [inner_t: $num_t, trait_fn_name: add    , op_trait: ::core::ops::Add     , op: +  ],
