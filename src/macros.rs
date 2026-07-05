@@ -243,54 +243,54 @@ macro_rules! impl_ints {
         //~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~
 
         macros::impl_simple_unary_ops! {
-            [inner_t: $num_t, trait_fn_name: not    , op_trait: ::core::ops::Not     , op: !  ],
+            [ inner_t: $num_t, trait_fn_name: not    , op_trait: ::core::ops::Not     , op: !  ],
         }
 
         macros::if_signed!{ $num_t, { macros::impl_simple_unary_ops! {
-            [inner_t: $num_t, trait_fn_name: neg    , op_trait: ::core::ops::Neg     , op: -  ],
+            [ inner_t: $num_t, trait_fn_name: neg    , op_trait: ::core::ops::Neg     , op: -  ],
         }}}
 
         macros::impl_simple_binary_ops! {
-            [inner_t: $num_t, trait_fn_name: add    , op_trait: ::core::ops::Add     , op: +  ],
-            [inner_t: $num_t, trait_fn_name: sub    , op_trait: ::core::ops::Sub     , op: -  ],
-            [inner_t: $num_t, trait_fn_name: mul    , op_trait: ::core::ops::Mul     , op: *  ],
-            [inner_t: $num_t, trait_fn_name: div    , op_trait: ::core::ops::Div     , op: /  ],
+            [ inner_t: $num_t, trait_fn_name: add    , op_trait: ::core::ops::Add     , op: +  ],
+            [ inner_t: $num_t, trait_fn_name: sub    , op_trait: ::core::ops::Sub     , op: -  ],
+            [ inner_t: $num_t, trait_fn_name: mul    , op_trait: ::core::ops::Mul     , op: *  ],
+            [ inner_t: $num_t, trait_fn_name: div    , op_trait: ::core::ops::Div     , op: /  ],
 
-            [inner_t: $num_t, trait_fn_name: rem    , op_trait: ::core::ops::Rem     , op: %  ],
+            [ inner_t: $num_t, trait_fn_name: rem    , op_trait: ::core::ops::Rem     , op: %  ],
 
-            [inner_t: $num_t, trait_fn_name: bitand , op_trait: ::core::ops::BitAnd  , op: &  ],
-            [inner_t: $num_t, trait_fn_name: bitor  , op_trait: ::core::ops::BitOr   , op: |  ],
-            [inner_t: $num_t, trait_fn_name: bitxor , op_trait: ::core::ops::BitXor  , op: ^  ],
+            [ inner_t: $num_t, trait_fn_name: bitand , op_trait: ::core::ops::BitAnd  , op: &  ],
+            [ inner_t: $num_t, trait_fn_name: bitor  , op_trait: ::core::ops::BitOr   , op: |  ],
+            [ inner_t: $num_t, trait_fn_name: bitxor , op_trait: ::core::ops::BitXor  , op: ^  ],
 
-            [inner_t: $num_t, trait_fn_name: shl    , op_trait: ::core::ops::Shl     , op: << ],
-            [inner_t: $num_t, trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
+            [ inner_t: $num_t, trait_fn_name: shl    , op_trait: ::core::ops::Shl     , op: << ],
+            [ inner_t: $num_t, trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
         }
 
         //~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~
 
         macros::impl_unary_fns! {
-            [fn reverse_bits($num_t) -> $num_t        , fn_path: ::core::primitive::$num_t::reverse_bits  ],
+            [ fn reverse_bits($num_t) -> $num_t        , fn_path: ::core::primitive::$num_t::reverse_bits  ],
         }
 
         macros::if_signed!{ $num_t, { macros::impl_unary_fns! {
-            [fn abs($num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::abs           ],
-            [fn strict_abs($num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::strict_abs    ],
-            [fn unsigned_abs($num_t) -> $uns_num_t      , fn_path: ::core::primitive::$num_t::unsigned_abs  ],
+            [ fn abs($num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::abs           ],
+            [ fn strict_abs($num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::strict_abs    ],
+            [ fn unsigned_abs($num_t) -> $uns_num_t      , fn_path: ::core::primitive::$num_t::unsigned_abs  ],
         }}}
 
         macros::impl_binary_fns! {
-            [fn abs_diff($num_t, $num_t) -> $uns_num_t  , fn_path: ::core::primitive::$num_t::abs_diff      ],
-            [fn ilog($num_t, $num_t) -> u32             , fn_path: ::core::primitive::$num_t::ilog          ],
+            [ fn abs_diff($num_t, $num_t) -> $uns_num_t  , fn_path: ::core::primitive::$num_t::abs_diff      ],
+            [ fn ilog($num_t, $num_t) -> u32             , fn_path: ::core::primitive::$num_t::ilog          ],
 
-            [fn strict_add($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_add    ],
-            [fn strict_sub($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_sub    ],
-            [fn strict_mul($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_mul    ],
-            [fn strict_div($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_div    ],
+            [ fn strict_add($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_add    ],
+            [ fn strict_sub($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_sub    ],
+            [ fn strict_mul($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_mul    ],
+            [ fn strict_div($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_div    ],
 
-            [fn wrapping_add($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_add  ],
-            [fn wrapping_sub($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
-            [fn wrapping_mul($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
-            [fn wrapping_div($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_div  ],
+            [ fn wrapping_add($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_add  ],
+            [ fn wrapping_sub($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
+            [ fn wrapping_mul($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
+            [ fn wrapping_div($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_div  ],
         }
 
     )*}
