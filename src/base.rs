@@ -5,7 +5,7 @@ use core::marker::Freeze;
 use alloc::vec::Vec;
 
 pub(crate) const LENGTH<T: ConstParamTy_ + 'static, const SET: &'static[T]>: usize = const { SET.len()};
-pub(crate) const CARTESIAN_LENGTH<T: ConstParamTy_ + 'static, const A: &'static[T], const B: &'static[T]>: usize = const { A.len() * B.len() };
+pub(crate) const CARTESIAN_LENGTH<T: ConstParamTy_ + 'static, U: ConstParamTy_ + 'static, const A: &'static[T], const B: &'static[U]>: usize = const { A.len() * B.len() };
 
 pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + 'static, const SET: &'static[T]>: &[T]= const {
     let arr: [T; LENGTH::<T, SET>] = match SET.try_into() {
