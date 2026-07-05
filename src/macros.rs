@@ -272,6 +272,9 @@ macro_rules! impl_ints {
         }}}
 
         macros::impl_binary_fns! {
+            [inner_t: $num_t, signature: (self, $num_t) -> $uns_num_t   , fn_name: abs_diff     , fn_path: ::core::primitive::$num_t::abs_diff      ],
+            [inner_t: $num_t, signature: (self, $num_t) -> u32          , fn_name: ilog         , fn_path: ::core::primitive::$num_t::ilog          ],
+
             [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
             [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub    ],
             [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul    ],
@@ -282,7 +285,6 @@ macro_rules! impl_ints {
             [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
             [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div  ],
 
-            [inner_t: $num_t, signature: (self, $num_t) -> $uns_num_t   , fn_name: abs_diff     , fn_path: ::core::primitive::$num_t::abs_diff      ],
         }
 
     )*}
