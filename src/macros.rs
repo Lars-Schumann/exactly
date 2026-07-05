@@ -99,24 +99,24 @@ macro_rules! impl_simple_binary_ops {
 pub(crate) use impl_simple_binary_ops;
 
 macro_rules! impl_unary_fns {
-    ($([signature: fn $fn_name:ident($inner_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+    ($([fn $fn_name:ident($input_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
-        mod ${concat(ඞඞ__,$inner_t,_,$fn_name)} {
+        mod ${concat(ඞඞ__,$input_t,_,$fn_name)} {
             use crate::base::Set;
 
-            const CODOMAIN<const SET: &'static[$inner_t]>: &[$codomain_t] = const {
-                &core::array::from_fn::<$codomain_t, { crate::base::LENGTH::<$inner_t, SET> }, _>(
+            const CODOMAIN<const SET: &'static[$input_t]>: &[$codomain_t] = const {
+                &core::array::from_fn::<$codomain_t, { crate::base::LENGTH::<$input_t, SET> }, _>(
                     const |i| {
-                        let a: $inner_t = SET[i];
+                        let a: $input_t = SET[i];
                         $fn_path(a)
                     }
                 )
             };
 
-            const impl<const SET: &'static [$inner_t]> Set<$inner_t, SET> {
+            const impl<const SET: &'static [$input_t]> Set<$input_t, SET> {
                 pub fn $fn_name(self) -> Set<$codomain_t, { CODOMAIN::<{ SET }> }> {
-                    let self_inner: $inner_t = self.inner();
+                    let self_inner: $input_t = self.inner();
                     let res_inner: $codomain_t = $fn_path(self_inner);
                     unsafe { Set::new_unchecked(res_inner) }
                 }
@@ -128,30 +128,30 @@ macro_rules! impl_unary_fns {
 pub(crate) use impl_unary_fns;
 
 macro_rules! impl_binary_fns {
-    ($([signature: fn $fn_name:ident($inner_t:ident, $rhs_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+    ($([fn $fn_name:ident($lhs_t:ident, $rhs_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
-        mod ${concat(ඞඞ__,$inner_t,_,$fn_name)} {
+        mod ${concat(ඞඞ__,$lhs_t,_,$rhs_t,_,$fn_name)} {
             use crate::base::Set;
 
-            const CODOMAIN<const A: &'static[$inner_t], const B: &'static[$rhs_t]>: &[$codomain_t] = const {
-                &core::array::from_fn::<$codomain_t, { crate::base::CARTESIAN_LENGTH::<$inner_t, $rhs_t, A, B> }, _>(
+            const CODOMAIN<const L: &'static[$lhs_t], const R: &'static[$rhs_t]>: &[$codomain_t] = const {
+                &core::array::from_fn::<$codomain_t, { crate::base::CARTESIAN_LENGTH::<$lhs_t, $rhs_t, L, R> }, _>(
                     const |i| {
-                        let b_len: usize = B.len();
-                        let a_index: usize = i.strict_div(b_len);
-                        let b_index: usize = i.strict_rem(b_len);
-                        let a: $inner_t = A[a_index];
-                        let b: $rhs_t = B[b_index];
-                        $fn_path(a, b)
+                        let r_len: usize = R.len();
+                        let l_index: usize = i.strict_div(r_len);
+                        let r_index: usize = i.strict_rem(r_len);
+                        let l: $lhs_t = L[l_index];
+                        let r: $rhs_t = R[r_index];
+                        $fn_path(l, r)
                     }
                 )
             };
 
-            const impl<const SET: &'static [$inner_t]> Set<$inner_t, SET> {
-                pub fn $fn_name<const RHS_SET: &'static [$inner_t]>(self, rhs: Set<$inner_t, RHS_SET>) -> Set<$codomain_t, { CODOMAIN::<{ SET }, { RHS_SET }> }> {
-                    let self_inner: $inner_t = self.inner();
+            const impl<const SET: &'static [$lhs_t]> Set<$lhs_t, SET> {
+                pub fn $fn_name<const RHS_SET: &'static [$rhs_t]>(self, rhs: Set<$rhs_t, RHS_SET>) -> Set<$codomain_t, { CODOMAIN::<{ SET }, { RHS_SET }> }> {
+                    let lhs_inner: $lhs_t = self.inner();
                     let rhs_inner: $rhs_t = rhs.inner();
-                    let res_inner: $codomain_t = $fn_path(self_inner, rhs_inner);
+                    let res_inner: $codomain_t = $fn_path(lhs_inner, rhs_inner);
                     unsafe { Set::new_unchecked(res_inner) }
                 }
             }
@@ -240,6 +240,8 @@ macro_rules! impl_ints {
             };
         }
 
+        //~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~
+
         macros::impl_simple_unary_ops! {
             [inner_t: $num_t, trait_fn_name: not    , op_trait: ::core::ops::Not     , op: !  ],
         }
@@ -264,29 +266,31 @@ macro_rules! impl_ints {
             [inner_t: $num_t, trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
         }
 
+        //~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~
+
         macros::impl_unary_fns! {
-            [signature: fn reverse_bits($num_t) -> $num_t        , fn_path: ::core::primitive::$num_t::reverse_bits  ],
+            [fn reverse_bits($num_t) -> $num_t        , fn_path: ::core::primitive::$num_t::reverse_bits  ],
         }
 
         macros::if_signed!{ $num_t, { macros::impl_unary_fns! {
-            [signature: fn abs($num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::abs           ],
-            [signature: fn strict_abs($num_t) -> $num_t          , fn_path: ::core::primitive::$num_t::strict_abs    ],
-            [signature: fn unsigned_abs($num_t) -> $uns_num_t    , fn_path: ::core::primitive::$num_t::unsigned_abs  ],
+            [fn abs($num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::abs           ],
+            [fn strict_abs($num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::strict_abs    ],
+            [fn unsigned_abs($num_t) -> $uns_num_t      , fn_path: ::core::primitive::$num_t::unsigned_abs  ],
         }}}
 
         macros::impl_binary_fns! {
-            [signature: fn abs_diff($num_t, $num_t) -> $uns_num_t   , fn_path: ::core::primitive::$num_t::abs_diff      ],
-            [signature: fn ilog($num_t, $num_t) -> u32              , fn_path: ::core::primitive::$num_t::ilog          ],
+            [fn abs_diff($num_t, $num_t) -> $uns_num_t  , fn_path: ::core::primitive::$num_t::abs_diff      ],
+            [fn ilog($num_t, $num_t) -> u32             , fn_path: ::core::primitive::$num_t::ilog          ],
 
-            [signature: fn strict_add($num_t, $num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_add    ],
-            [signature: fn strict_sub($num_t, $num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_sub    ],
-            [signature: fn strict_mul($num_t, $num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_mul    ],
-            [signature: fn strict_div($num_t, $num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_div    ],
+            [fn strict_add($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_add    ],
+            [fn strict_sub($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_sub    ],
+            [fn strict_mul($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_mul    ],
+            [fn strict_div($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_div    ],
 
-            [signature: fn wrapping_add($num_t, $num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_add  ],
-            [signature: fn wrapping_sub($num_t, $num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
-            [signature: fn wrapping_mul($num_t, $num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
-            [signature: fn wrapping_div($num_t, $num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_div  ],
+            [fn wrapping_add($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_add  ],
+            [fn wrapping_sub($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
+            [fn wrapping_mul($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
+            [fn wrapping_div($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_div  ],
         }
 
     )*}
