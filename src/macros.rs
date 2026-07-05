@@ -287,13 +287,23 @@ macro_rules! impl_ints {
         }}}
 
         macros::impl_unary_fns! {
-            [ fn reverse_bits($num_t) -> $num_t        , fn_path: ::core::primitive::$num_t::reverse_bits  ],
+            [ fn count_ones($num_t) -> u32                      , fn_path: ::core::primitive::$num_t::count_ones    ],
+            [ fn count_zeros($num_t) -> u32                     , fn_path: ::core::primitive::$num_t::count_zeros   ],
+            [ fn ilog2($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::ilog2         ],
+            [ fn ilog10($num_t) -> u32                          , fn_path: ::core::primitive::$num_t::ilog10        ],
+            [ fn reverse_bits($num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::reverse_bits  ],
         }
 
         //~~~~~BINARY~~~~~~
 
+        macros::if_unsigned!{ $num_t, {
+        macros::impl_binary_fns! {
+            [ fn div_ceil($num_t, $num_t) -> $unsigned_num_t    , fn_path: ::core::primitive::$num_t::div_ceil      ],
+        }}}
+
         macros::impl_binary_fns! {
             [ fn abs_diff($num_t, $num_t) -> $unsigned_num_t    , fn_path: ::core::primitive::$num_t::abs_diff      ],
+            [ fn div_euclid($num_t, $num_t) -> $num_t           , fn_path: ::core::primitive::$num_t::div_euclid    ],
             [ fn ilog($num_t, $num_t) -> u32                    , fn_path: ::core::primitive::$num_t::ilog          ],
 
             [ fn strict_add($num_t, $num_t) -> $num_t           , fn_path: ::core::primitive::$num_t::strict_add    ],
