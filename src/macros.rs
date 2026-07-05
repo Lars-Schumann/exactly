@@ -14,6 +14,22 @@ macro_rules! if_signed {
 }
 pub(crate) use if_signed;
 
+macro_rules! if_unsigned {
+    (u8,    {$($tt:tt)+}) => {$($tt)+};
+    (u16,   {$($tt:tt)+}) => {$($tt)+};
+    (u32,   {$($tt:tt)+}) => {$($tt)+};
+    (u64,   {$($tt:tt)+}) => {$($tt)+};
+    (u128,  {$($tt:tt)+}) => {$($tt)+};
+    (usize, {$($tt:tt)+}) => {$($tt)+};
+    (i8,    {$($tt:tt)+}) => { /* nothing */};
+    (i16,   {$($tt:tt)+}) => { /* nothing */};
+    (i32,   {$($tt:tt)+}) => { /* nothing */};
+    (i64,   {$($tt:tt)+}) => { /* nothing */};
+    (i128,  {$($tt:tt)+}) => { /* nothing */};
+    (isize, {$($tt:tt)+}) => { /* nothing */};
+}
+pub(crate) use if_unsigned;
+
 macro_rules! impl_simple_unary_ops {
     ($([inner_t: $inner_t:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
 
