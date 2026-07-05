@@ -90,7 +90,7 @@ macro_rules! impl_simple_binary_ops {
                     let rhs_inner: $inner_t = rhs.inner();
                     let res_inner: $inner_t = self_inner $op rhs_inner;
 
-                unsafe { Set::new_unchecked(res_inner) }
+                    unsafe { Set::new_unchecked(res_inner) }
                 }
             }
         }
@@ -128,7 +128,7 @@ macro_rules! impl_unary_fns {
 pub(crate) use impl_unary_fns;
 
 macro_rules! impl_binary_fns {
-    ($([inner_t: $inner_t:ident, signature: (self, $rhs_t:ident) -> $codomain_t:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+    ($([signature: fn $fn_name:ident($inner_t:ident, $rhs_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
         mod ${concat(ඞඞ__,$inner_t,_,$fn_name)} {
@@ -275,19 +275,18 @@ macro_rules! impl_ints {
         }}}
 
         macros::impl_binary_fns! {
-            [inner_t: $num_t, signature: (self, $num_t) -> $uns_num_t   , fn_name: abs_diff     , fn_path: ::core::primitive::$num_t::abs_diff      ],
-            [inner_t: $num_t, signature: (self, $num_t) -> u32          , fn_name: ilog         , fn_path: ::core::primitive::$num_t::ilog          ],
+            [signature: fn abs_diff($num_t, $num_t) -> $uns_num_t   , fn_path: ::core::primitive::$num_t::abs_diff      ],
+            [signature: fn ilog($num_t, $num_t) -> u32              , fn_path: ::core::primitive::$num_t::ilog          ],
 
-            [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: strict_add   , fn_path: ::core::primitive::$num_t::strict_add    ],
-            [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: strict_sub   , fn_path: ::core::primitive::$num_t::strict_sub    ],
-            [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: strict_mul   , fn_path: ::core::primitive::$num_t::strict_mul    ],
-            [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: strict_div   , fn_path: ::core::primitive::$num_t::strict_div    ],
+            [signature: fn strict_add($num_t, $num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_add    ],
+            [signature: fn strict_sub($num_t, $num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_sub    ],
+            [signature: fn strict_mul($num_t, $num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_mul    ],
+            [signature: fn strict_div($num_t, $num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_div    ],
 
-            [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: wrapping_add , fn_path: ::core::primitive::$num_t::wrapping_add  ],
-            [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: wrapping_sub , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
-            [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: wrapping_mul , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
-            [inner_t: $num_t, signature: (self, $num_t) -> $num_t       , fn_name: wrapping_div , fn_path: ::core::primitive::$num_t::wrapping_div  ],
-
+            [signature: fn wrapping_add($num_t, $num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_add  ],
+            [signature: fn wrapping_sub($num_t, $num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
+            [signature: fn wrapping_mul($num_t, $num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
+            [signature: fn wrapping_div($num_t, $num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_div  ],
         }
 
     )*}
