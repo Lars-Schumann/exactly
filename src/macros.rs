@@ -49,7 +49,8 @@ macro_rules! impl_simple_unary_ops {
             const impl<const SET: &'static [$inner_t]> $(::$op_trait)+ for Set<$inner_t, SET> {
                 type Output = Set<$inner_t, { CODOMAIN::<{ SET }> }>;
 
-                fn $trait_fn_name(self) -> Self::Output {
+
+            fn $trait_fn_name(self) -> Self::Output {
                     let self_inner: $inner_t = self.inner();
                     let res_inner: $inner_t = $op self_inner;
                     unsafe { Set::new_unchecked(res_inner) }
@@ -62,6 +63,7 @@ pub(crate) use impl_simple_unary_ops;
 
 macro_rules! impl_simple_binary_ops {
     ($([inner_t: $inner_t:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
+
 
         #[expect(non_snake_case)]
         mod ${concat(ඞඞ__,$inner_t,_,$trait_fn_name)} {
@@ -87,7 +89,8 @@ macro_rules! impl_simple_binary_ops {
                     let self_inner: $inner_t = self.inner();
                     let rhs_inner: $inner_t = rhs.inner();
                     let res_inner: $inner_t = self_inner $op rhs_inner;
-                    unsafe { Set::new_unchecked(res_inner) }
+
+                unsafe { Set::new_unchecked(res_inner) }
                 }
             }
         }
@@ -96,7 +99,7 @@ macro_rules! impl_simple_binary_ops {
 pub(crate) use impl_simple_binary_ops;
 
 macro_rules! impl_unary_fns {
-    ($([inner_t: $inner_t:ident, signature: (self) -> $codomain_t:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+    ($([signature: fn $fn_name:ident($inner_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
         mod ${concat(ඞඞ__,$inner_t,_,$fn_name)} {
@@ -262,13 +265,13 @@ macro_rules! impl_ints {
         }
 
         macros::impl_unary_fns! {
-            [inner_t: $num_t, signature: (self) -> $num_t       , fn_name: reverse_bits , fn_path: ::core::primitive::$num_t::reverse_bits  ],
+            [signature: fn reverse_bits($num_t) -> $num_t        , fn_path: ::core::primitive::$num_t::reverse_bits  ],
         }
 
         macros::if_signed!{ $num_t, { macros::impl_unary_fns! {
-            [inner_t: $num_t, signature: (self)         -> $num_t       , fn_name: abs          , fn_path: ::core::primitive::$num_t::abs           ],
-            [inner_t: $num_t, signature: (self)         -> $num_t       , fn_name: strict_abs   , fn_path: ::core::primitive::$num_t::strict_abs    ],
-            [inner_t: $num_t, signature: (self)         -> $uns_num_t   , fn_name: unsigned_abs , fn_path: ::core::primitive::$num_t::unsigned_abs  ],
+            [signature: fn abs($num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::abs           ],
+            [signature: fn strict_abs($num_t) -> $num_t          , fn_path: ::core::primitive::$num_t::strict_abs    ],
+            [signature: fn unsigned_abs($num_t) -> $uns_num_t    , fn_path: ::core::primitive::$num_t::unsigned_abs  ],
         }}}
 
         macros::impl_binary_fns! {
