@@ -272,7 +272,8 @@ macro_rules! impl_ints {
             [ fn reverse_bits($num_t) -> $num_t        , fn_path: ::core::primitive::$num_t::reverse_bits  ],
         }
 
-        macros::if_signed!{ $num_t, { macros::impl_unary_fns! {
+        macros::if_signed!{ $num_t, {
+        macros::impl_unary_fns! {
             [ fn abs($num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::abs           ],
             [ fn strict_abs($num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::strict_abs    ],
             [ fn unsigned_abs($num_t) -> $uns_num_t      , fn_path: ::core::primitive::$num_t::unsigned_abs  ],
@@ -283,14 +284,14 @@ macro_rules! impl_ints {
             [ fn ilog($num_t, $num_t) -> u32             , fn_path: ::core::primitive::$num_t::ilog          ],
 
             [ fn strict_add($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_add    ],
-            [ fn strict_sub($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_sub    ],
-            [ fn strict_mul($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_mul    ],
             [ fn strict_div($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_div    ],
+            [ fn strict_mul($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_mul    ],
+            [ fn strict_sub($num_t, $num_t) -> $num_t    , fn_path: ::core::primitive::$num_t::strict_sub    ],
 
             [ fn wrapping_add($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_add  ],
-            [ fn wrapping_sub($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
-            [ fn wrapping_mul($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
             [ fn wrapping_div($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_div  ],
+            [ fn wrapping_mul($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_mul  ],
+            [ fn wrapping_sub($num_t, $num_t) -> $num_t  , fn_path: ::core::primitive::$num_t::wrapping_sub  ],
         }
 
     )*}
