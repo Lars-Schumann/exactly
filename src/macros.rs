@@ -21,10 +21,10 @@ macro_rules! impl_simple_unary_ops {
         mod ${concat(ඞඞ__,$inner_t,_,$trait_fn_name)} {
             use crate::base::Set;
 
-            const CODOMAIN<const A: &'static[$inner_t]>: &[$inner_t] = const {
-                &core::array::from_fn::<$inner_t, { crate::base::LENGTH::<$inner_t, A> }, _>(
+            const CODOMAIN<const SET: &'static[$inner_t]>: &[$inner_t] = const {
+                &core::array::from_fn::<$inner_t, { crate::base::LENGTH::<$inner_t, SET> }, _>(
                     const |i| {
-                        let a: $inner_t = A[i];
+                        let a: $inner_t = SET[i];
                         $op a
                     }
                 )
@@ -86,10 +86,10 @@ macro_rules! impl_simple_unary_fns {
         mod ${concat(ඞඞ__,$inner_t,_,$fn_name)} {
             use crate::base::Set;
 
-            const CODOMAIN<const A: &'static[$inner_t]>: &[$inner_t] = const {
-                &core::array::from_fn::<$inner_t, { crate::base::LENGTH::<$inner_t, A> }, _>(
+            const CODOMAIN<const SET: &'static[$inner_t]>: &[$inner_t] = const {
+                &core::array::from_fn::<$inner_t, { crate::base::LENGTH::<$inner_t, SET> }, _>(
                     const |i| {
-                        let a: $inner_t = A[i];
+                        let a: $inner_t = SET[i];
                         $fn_path(a)
                     }
                 )
@@ -107,6 +107,35 @@ macro_rules! impl_simple_unary_fns {
     )+}
 }
 pub(crate) use impl_simple_unary_fns;
+
+macro_rules! impl_unary_fns {
+    ($([inner_t: $inner_t:ident, signature: (self) -> $codomain_t:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+
+        #[expect(non_snake_case)]
+        mod ${concat(ඞඞ__,$inner_t,_,$fn_name)} {
+            use crate::base::Set;
+
+            const CODOMAIN<const SET: &'static[$inner_t]>: &[$codomain_t] = const {
+                &core::array::from_fn::<$codomain_t, { crate::base::LENGTH::<$inner_t, SET> }, _>(
+                    const |i| {
+                        let a: $inner_t = SET[i];
+                        $fn_path(a)
+                    }
+                )
+            };
+
+            const impl<const SET: &'static [$inner_t]> Set<$inner_t, SET> {
+                pub fn $fn_name(self) -> Set<$codomain_t, { CODOMAIN::<{ SET }> }> {
+                    let self_inner: $inner_t = self.inner();
+                    let res_inner: $codomain_t = $fn_path(self_inner);
+                    unsafe { Set::new_unchecked(res_inner) }
+                }
+            }
+        }
+
+    )+}
+}
+pub(crate) use impl_unary_fns;
 
 macro_rules! impl_simple_binary_fns {
     ($([inner_t: $inner_t:ident, fn_name: $fn_name:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
@@ -143,7 +172,7 @@ macro_rules! impl_simple_binary_fns {
 pub(crate) use impl_simple_binary_fns;
 
 macro_rules! impl_ints {
-    (the_dolla: $d:tt, $([num_t: $num_t:ident, t_alias: $t_alias:ident, wide_num_t: $wide_num_t:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
+    (the_dolla: $d:tt, $([num_t: $num_t:ident, num_t_uns: $num_t_uns:ident, t_alias: $t_alias:ident, wide_num_t: $wide_num_t:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
 
         pub type $t_alias<const SET: &'static [$num_t]> = base::Set<$num_t, SET>;
 
@@ -252,6 +281,10 @@ macro_rules! impl_ints {
         macros::if_signed!{ $num_t, { macros::impl_simple_unary_fns! {
             [inner_t: $num_t, fn_name: abs          , fn_path: ::core::primitive::$num_t::abs           ],
             [inner_t: $num_t, fn_name: strict_abs   , fn_path: ::core::primitive::$num_t::strict_abs    ],
+        }}}
+
+        macros::if_signed!{ $num_t, { macros::impl_unary_fns! {
+            [inner_t: $num_t, signature: (self) -> $num_t_uns, fn_name: unsigned_abs, fn_path: ::core::primitive::$num_t::unsigned_abs  ],
         }}}
 
         macros::impl_simple_binary_fns! {
