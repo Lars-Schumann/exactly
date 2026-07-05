@@ -116,9 +116,9 @@ macro_rules! impl_unary_fns {
 
             const impl<const SET: &'static [$input_t]> Set<$input_t, SET> {
                 pub fn $fn_name(self) -> Set<$codomain_t, { CODOMAIN::<{ SET }> }> {
-                    let self_inner: $input_t = self.inner();
-                    let res_inner: $codomain_t = $fn_path(self_inner);
-                    unsafe { Set::new_unchecked(res_inner) }
+                    let input_inner: $input_t = self.inner();
+                    let output_inner: $codomain_t = $fn_path(input_inner);
+                    unsafe { Set::new_unchecked(output_inner) }
                 }
             }
         }
@@ -134,25 +134,25 @@ macro_rules! impl_binary_fns {
         mod ${concat(ඞඞ__,$lhs_t,_,$rhs_t,_,$fn_name)} {
             use crate::base::Set;
 
-            const CODOMAIN<const L: &'static[$lhs_t], const R: &'static[$rhs_t]>: &[$codomain_t] = const {
-                &core::array::from_fn::<$codomain_t, { crate::base::CARTESIAN_LENGTH::<$lhs_t, $rhs_t, L, R> }, _>(
+            const CODOMAIN<const LHS: &'static[$lhs_t], const RHS: &'static[$rhs_t]>: &[$codomain_t] = const {
+                &core::array::from_fn::<$codomain_t, { crate::base::CARTESIAN_LENGTH::<$lhs_t, $rhs_t, LHS, RHS> }, _>(
                     const |i| {
-                        let r_len: usize = R.len();
-                        let l_index: usize = i.strict_div(r_len);
-                        let r_index: usize = i.strict_rem(r_len);
-                        let l: $lhs_t = L[l_index];
-                        let r: $rhs_t = R[r_index];
-                        $fn_path(l, r)
+                        let rhs_len: usize = RHS.len();
+                        let lhs_index: usize = i.strict_div(rhs_len);
+                        let rhs_index: usize = i.strict_rem(rhs_len);
+                        let lhs: $lhs_t = LHS[lhs_index];
+                        let rhs: $rhs_t = RHS[rhs_index];
+                        $fn_path(lhs, rhs)
                     }
                 )
             };
 
-            const impl<const SET: &'static [$lhs_t]> Set<$lhs_t, SET> {
-                pub fn $fn_name<const RHS_SET: &'static [$rhs_t]>(self, rhs: Set<$rhs_t, RHS_SET>) -> Set<$codomain_t, { CODOMAIN::<{ SET }, { RHS_SET }> }> {
+            const impl<const LHS_SET: &'static [$lhs_t]> Set<$lhs_t, LHS_SET> {
+                pub fn $fn_name<const RHS_SET: &'static [$rhs_t]>(self, rhs: Set<$rhs_t, RHS_SET>) -> Set<$codomain_t, { CODOMAIN::<{ LHS_SET }, { RHS_SET }> }> {
                     let lhs_inner: $lhs_t = self.inner();
                     let rhs_inner: $rhs_t = rhs.inner();
-                    let res_inner: $codomain_t = $fn_path(lhs_inner, rhs_inner);
-                    unsafe { Set::new_unchecked(res_inner) }
+                    let output_inner: $codomain_t = $fn_path(lhs_inner, rhs_inner);
+                    unsafe { Set::new_unchecked(output_inner) }
                 }
             }
         }
