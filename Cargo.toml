@@ -7,7 +7,7 @@ edition = "2024"
 bench_compile_time = []
 
 [dependencies]
-compile_time_sort = "1.5.1"
+
 
 [[bench]]
 name = "compile_time"

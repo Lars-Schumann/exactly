@@ -3,30 +3,5 @@
 version = 4
 
 [[package]]
-name = "compile_time_sort"
-version = "1.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97bb1d4117c9c4dd5ef4ea389964de6082a6d67c2336993209636d13f1910cc1"
-dependencies = [
- "paste",
- "rustversion",
-]
-
-[[package]]
 name = "exactly"
 version = "0.1.0"
-dependencies = [
- "compile_time_sort",
-]
-
-[[package]]
-name = "paste"
-version = "1.0.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
-
-[[package]]
-name = "rustversion"
-version = "1.0.22"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
