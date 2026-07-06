@@ -297,6 +297,12 @@ macro_rules! impl_ints {
             [ fn leading_ones($num_t) -> u32                            , fn_path: ::core::primitive::$num_t::leading_ones          ],
             [ fn leading_zeros($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::leading_zeros         ],
             [ fn reverse_bits($num_t) -> $num_t                         , fn_path: ::core::primitive::$num_t::reverse_bits          ],
+            [ fn strict_neg($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::strict_neg            ],
+            [ fn swap_bytes($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::swap_bytes            ],
+            [ fn to_be($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::to_be                 ],
+            [ fn to_le($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::to_le                 ],
+            [ fn trailing_ones($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::trailing_ones         ],
+            [ fn trailing_zeros($num_t) -> u32                          , fn_path: ::core::primitive::$num_t::trailing_zeros        ],
         }
 
         //~~~~~BINARY~~~~~~
@@ -308,6 +314,8 @@ macro_rules! impl_ints {
             [ fn next_multiple_of($num_t, $num_t) -> $num_t             , fn_path: ::core::primitive::$num_t::next_multiple_of      ],
             [ fn saturating_add_signed($num_t, $signed_num_t) -> $num_t , fn_path: ::core::primitive::$num_t::saturating_add_signed ],
             [ fn saturating_sub_signed($num_t, $signed_num_t) -> $num_t , fn_path: ::core::primitive::$num_t::saturating_sub_signed ],
+            [ fn strict_add_signed($num_t, $signed_num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_add_signed     ],
+            [ fn strict_sub_signed($num_t, $signed_num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_sub_signed     ],
         }}}
 
         macros::impl_binary_fns! {
@@ -328,7 +336,13 @@ macro_rules! impl_ints {
 
             [ fn strict_add($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_add            ],
             [ fn strict_div($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_div            ],
+            [ fn strict_div_euclid($num_t, $num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::strict_div_euclid     ],
             [ fn strict_mul($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_mul            ],
+            [ fn strict_pow($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::strict_pow            ],
+            [ fn strict_rem($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_rem            ],
+            [ fn strict_rem_euclid($num_t, $num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::strict_rem_euclid     ],
+            [ fn strict_shl($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::strict_shl            ],
+            [ fn strict_shr($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::strict_shr            ],
             [ fn strict_sub($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_sub            ],
 
             [ fn wrapping_add($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_add          ],
