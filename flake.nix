@@ -22,16 +22,14 @@
     {
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
-          (rust-bin.selectLatestNightlyWith (toolchain: toolchain.default))
+          (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
 
-          clippy
           bacon
 
           cargo-msrv
 
           nixfmt
           nixd
-
         ];
         env = {
           RUST_BACKTRACE = "1";
