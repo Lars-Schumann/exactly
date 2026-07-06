@@ -240,7 +240,7 @@ macro_rules! impl_ints {
             };
         }
 
-        //~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~
+        //~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~
 
         //~~~~~UNARY~~~~~~
 
@@ -270,7 +270,7 @@ macro_rules! impl_ints {
             [ inner_t: $num_t, trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
         }
 
-        //~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~
+        //~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~
 
         //~~~~~UNARY~~~~~~
 
@@ -363,16 +363,16 @@ macro_rules! impl_ints {
             [ fn unbounded_shl($num_t, u32) -> $num_t                   , fn_path: ::core::primitive::$num_t::unbounded_shl         ],
             [ fn unbounded_shr($num_t, u32) -> $num_t                   , fn_path: ::core::primitive::$num_t::unbounded_shr         ],
 
-            [ fn wrapping_add($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::wrapping_add        ],
-            [ fn wrapping_div($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::wrapping_div        ],
-            [ fn wrapping_div_euclid($num_t, $num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::wrapping_div_euclid ],
-            [ fn wrapping_mul($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::wrapping_mul        ],
-            [ fn wrapping_pow($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::wrapping_pow        ],
-            [ fn wrapping_rem($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::wrapping_rem        ],
-            [ fn wrapping_rem_euclid($num_t, $num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::wrapping_rem_euclid ],
-            [ fn wrapping_shl($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::wrapping_shl        ],
-            [ fn wrapping_shr($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::wrapping_shr        ],
-            [ fn wrapping_sub($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::wrapping_sub        ]
+            [ fn wrapping_add($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_add          ],
+            [ fn wrapping_div($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_div          ],
+            [ fn wrapping_div_euclid($num_t, $num_t) -> $num_t          , fn_path: ::core::primitive::$num_t::wrapping_div_euclid   ],
+            [ fn wrapping_mul($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_mul          ],
+            [ fn wrapping_pow($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::wrapping_pow          ],
+            [ fn wrapping_rem($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_rem          ],
+            [ fn wrapping_rem_euclid($num_t, $num_t) -> $num_t          , fn_path: ::core::primitive::$num_t::wrapping_rem_euclid   ],
+            [ fn wrapping_shl($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::wrapping_shl          ],
+            [ fn wrapping_shr($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::wrapping_shr          ],
+            [ fn wrapping_sub($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_sub          ],
         }
 
     )*}
