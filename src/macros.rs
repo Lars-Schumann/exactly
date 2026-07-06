@@ -284,6 +284,7 @@ macro_rules! impl_ints {
         macros::if_unsigned!{ $num_t, {
         macros::impl_unary_fns! {
             [ fn cast_signed($num_t) -> $signed_num_t                   , fn_path: ::core::primitive::$num_t::cast_signed           ],
+
             [ fn is_power_of_two($num_t) -> bool                        , fn_path: ::core::primitive::$num_t::is_power_of_two       ],
             [ fn next_power_of_two($num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::next_power_of_two     ],
         }}}
@@ -291,16 +292,24 @@ macro_rules! impl_ints {
         macros::impl_unary_fns! {
             [ fn count_ones($num_t) -> u32                              , fn_path: ::core::primitive::$num_t::count_ones            ],
             [ fn count_zeros($num_t) -> u32                             , fn_path: ::core::primitive::$num_t::count_zeros           ],
+
             [ fn ilog2($num_t) -> u32                                   , fn_path: ::core::primitive::$num_t::ilog2                 ],
             [ fn ilog10($num_t) -> u32                                  , fn_path: ::core::primitive::$num_t::ilog10                ],
+
             [ fn isqrt($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::isqrt                 ],
+
             [ fn leading_ones($num_t) -> u32                            , fn_path: ::core::primitive::$num_t::leading_ones          ],
             [ fn leading_zeros($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::leading_zeros         ],
+
             [ fn reverse_bits($num_t) -> $num_t                         , fn_path: ::core::primitive::$num_t::reverse_bits          ],
+
             [ fn strict_neg($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::strict_neg            ],
+
             [ fn swap_bytes($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::swap_bytes            ],
+
             [ fn to_be($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::to_be                 ],
             [ fn to_le($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::to_le                 ],
+
             [ fn trailing_ones($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::trailing_ones         ],
             [ fn trailing_zeros($num_t) -> u32                          , fn_path: ::core::primitive::$num_t::trailing_zeros        ],
         }
@@ -310,12 +319,18 @@ macro_rules! impl_ints {
         macros::if_unsigned!{ $num_t, {
         macros::impl_binary_fns! {
             [ fn div_ceil($num_t, $num_t) -> $num_t                     , fn_path: ::core::primitive::$num_t::div_ceil              ],
+
             [ fn is_multiple_of($num_t, $num_t) -> bool                 , fn_path: ::core::primitive::$num_t::is_multiple_of        ],
             [ fn next_multiple_of($num_t, $num_t) -> $num_t             , fn_path: ::core::primitive::$num_t::next_multiple_of      ],
+
             [ fn saturating_add_signed($num_t, $signed_num_t) -> $num_t , fn_path: ::core::primitive::$num_t::saturating_add_signed ],
             [ fn saturating_sub_signed($num_t, $signed_num_t) -> $num_t , fn_path: ::core::primitive::$num_t::saturating_sub_signed ],
+
             [ fn strict_add_signed($num_t, $signed_num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_add_signed     ],
             [ fn strict_sub_signed($num_t, $signed_num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_sub_signed     ],
+
+            [ fn wrapping_add_signed($num_t, $signed_num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_add_signed   ],
+            [ fn wrapping_sub_signed($num_t, $signed_num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_sub_signed   ],
         }}}
 
         macros::impl_binary_fns! {
@@ -345,10 +360,19 @@ macro_rules! impl_ints {
             [ fn strict_shr($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::strict_shr            ],
             [ fn strict_sub($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_sub            ],
 
-            [ fn wrapping_add($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_add          ],
-            [ fn wrapping_div($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_div          ],
-            [ fn wrapping_mul($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_mul          ],
-            [ fn wrapping_sub($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_sub          ],
+            [ fn unbounded_shl($num_t, u32) -> $num_t                   , fn_path: ::core::primitive::$num_t::unbounded_shl         ],
+            [ fn unbounded_shr($num_t, u32) -> $num_t                   , fn_path: ::core::primitive::$num_t::unbounded_shr         ],
+
+            [ fn wrapping_add($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::wrapping_add        ],
+            [ fn wrapping_div($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::wrapping_div        ],
+            [ fn wrapping_div_euclid($num_t, $num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::wrapping_div_euclid ],
+            [ fn wrapping_mul($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::wrapping_mul        ],
+            [ fn wrapping_pow($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::wrapping_pow        ],
+            [ fn wrapping_rem($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::wrapping_rem        ],
+            [ fn wrapping_rem_euclid($num_t, $num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::wrapping_rem_euclid ],
+            [ fn wrapping_shl($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::wrapping_shl        ],
+            [ fn wrapping_shr($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::wrapping_shr        ],
+            [ fn wrapping_sub($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::wrapping_sub        ]
         }
 
     )*}
