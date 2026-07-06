@@ -170,6 +170,7 @@ mod tests {
         let a: Set<u16, { Range![1..=4] }> = Set::new(4).unwrap();
         let b: Set<u16, { Range![2..=6] }> = Set::new(2).unwrap();
 
-        let _c: Set<u16, { Range![3..=10] }> = (a + b).normalize();
+        let _c: Set<u16, { Range![3..=10] }> = a.wrapping_add(b).normalize();
+        let d = a.isqrt();
     }
 }

@@ -115,6 +115,8 @@ macro_rules! impl_unary_fns {
             };
 
             const impl<const SET: &'static [$input_t]> Set<$input_t, SET> {
+                #[doc = "This method is the equivalent of:\n"]
+                #[doc = concat!("https://doc.rust-lang.org/std/primitive.",stringify!($input_t),".html#method.",stringify!($fn_name))]
                 pub fn $fn_name(self) -> Set<$codomain_t, { CODOMAIN::<{ SET }> }> {
                     let input_inner: $input_t = self.inner();
                     let output_inner: $codomain_t = $fn_path(input_inner);
@@ -148,6 +150,8 @@ macro_rules! impl_binary_fns {
             };
 
             const impl<const LHS_SET: &'static [$lhs_t]> Set<$lhs_t, LHS_SET> {
+                #[doc = "This method is the equivalent of:\n"]
+                #[doc = concat!("https://doc.rust-lang.org/std/primitive.",stringify!($lhs_t),".html#method.",stringify!($fn_name))]
                 pub fn $fn_name<const RHS_SET: &'static [$rhs_t]>(self, rhs: Set<$rhs_t, RHS_SET>) -> Set<$codomain_t, { CODOMAIN::<{ LHS_SET }, { RHS_SET }> }> {
                     let lhs_inner: $lhs_t = self.inner();
                     let rhs_inner: $rhs_t = rhs.inner();
