@@ -98,7 +98,7 @@ macro_rules! impl_simple_binary_ops {
 }
 pub(crate) use impl_simple_binary_ops;
 
-macro_rules! impl_unary_fns {
+macro_rules! impl_std_unary_fns {
     ($([fn $fn_name:ident($input_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
@@ -127,9 +127,9 @@ macro_rules! impl_unary_fns {
 
     )+}
 }
-pub(crate) use impl_unary_fns;
+pub(crate) use impl_std_unary_fns;
 
-macro_rules! impl_binary_fns {
+macro_rules! impl_std_binary_fns {
     ($([fn $fn_name:ident($lhs_t:ident, $rhs_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
@@ -163,7 +163,7 @@ macro_rules! impl_binary_fns {
 
     )+}
 }
-pub(crate) use impl_binary_fns;
+pub(crate) use impl_std_binary_fns;
 
 macro_rules! impl_ints {
     (the_dolla: $d:tt, $([num_t: $num_t:ident, unsigned_num_t: $unsigned_num_t:ident, signed_num_t: $signed_num_t:ident, t_alias: $t_alias:ident, wide_num_t: $wide_num_t:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
@@ -229,6 +229,31 @@ macro_rules! impl_ints {
             }
             pub use ${ concat($private_macro_prefix, intersection) } as Intersection;
 
+            const fn as_u8   (value: $num_t) -> u8    { value as u8    }
+            const fn as_u16  (value: $num_t) -> u16   { value as u16   }
+            const fn as_u32  (value: $num_t) -> u32   { value as u32   }
+            const fn as_u64  (value: $num_t) -> u64   { value as u64   }
+            const fn as_u128 (value: $num_t) -> u128  { value as u128  }
+            const fn as_usize(value: $num_t) -> usize { value as usize }
+            const fn as_i8   (value: $num_t) -> i8    { value as i8    }
+            const fn as_i16  (value: $num_t) -> i16   { value as i16   }
+            const fn as_i32  (value: $num_t) -> i32   { value as i32   }
+            const fn as_i64  (value: $num_t) -> i64   { value as i64   }
+            const fn as_i128 (value: $num_t) -> i128  { value as i128  }
+            const fn as_isize(value: $num_t) -> isize { value as isize }
+
+            const fn to_u8   (value: $num_t) -> u8    { u8   ::try_from(value).ok().expect("Unable to losslessly convert to a u8    (this can never happen at runtime.)") }
+            const fn to_u16  (value: $num_t) -> u16   { u16  ::try_from(value).ok().expect("Unable to losslessly convert to a u16   (this can never happen at runtime.)") }
+            const fn to_u32  (value: $num_t) -> u32   { u32  ::try_from(value).ok().expect("Unable to losslessly convert to a u32   (this can never happen at runtime.)") }
+            const fn to_u64  (value: $num_t) -> u64   { u64  ::try_from(value).ok().expect("Unable to losslessly convert to a u64   (this can never happen at runtime.)") }
+            const fn to_u128 (value: $num_t) -> u128  { u128 ::try_from(value).ok().expect("Unable to losslessly convert to a u128  (this can never happen at runtime.)") }
+            const fn to_usize(value: $num_t) -> usize { usize::try_from(value).ok().expect("Unable to losslessly convert to a usize (this can never happen at runtime.)") }
+            const fn to_i8   (value: $num_t) -> i8    { i8   ::try_from(value).ok().expect("Unable to losslessly convert to a i8    (this can never happen at runtime.)") }
+            const fn to_i16  (value: $num_t) -> i16   { i16  ::try_from(value).ok().expect("Unable to losslessly convert to a i16   (this can never happen at runtime.)") }
+            const fn to_i32  (value: $num_t) -> i32   { i32  ::try_from(value).ok().expect("Unable to losslessly convert to a i32   (this can never happen at runtime.)") }
+            const fn to_i64  (value: $num_t) -> i64   { i64  ::try_from(value).ok().expect("Unable to losslessly convert to a i64   (this can never happen at runtime.)") }
+            const fn to_i128 (value: $num_t) -> i128  { i128 ::try_from(value).ok().expect("Unable to losslessly convert to a i128  (this can never happen at runtime.)") }
+            const fn to_isize(value: $num_t) -> isize { isize::try_from(value).ok().expect("Unable to losslessly convert to a isize (this can never happen at runtime.)") }
         }
 
         #[macro_export]
@@ -279,21 +304,21 @@ macro_rules! impl_ints {
         //~~~~~UNARY~~~~~~
 
         macros::if_signed!{ $num_t, {
-        macros::impl_unary_fns! {
+        macros::impl_std_unary_fns! {
             [ fn abs($num_t) -> $num_t                                  , fn_path: ::core::primitive::$num_t::abs                   ],
             [ fn strict_abs($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::strict_abs            ],
             [ fn unsigned_abs($num_t) -> $unsigned_num_t                , fn_path: ::core::primitive::$num_t::unsigned_abs          ],
         }}}
 
         macros::if_unsigned!{ $num_t, {
-        macros::impl_unary_fns! {
+        macros::impl_std_unary_fns! {
             [ fn cast_signed($num_t) -> $signed_num_t                   , fn_path: ::core::primitive::$num_t::cast_signed           ],
 
             [ fn is_power_of_two($num_t) -> bool                        , fn_path: ::core::primitive::$num_t::is_power_of_two       ],
             [ fn next_power_of_two($num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::next_power_of_two     ],
         }}}
 
-        macros::impl_unary_fns! {
+        macros::impl_std_unary_fns! {
             [ fn count_ones($num_t) -> u32                              , fn_path: ::core::primitive::$num_t::count_ones            ],
             [ fn count_zeros($num_t) -> u32                             , fn_path: ::core::primitive::$num_t::count_zeros           ],
 
@@ -321,7 +346,7 @@ macro_rules! impl_ints {
         //~~~~~BINARY~~~~~~
 
         macros::if_unsigned!{ $num_t, {
-        macros::impl_binary_fns! {
+        macros::impl_std_binary_fns! {
             [ fn div_ceil($num_t, $num_t) -> $num_t                     , fn_path: ::core::primitive::$num_t::div_ceil              ],
 
             [ fn is_multiple_of($num_t, $num_t) -> bool                 , fn_path: ::core::primitive::$num_t::is_multiple_of        ],
@@ -337,7 +362,7 @@ macro_rules! impl_ints {
             [ fn wrapping_sub_signed($num_t, $signed_num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_sub_signed   ],
         }}}
 
-        macros::impl_binary_fns! {
+        macros::impl_std_binary_fns! {
             [ fn abs_diff($num_t, $num_t) -> $unsigned_num_t            , fn_path: ::core::primitive::$num_t::abs_diff              ],
             [ fn div_euclid($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::div_euclid            ],
             [ fn ilog($num_t, $num_t) -> u32                            , fn_path: ::core::primitive::$num_t::ilog                  ],
