@@ -172,7 +172,21 @@ mod tests {
             let b: Set<u16, { Range![2..=6] }> = Set::new(2).unwrap();
 
             let _c: Set<u16, { Range![3..=10] }> = a.wrapping_add(b).normalize();
-            let d = a.isqrt();
+            let _d = a.isqrt();
         }
+    }
+
+    #[test]
+    fn to_as() {
+        use exactly::base::Set;
+        use exactly::set_i8::Range as RangeI8;
+        use exactly::set_i8::Union;
+        use exactly::set_u16::Range as RangeU16;
+
+        let a: SetU16![RangeU16![1..=130]] = Set::new(4).unwrap();
+        let _b: SetI8![Union![&[-128, -127, -126], RangeI8![1..=127]]] = a.as_i8().normalize();
+
+        let c: SetU16![RangeU16![1..=5]] = Set::new(2).unwrap();
+        let _d: SetI8![RangeI8![1..=5]] = c.to_i8();
     }
 }

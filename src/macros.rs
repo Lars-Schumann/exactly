@@ -129,6 +129,68 @@ macro_rules! impl_std_unary_fns {
 }
 pub(crate) use impl_std_unary_fns;
 
+macro_rules! impl_custom_as_unary_fns {
+    ($([fn $fn_name:ident($input_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+
+        #[expect(non_snake_case)]
+        mod ${concat(ඞඞ__,$input_t,_,$fn_name)} {
+            use crate::base::Set;
+
+            const CODOMAIN<const SET: &'static[$input_t]>: &[$codomain_t] = const {
+                &core::array::from_fn::<$codomain_t, { crate::base::LENGTH::<$input_t, SET> }, _>(
+                    const |i| {
+                        let a: $input_t = SET[i];
+                        $fn_path(a)
+                    }
+                )
+            };
+
+            impl<const SET: &'static [$input_t]> Set<$input_t, SET> {
+                #[doc = concat!("This method is the equivalent of: ",stringify!($input_t)," as ",stringify!($codomain_t),"\n")]
+                #[doc = "**I do not recommend using this method**, it exists purely for completeness.\n"]
+                #[doc = concat!("If at all possible prefer the `.to_",stringify!($codomain_t),"` method, since it is guaranteed to be lossless.")]
+                pub const fn $fn_name(self) -> Set<$codomain_t, { CODOMAIN::<{ SET }> }> {
+                    let input_inner: $input_t = self.inner();
+                    let output_inner: $codomain_t = $fn_path(input_inner);
+                    unsafe { Set::new_unchecked(output_inner) }
+                }
+            }
+        }
+
+    )+}
+}
+pub(crate) use impl_custom_as_unary_fns;
+
+macro_rules! impl_custom_to_unary_fns {
+    ($([fn $fn_name:ident($input_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+
+        #[expect(non_snake_case)]
+        mod ${concat(ඞඞ__,$input_t,_,$fn_name)} {
+            use crate::base::Set;
+
+            const CODOMAIN<const SET: &'static[$input_t]>: &[$codomain_t] = const {
+                &core::array::from_fn::<$codomain_t, { crate::base::LENGTH::<$input_t, SET> }, _>(
+                    const |i| {
+                        let a: $input_t = SET[i];
+                        $fn_path(a)
+                    }
+                )
+            };
+
+            impl<const SET: &'static [$input_t]> Set<$input_t, SET> {
+                #[doc = concat!("This perfoms a lossless conversion to ",stringify!($codomain_t)," or fails to compile if this isn't possible.")]
+                pub const fn $fn_name(self) -> Set<$codomain_t, { CODOMAIN::<{ SET }> }> {
+                    let input_inner: $input_t = self.inner();
+                    let output_inner: $codomain_t = $fn_path(input_inner);
+                    unsafe { Set::new_unchecked(output_inner) }
+                }
+            }
+        }
+
+    )+}
+}
+pub(crate) use impl_custom_to_unary_fns;
+
 macro_rules! impl_std_binary_fns {
     ($([fn $fn_name:ident($lhs_t:ident, $rhs_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
@@ -229,31 +291,31 @@ macro_rules! impl_ints {
             }
             pub use ${ concat($private_macro_prefix, intersection) } as Intersection;
 
-            const fn as_u8   (value: $num_t) -> u8    { value as u8    }
-            const fn as_u16  (value: $num_t) -> u16   { value as u16   }
-            const fn as_u32  (value: $num_t) -> u32   { value as u32   }
-            const fn as_u64  (value: $num_t) -> u64   { value as u64   }
-            const fn as_u128 (value: $num_t) -> u128  { value as u128  }
-            const fn as_usize(value: $num_t) -> usize { value as usize }
-            const fn as_i8   (value: $num_t) -> i8    { value as i8    }
-            const fn as_i16  (value: $num_t) -> i16   { value as i16   }
-            const fn as_i32  (value: $num_t) -> i32   { value as i32   }
-            const fn as_i64  (value: $num_t) -> i64   { value as i64   }
-            const fn as_i128 (value: $num_t) -> i128  { value as i128  }
-            const fn as_isize(value: $num_t) -> isize { value as isize }
+            pub(super) const fn as_u8   (value: $num_t) -> u8    { value as u8    }
+            pub(super) const fn as_u16  (value: $num_t) -> u16   { value as u16   }
+            pub(super) const fn as_u32  (value: $num_t) -> u32   { value as u32   }
+            pub(super) const fn as_u64  (value: $num_t) -> u64   { value as u64   }
+            pub(super) const fn as_u128 (value: $num_t) -> u128  { value as u128  }
+            pub(super) const fn as_usize(value: $num_t) -> usize { value as usize }
+            pub(super) const fn as_i8   (value: $num_t) -> i8    { value as i8    }
+            pub(super) const fn as_i16  (value: $num_t) -> i16   { value as i16   }
+            pub(super) const fn as_i32  (value: $num_t) -> i32   { value as i32   }
+            pub(super) const fn as_i64  (value: $num_t) -> i64   { value as i64   }
+            pub(super) const fn as_i128 (value: $num_t) -> i128  { value as i128  }
+            pub(super) const fn as_isize(value: $num_t) -> isize { value as isize }
 
-            const fn to_u8   (value: $num_t) -> u8    { u8   ::try_from(value).ok().expect("Unable to losslessly convert to a u8    (this can never happen at runtime.)") }
-            const fn to_u16  (value: $num_t) -> u16   { u16  ::try_from(value).ok().expect("Unable to losslessly convert to a u16   (this can never happen at runtime.)") }
-            const fn to_u32  (value: $num_t) -> u32   { u32  ::try_from(value).ok().expect("Unable to losslessly convert to a u32   (this can never happen at runtime.)") }
-            const fn to_u64  (value: $num_t) -> u64   { u64  ::try_from(value).ok().expect("Unable to losslessly convert to a u64   (this can never happen at runtime.)") }
-            const fn to_u128 (value: $num_t) -> u128  { u128 ::try_from(value).ok().expect("Unable to losslessly convert to a u128  (this can never happen at runtime.)") }
-            const fn to_usize(value: $num_t) -> usize { usize::try_from(value).ok().expect("Unable to losslessly convert to a usize (this can never happen at runtime.)") }
-            const fn to_i8   (value: $num_t) -> i8    { i8   ::try_from(value).ok().expect("Unable to losslessly convert to a i8    (this can never happen at runtime.)") }
-            const fn to_i16  (value: $num_t) -> i16   { i16  ::try_from(value).ok().expect("Unable to losslessly convert to a i16   (this can never happen at runtime.)") }
-            const fn to_i32  (value: $num_t) -> i32   { i32  ::try_from(value).ok().expect("Unable to losslessly convert to a i32   (this can never happen at runtime.)") }
-            const fn to_i64  (value: $num_t) -> i64   { i64  ::try_from(value).ok().expect("Unable to losslessly convert to a i64   (this can never happen at runtime.)") }
-            const fn to_i128 (value: $num_t) -> i128  { i128 ::try_from(value).ok().expect("Unable to losslessly convert to a i128  (this can never happen at runtime.)") }
-            const fn to_isize(value: $num_t) -> isize { isize::try_from(value).ok().expect("Unable to losslessly convert to a isize (this can never happen at runtime.)") }
+            pub(super) const fn to_u8   (value: $num_t) -> u8    { u8   ::try_from(value).ok().expect("Unable to losslessly convert to a u8   ") }
+            pub(super) const fn to_u16  (value: $num_t) -> u16   { u16  ::try_from(value).ok().expect("Unable to losslessly convert to a u16  ") }
+            pub(super) const fn to_u32  (value: $num_t) -> u32   { u32  ::try_from(value).ok().expect("Unable to losslessly convert to a u32  ") }
+            pub(super) const fn to_u64  (value: $num_t) -> u64   { u64  ::try_from(value).ok().expect("Unable to losslessly convert to a u64  ") }
+            pub(super) const fn to_u128 (value: $num_t) -> u128  { u128 ::try_from(value).ok().expect("Unable to losslessly convert to a u128 ") }
+            pub(super) const fn to_usize(value: $num_t) -> usize { usize::try_from(value).ok().expect("Unable to losslessly convert to a usize") }
+            pub(super) const fn to_i8   (value: $num_t) -> i8    { i8   ::try_from(value).ok().expect("Unable to losslessly convert to a i8   ") }
+            pub(super) const fn to_i16  (value: $num_t) -> i16   { i16  ::try_from(value).ok().expect("Unable to losslessly convert to a i16  ") }
+            pub(super) const fn to_i32  (value: $num_t) -> i32   { i32  ::try_from(value).ok().expect("Unable to losslessly convert to a i32  ") }
+            pub(super) const fn to_i64  (value: $num_t) -> i64   { i64  ::try_from(value).ok().expect("Unable to losslessly convert to a i64  ") }
+            pub(super) const fn to_i128 (value: $num_t) -> i128  { i128 ::try_from(value).ok().expect("Unable to losslessly convert to a i128 ") }
+            pub(super) const fn to_isize(value: $num_t) -> isize { isize::try_from(value).ok().expect("Unable to losslessly convert to a isize") }
         }
 
         #[macro_export]
@@ -269,7 +331,7 @@ macro_rules! impl_ints {
             };
         }
 
-        //~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~OPS~~~~~
+        //~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~
 
         //~~~~~UNARY~~~~~~
 
@@ -299,7 +361,7 @@ macro_rules! impl_ints {
             [ inner_t: $num_t, trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
         }
 
-        //~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~FNS~~~~~
+        //~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~
 
         //~~~~~UNARY~~~~~~
 
@@ -402,6 +464,42 @@ macro_rules! impl_ints {
             [ fn wrapping_shl($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::wrapping_shl          ],
             [ fn wrapping_shr($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::wrapping_shr          ],
             [ fn wrapping_sub($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_sub          ],
+        }
+
+        //~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~
+
+        //~~~~~UNARY~~~~~~
+
+        macros::impl_custom_as_unary_fns! {
+            [ fn as_u8($num_t) -> u8                                    , fn_path: crate::$extra_mod::as_u8                         ],
+            [ fn as_u16($num_t) -> u16                                  , fn_path: crate::$extra_mod::as_u16                        ],
+            [ fn as_u32($num_t) -> u32                                  , fn_path: crate::$extra_mod::as_u32                        ],
+            [ fn as_u64($num_t) -> u64                                  , fn_path: crate::$extra_mod::as_u64                        ],
+            [ fn as_u128($num_t) -> u128                                , fn_path: crate::$extra_mod::as_u128                       ],
+            [ fn as_usize($num_t) -> usize                              , fn_path: crate::$extra_mod::as_usize                      ],
+
+            [ fn as_i8($num_t) -> i8                                    , fn_path: crate::$extra_mod::as_i8                         ],
+            [ fn as_i16($num_t) -> i16                                  , fn_path: crate::$extra_mod::as_i16                        ],
+            [ fn as_i32($num_t) -> i32                                  , fn_path: crate::$extra_mod::as_i32                        ],
+            [ fn as_i64($num_t) -> i64                                  , fn_path: crate::$extra_mod::as_i64                        ],
+            [ fn as_i128($num_t) -> i128                                , fn_path: crate::$extra_mod::as_i128                       ],
+            [ fn as_isize($num_t) -> isize                              , fn_path: crate::$extra_mod::as_isize                      ],
+        }
+
+        macros::impl_custom_to_unary_fns! {
+            [ fn to_u8($num_t) -> u8                                    , fn_path: crate::$extra_mod::to_u8                         ],
+            [ fn to_u16($num_t) -> u16                                  , fn_path: crate::$extra_mod::to_u16                        ],
+            [ fn to_u32($num_t) -> u32                                  , fn_path: crate::$extra_mod::to_u32                        ],
+            [ fn to_u64($num_t) -> u64                                  , fn_path: crate::$extra_mod::to_u64                        ],
+            [ fn to_u128($num_t) -> u128                                , fn_path: crate::$extra_mod::to_u128                       ],
+            [ fn to_usize($num_t) -> usize                              , fn_path: crate::$extra_mod::to_usize                      ],
+
+            [ fn to_i8($num_t) -> i8                                    , fn_path: crate::$extra_mod::to_i8                         ],
+            [ fn to_i16($num_t) -> i16                                  , fn_path: crate::$extra_mod::to_i16                        ],
+            [ fn to_i32($num_t) -> i32                                  , fn_path: crate::$extra_mod::to_i32                        ],
+            [ fn to_i64($num_t) -> i64                                  , fn_path: crate::$extra_mod::to_i64                        ],
+            [ fn to_i128($num_t) -> i128                                , fn_path: crate::$extra_mod::to_i128                       ],
+            [ fn to_isize($num_t) -> isize                              , fn_path: crate::$extra_mod::to_isize                      ],
         }
 
     )*}
