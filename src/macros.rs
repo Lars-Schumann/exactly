@@ -341,6 +341,7 @@ macro_rules! impl_ints {
 
         macros::if_unsigned!{ $num_t, {
         macros::impl_unary_fns! {
+            [ fn bit_width($num_t) -> u32                               , fn_path: ::core::primitive::$num_t::bit_width             , doc_macro_path: doc_debug_unary_fn ],
             [ fn cast_signed($num_t) -> $signed_num_t                   , fn_path: ::core::primitive::$num_t::cast_signed           , doc_macro_path: doc_debug_unary_fn ],
 
             [ fn is_power_of_two($num_t) -> bool                        , fn_path: ::core::primitive::$num_t::is_power_of_two       , doc_macro_path: doc_debug_unary_fn ],
@@ -353,6 +354,9 @@ macro_rules! impl_ints {
 
             [ fn ilog2($num_t) -> u32                                   , fn_path: ::core::primitive::$num_t::ilog2                 , doc_macro_path: doc_debug_unary_fn ],
             [ fn ilog10($num_t) -> u32                                  , fn_path: ::core::primitive::$num_t::ilog10                , doc_macro_path: doc_debug_unary_fn ],
+
+            [ fn isolate_highest_one($num_t) -> $num_t                  , fn_path: ::core::primitive::$num_t::isolate_highest_one   , doc_macro_path: doc_debug_unary_fn ],
+            [ fn isolate_lowest_one($num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::isolate_lowest_one    , doc_macro_path: doc_debug_unary_fn ],
 
             [ fn isqrt($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::isqrt                 , doc_macro_path: doc_debug_unary_fn ],
 
