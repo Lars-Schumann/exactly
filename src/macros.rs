@@ -30,20 +30,35 @@ macro_rules! if_unsigned {
 }
 pub(crate) use if_unsigned;
 
+#[rustfmt::skip]
 macro_rules! doc_debug_unary_fn {
     (fn_name: $fn_name:ident, input_t: $input_t:ident, codomain_t: $codomain_t:ident) => {
-        concat!(
-            "fn_name: `",
-            stringify!($fn_name),
-            "`, input_t: `",
-            stringify!($input_t),
-            "`, codomain_t: `",
-            stringify!($codomain_t),
-            "`."
-        )
+        concat!("fn_name: `",stringify!($fn_name),"`, input_t: `",stringify!($input_t),"`, codomain_t: `",stringify!($codomain_t),"`.")
     };
 }
 pub(crate) use doc_debug_unary_fn;
+
+#[rustfmt::skip]
+macro_rules! doc_custom_unary_as_fn {
+    (fn_name: $fn_name:ident, input_t: $input_t:ident, codomain_t: $codomain_t:ident) => {
+        concat!(
+            "This method is the equivalent of: `",stringify!($input_t)," as ",stringify!($codomain_t),
+            "` \n \n **I do not recommend using this method**, it exists purely for completeness.",
+            " \n \n If at all possible prefer the `.to_",stringify!($codomain_t),"` method, since it is guaranteed to be lossless."
+        )
+    };
+}
+pub(crate) use doc_custom_unary_as_fn;
+
+#[rustfmt::skip]
+macro_rules! doc_custom_unary_to_fn {
+    (fn_name: $fn_name:ident, input_t: $input_t:ident, codomain_t: $codomain_t:ident) => {
+        concat!(
+            "This perfoms a lossless conversion from `",stringify!($input_t),"` to `",stringify!($codomain_t),"` or fails to compile if this isn't possible."
+        )
+    };
+}
+pub(crate) use doc_custom_unary_to_fn;
 
 macro_rules! impl_simple_unary_ops {
     ($([inner_t: $inner_t:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
@@ -113,7 +128,7 @@ macro_rules! impl_simple_binary_ops {
 }
 pub(crate) use impl_simple_binary_ops;
 
-macro_rules! impl_std_unary_fns {
+macro_rules! impl_unary_fns {
     ($([fn $fn_name:ident($input_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path, doc_macro_path: $doc_macro_path:ident]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
@@ -141,69 +156,7 @@ macro_rules! impl_std_unary_fns {
 
     )+}
 }
-pub(crate) use impl_std_unary_fns;
-
-macro_rules! impl_custom_as_unary_fns {
-    ($([fn $fn_name:ident($input_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
-
-        #[expect(non_snake_case)]
-        mod ${concat(ඞඞ__,$input_t,_,$fn_name)} {
-            use crate::base::Set;
-
-            const CODOMAIN<const SET: &'static[$input_t]>: &[$codomain_t] = const {
-                &core::array::from_fn::<$codomain_t, { crate::base::LENGTH::<$input_t, SET> }, _>(
-                    const |i| {
-                        let a: $input_t = SET[i];
-                        $fn_path(a)
-                    }
-                )
-            };
-
-            impl<const SET: &'static [$input_t]> Set<$input_t, SET> {
-                #[doc = concat!("This method is the equivalent of: ",stringify!($input_t)," as ",stringify!($codomain_t),"\n")]
-                #[doc = "**I do not recommend using this method**, it exists purely for completeness.\n"]
-                #[doc = concat!("If at all possible prefer the `.to_",stringify!($codomain_t),"` method, since it is guaranteed to be lossless.")]
-                pub const fn $fn_name(self) -> Set<$codomain_t, { CODOMAIN::<{ SET }> }> {
-                    let input_inner: $input_t = self.inner();
-                    let output_inner: $codomain_t = $fn_path(input_inner);
-                    unsafe { Set::new_unchecked(output_inner) }
-                }
-            }
-        }
-
-    )+}
-}
-pub(crate) use impl_custom_as_unary_fns;
-
-macro_rules! impl_custom_to_unary_fns {
-    ($([fn $fn_name:ident($input_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
-
-        #[expect(non_snake_case)]
-        mod ${concat(ඞඞ__,$input_t,_,$fn_name)} {
-            use crate::base::Set;
-
-            const CODOMAIN<const SET: &'static[$input_t]>: &[$codomain_t] = const {
-                &core::array::from_fn::<$codomain_t, { crate::base::LENGTH::<$input_t, SET> }, _>(
-                    const |i| {
-                        let a: $input_t = SET[i];
-                        $fn_path(a)
-                    }
-                )
-            };
-
-            impl<const SET: &'static [$input_t]> Set<$input_t, SET> {
-                #[doc = concat!("This perfoms a lossless conversion to ",stringify!($codomain_t)," or fails to compile if this isn't possible.")]
-                pub const fn $fn_name(self) -> Set<$codomain_t, { CODOMAIN::<{ SET }> }> {
-                    let input_inner: $input_t = self.inner();
-                    let output_inner: $codomain_t = $fn_path(input_inner);
-                    unsafe { Set::new_unchecked(output_inner) }
-                }
-            }
-        }
-
-    )+}
-}
-pub(crate) use impl_custom_to_unary_fns;
+pub(crate) use impl_unary_fns;
 
 macro_rules! impl_std_binary_fns {
     ($([fn $fn_name:ident($lhs_t:ident, $rhs_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
@@ -380,21 +333,21 @@ macro_rules! impl_ints {
         //~~~~~UNARY~~~~~~
 
         macros::if_signed!{ $num_t, {
-        macros::impl_std_unary_fns! {
+        macros::impl_unary_fns! {
             [ fn abs($num_t) -> $num_t                                  , fn_path: ::core::primitive::$num_t::abs                   , doc_macro_path: doc_debug_unary_fn ],
             [ fn strict_abs($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::strict_abs            , doc_macro_path: doc_debug_unary_fn ],
             [ fn unsigned_abs($num_t) -> $unsigned_num_t                , fn_path: ::core::primitive::$num_t::unsigned_abs          , doc_macro_path: doc_debug_unary_fn ],
         }}}
 
         macros::if_unsigned!{ $num_t, {
-        macros::impl_std_unary_fns! {
+        macros::impl_unary_fns! {
             [ fn cast_signed($num_t) -> $signed_num_t                   , fn_path: ::core::primitive::$num_t::cast_signed           , doc_macro_path: doc_debug_unary_fn ],
 
             [ fn is_power_of_two($num_t) -> bool                        , fn_path: ::core::primitive::$num_t::is_power_of_two       , doc_macro_path: doc_debug_unary_fn ],
             [ fn next_power_of_two($num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::next_power_of_two     , doc_macro_path: doc_debug_unary_fn ],
         }}}
 
-        macros::impl_std_unary_fns! {
+        macros::impl_unary_fns! {
             [ fn count_ones($num_t) -> u32                              , fn_path: ::core::primitive::$num_t::count_ones            , doc_macro_path: doc_debug_unary_fn ],
             [ fn count_zeros($num_t) -> u32                             , fn_path: ::core::primitive::$num_t::count_zeros           , doc_macro_path: doc_debug_unary_fn ],
 
@@ -484,36 +437,34 @@ macro_rules! impl_ints {
 
         //~~~~~UNARY~~~~~~
 
-        macros::impl_custom_as_unary_fns! {
-            [ fn as_u8($num_t) -> u8                                    , fn_path: crate::$extra_mod::as_u8                         ],
-            [ fn as_u16($num_t) -> u16                                  , fn_path: crate::$extra_mod::as_u16                        ],
-            [ fn as_u32($num_t) -> u32                                  , fn_path: crate::$extra_mod::as_u32                        ],
-            [ fn as_u64($num_t) -> u64                                  , fn_path: crate::$extra_mod::as_u64                        ],
-            [ fn as_u128($num_t) -> u128                                , fn_path: crate::$extra_mod::as_u128                       ],
-            [ fn as_usize($num_t) -> usize                              , fn_path: crate::$extra_mod::as_usize                      ],
+        macros::impl_unary_fns! {
+            [ fn as_u8($num_t) -> u8                                    , fn_path: crate::$extra_mod::as_u8                         , doc_macro_path: doc_custom_unary_as_fn ],
+            [ fn as_u16($num_t) -> u16                                  , fn_path: crate::$extra_mod::as_u16                        , doc_macro_path: doc_custom_unary_as_fn ],
+            [ fn as_u32($num_t) -> u32                                  , fn_path: crate::$extra_mod::as_u32                        , doc_macro_path: doc_custom_unary_as_fn ],
+            [ fn as_u64($num_t) -> u64                                  , fn_path: crate::$extra_mod::as_u64                        , doc_macro_path: doc_custom_unary_as_fn ],
+            [ fn as_u128($num_t) -> u128                                , fn_path: crate::$extra_mod::as_u128                       , doc_macro_path: doc_custom_unary_as_fn ],
+            [ fn as_usize($num_t) -> usize                              , fn_path: crate::$extra_mod::as_usize                      , doc_macro_path: doc_custom_unary_as_fn ],
 
-            [ fn as_i8($num_t) -> i8                                    , fn_path: crate::$extra_mod::as_i8                         ],
-            [ fn as_i16($num_t) -> i16                                  , fn_path: crate::$extra_mod::as_i16                        ],
-            [ fn as_i32($num_t) -> i32                                  , fn_path: crate::$extra_mod::as_i32                        ],
-            [ fn as_i64($num_t) -> i64                                  , fn_path: crate::$extra_mod::as_i64                        ],
-            [ fn as_i128($num_t) -> i128                                , fn_path: crate::$extra_mod::as_i128                       ],
-            [ fn as_isize($num_t) -> isize                              , fn_path: crate::$extra_mod::as_isize                      ],
-        }
+            [ fn as_i8($num_t) -> i8                                    , fn_path: crate::$extra_mod::as_i8                         , doc_macro_path: doc_custom_unary_as_fn ],
+            [ fn as_i16($num_t) -> i16                                  , fn_path: crate::$extra_mod::as_i16                        , doc_macro_path: doc_custom_unary_as_fn ],
+            [ fn as_i32($num_t) -> i32                                  , fn_path: crate::$extra_mod::as_i32                        , doc_macro_path: doc_custom_unary_as_fn ],
+            [ fn as_i64($num_t) -> i64                                  , fn_path: crate::$extra_mod::as_i64                        , doc_macro_path: doc_custom_unary_as_fn ],
+            [ fn as_i128($num_t) -> i128                                , fn_path: crate::$extra_mod::as_i128                       , doc_macro_path: doc_custom_unary_as_fn ],
+            [ fn as_isize($num_t) -> isize                              , fn_path: crate::$extra_mod::as_isize                      , doc_macro_path: doc_custom_unary_as_fn ],
 
-        macros::impl_custom_to_unary_fns! {
-            [ fn to_u8($num_t) -> u8                                    , fn_path: crate::$extra_mod::to_u8                         ],
-            [ fn to_u16($num_t) -> u16                                  , fn_path: crate::$extra_mod::to_u16                        ],
-            [ fn to_u32($num_t) -> u32                                  , fn_path: crate::$extra_mod::to_u32                        ],
-            [ fn to_u64($num_t) -> u64                                  , fn_path: crate::$extra_mod::to_u64                        ],
-            [ fn to_u128($num_t) -> u128                                , fn_path: crate::$extra_mod::to_u128                       ],
-            [ fn to_usize($num_t) -> usize                              , fn_path: crate::$extra_mod::to_usize                      ],
+            [ fn to_u8($num_t) -> u8                                    , fn_path: crate::$extra_mod::to_u8                         , doc_macro_path: doc_custom_unary_to_fn ],
+            [ fn to_u16($num_t) -> u16                                  , fn_path: crate::$extra_mod::to_u16                        , doc_macro_path: doc_custom_unary_to_fn ],
+            [ fn to_u32($num_t) -> u32                                  , fn_path: crate::$extra_mod::to_u32                        , doc_macro_path: doc_custom_unary_to_fn ],
+            [ fn to_u64($num_t) -> u64                                  , fn_path: crate::$extra_mod::to_u64                        , doc_macro_path: doc_custom_unary_to_fn ],
+            [ fn to_u128($num_t) -> u128                                , fn_path: crate::$extra_mod::to_u128                       , doc_macro_path: doc_custom_unary_to_fn ],
+            [ fn to_usize($num_t) -> usize                              , fn_path: crate::$extra_mod::to_usize                      , doc_macro_path: doc_custom_unary_to_fn ],
 
-            [ fn to_i8($num_t) -> i8                                    , fn_path: crate::$extra_mod::to_i8                         ],
-            [ fn to_i16($num_t) -> i16                                  , fn_path: crate::$extra_mod::to_i16                        ],
-            [ fn to_i32($num_t) -> i32                                  , fn_path: crate::$extra_mod::to_i32                        ],
-            [ fn to_i64($num_t) -> i64                                  , fn_path: crate::$extra_mod::to_i64                        ],
-            [ fn to_i128($num_t) -> i128                                , fn_path: crate::$extra_mod::to_i128                       ],
-            [ fn to_isize($num_t) -> isize                              , fn_path: crate::$extra_mod::to_isize                      ],
+            [ fn to_i8($num_t) -> i8                                    , fn_path: crate::$extra_mod::to_i8                         , doc_macro_path: doc_custom_unary_to_fn ],
+            [ fn to_i16($num_t) -> i16                                  , fn_path: crate::$extra_mod::to_i16                        , doc_macro_path: doc_custom_unary_to_fn ],
+            [ fn to_i32($num_t) -> i32                                  , fn_path: crate::$extra_mod::to_i32                        , doc_macro_path: doc_custom_unary_to_fn ],
+            [ fn to_i64($num_t) -> i64                                  , fn_path: crate::$extra_mod::to_i64                        , doc_macro_path: doc_custom_unary_to_fn ],
+            [ fn to_i128($num_t) -> i128                                , fn_path: crate::$extra_mod::to_i128                       , doc_macro_path: doc_custom_unary_to_fn ],
+            [ fn to_isize($num_t) -> isize                              , fn_path: crate::$extra_mod::to_isize                      , doc_macro_path: doc_custom_unary_to_fn ],
         }
 
     )*}
