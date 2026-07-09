@@ -30,6 +30,21 @@ macro_rules! if_unsigned {
 }
 pub(crate) use if_unsigned;
 
+macro_rules! doc_debug_unary_fn {
+    (fn_name: $fn_name:ident, input_t: $input_t:ident, codomain_t: $codomain_t:ident) => {
+        concat!(
+            "fn_name: `",
+            stringify!($fn_name),
+            "`, input_t: `",
+            stringify!($input_t),
+            "`, codomain_t: `",
+            stringify!($codomain_t),
+            "`."
+        )
+    };
+}
+pub(crate) use doc_debug_unary_fn;
+
 macro_rules! impl_simple_unary_ops {
     ($([inner_t: $inner_t:ident, trait_fn_name: $trait_fn_name:ident, op_trait: $(::$op_trait:ident)+, op: $op:tt]),+ $(,)?) => {$(
 
@@ -99,7 +114,7 @@ macro_rules! impl_simple_binary_ops {
 pub(crate) use impl_simple_binary_ops;
 
 macro_rules! impl_std_unary_fns {
-    ($([fn $fn_name:ident($input_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+    ($([fn $fn_name:ident($input_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path, doc_macro_path: $doc_macro_path:ident]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
         mod ${concat(ඞඞ__,$input_t,_,$fn_name)} {
@@ -115,8 +130,7 @@ macro_rules! impl_std_unary_fns {
             };
 
             impl<const SET: &'static [$input_t]> Set<$input_t, SET> {
-                #[doc = "This method is the equivalent of:\n"]
-                #[doc = concat!("https://doc.rust-lang.org/std/primitive.",stringify!($input_t),".html#method.",stringify!($fn_name))]
+                #[doc = crate::macros::$doc_macro_path!(fn_name: $fn_name, input_t: $input_t, codomain_t: $codomain_t)]
                 pub const fn $fn_name(self) -> Set<$codomain_t, { CODOMAIN::<{ SET }> }> {
                     let input_inner: $input_t = self.inner();
                     let output_inner: $codomain_t = $fn_path(input_inner);
@@ -367,42 +381,42 @@ macro_rules! impl_ints {
 
         macros::if_signed!{ $num_t, {
         macros::impl_std_unary_fns! {
-            [ fn abs($num_t) -> $num_t                                  , fn_path: ::core::primitive::$num_t::abs                   ],
-            [ fn strict_abs($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::strict_abs            ],
-            [ fn unsigned_abs($num_t) -> $unsigned_num_t                , fn_path: ::core::primitive::$num_t::unsigned_abs          ],
+            [ fn abs($num_t) -> $num_t                                  , fn_path: ::core::primitive::$num_t::abs                   , doc_macro_path: doc_debug_unary_fn ],
+            [ fn strict_abs($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::strict_abs            , doc_macro_path: doc_debug_unary_fn ],
+            [ fn unsigned_abs($num_t) -> $unsigned_num_t                , fn_path: ::core::primitive::$num_t::unsigned_abs          , doc_macro_path: doc_debug_unary_fn ],
         }}}
 
         macros::if_unsigned!{ $num_t, {
         macros::impl_std_unary_fns! {
-            [ fn cast_signed($num_t) -> $signed_num_t                   , fn_path: ::core::primitive::$num_t::cast_signed           ],
+            [ fn cast_signed($num_t) -> $signed_num_t                   , fn_path: ::core::primitive::$num_t::cast_signed           , doc_macro_path: doc_debug_unary_fn ],
 
-            [ fn is_power_of_two($num_t) -> bool                        , fn_path: ::core::primitive::$num_t::is_power_of_two       ],
-            [ fn next_power_of_two($num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::next_power_of_two     ],
+            [ fn is_power_of_two($num_t) -> bool                        , fn_path: ::core::primitive::$num_t::is_power_of_two       , doc_macro_path: doc_debug_unary_fn ],
+            [ fn next_power_of_two($num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::next_power_of_two     , doc_macro_path: doc_debug_unary_fn ],
         }}}
 
         macros::impl_std_unary_fns! {
-            [ fn count_ones($num_t) -> u32                              , fn_path: ::core::primitive::$num_t::count_ones            ],
-            [ fn count_zeros($num_t) -> u32                             , fn_path: ::core::primitive::$num_t::count_zeros           ],
+            [ fn count_ones($num_t) -> u32                              , fn_path: ::core::primitive::$num_t::count_ones            , doc_macro_path: doc_debug_unary_fn ],
+            [ fn count_zeros($num_t) -> u32                             , fn_path: ::core::primitive::$num_t::count_zeros           , doc_macro_path: doc_debug_unary_fn ],
 
-            [ fn ilog2($num_t) -> u32                                   , fn_path: ::core::primitive::$num_t::ilog2                 ],
-            [ fn ilog10($num_t) -> u32                                  , fn_path: ::core::primitive::$num_t::ilog10                ],
+            [ fn ilog2($num_t) -> u32                                   , fn_path: ::core::primitive::$num_t::ilog2                 , doc_macro_path: doc_debug_unary_fn ],
+            [ fn ilog10($num_t) -> u32                                  , fn_path: ::core::primitive::$num_t::ilog10                , doc_macro_path: doc_debug_unary_fn ],
 
-            [ fn isqrt($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::isqrt                 ],
+            [ fn isqrt($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::isqrt                 , doc_macro_path: doc_debug_unary_fn ],
 
-            [ fn leading_ones($num_t) -> u32                            , fn_path: ::core::primitive::$num_t::leading_ones          ],
-            [ fn leading_zeros($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::leading_zeros         ],
+            [ fn leading_ones($num_t) -> u32                            , fn_path: ::core::primitive::$num_t::leading_ones          , doc_macro_path: doc_debug_unary_fn ],
+            [ fn leading_zeros($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::leading_zeros         , doc_macro_path: doc_debug_unary_fn ],
 
-            [ fn reverse_bits($num_t) -> $num_t                         , fn_path: ::core::primitive::$num_t::reverse_bits          ],
+            [ fn reverse_bits($num_t) -> $num_t                         , fn_path: ::core::primitive::$num_t::reverse_bits          , doc_macro_path: doc_debug_unary_fn ],
 
-            [ fn strict_neg($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::strict_neg            ],
+            [ fn strict_neg($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::strict_neg            , doc_macro_path: doc_debug_unary_fn ],
 
-            [ fn swap_bytes($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::swap_bytes            ],
+            [ fn swap_bytes($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::swap_bytes            , doc_macro_path: doc_debug_unary_fn ],
 
-            [ fn to_be($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::to_be                 ],
-            [ fn to_le($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::to_le                 ],
+            [ fn to_be($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::to_be                 , doc_macro_path: doc_debug_unary_fn ],
+            [ fn to_le($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::to_le                 , doc_macro_path: doc_debug_unary_fn ],
 
-            [ fn trailing_ones($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::trailing_ones         ],
-            [ fn trailing_zeros($num_t) -> u32                          , fn_path: ::core::primitive::$num_t::trailing_zeros        ],
+            [ fn trailing_ones($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::trailing_ones         , doc_macro_path: doc_debug_unary_fn ],
+            [ fn trailing_zeros($num_t) -> u32                          , fn_path: ::core::primitive::$num_t::trailing_zeros        , doc_macro_path: doc_debug_unary_fn ],
         }
 
         //~~~~~BINARY~~~~~~
