@@ -13,15 +13,3 @@ bench_compile_time = []
 name = "compile_time"
 path = "benches/compile_time.rs"
 harness = false
-
-[profile.dev]
-overflow-checks = true
-
-[profile.release]
-overflow-checks = true
-
-[profile.test]
-overflow-checks = true
-
-[profile.bench]
-overflow-checks = true
