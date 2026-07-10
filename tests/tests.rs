@@ -1,7 +1,7 @@
 #[cfg(not(feature = "bench_compile_time"))]
 mod tests {
 
-    use exactly::*;
+    use sure::*;
 
     #[test]
     fn one() {
@@ -149,7 +149,7 @@ mod tests {
 
     #[test]
     fn generic() {
-        use exactly::base::Set;
+        use sure::base::Set;
 
         let a: Set<u8, { &[5, 4] }> = Set::new(5).unwrap();
         let b: Set<u8, { &[1, 2] }> = Set::new(2).unwrap();
@@ -164,8 +164,8 @@ mod tests {
 
     #[test]
     fn generic2() {
-        use exactly::base::Set;
-        use exactly::set_u16::Range;
+        use sure::base::Set;
+        use sure::set_u16::Range;
 
         const {
             let a: Set<u16, { Range![1..=4] }> = Set::new(4).unwrap();
@@ -178,10 +178,10 @@ mod tests {
 
     #[test]
     fn to_as() {
-        use exactly::base::Set;
-        use exactly::set_i8::Range as RangeI8;
-        use exactly::set_i8::Union;
-        use exactly::set_u16::Range as RangeU16;
+        use sure::base::Set;
+        use sure::set_i8::Range as RangeI8;
+        use sure::set_i8::Union;
+        use sure::set_u16::Range as RangeU16;
 
         let a: SetU16![RangeU16![1..=130]] = Set::new(4).unwrap();
         let _b: SetI8![Union![&[-128, -127, -126], RangeI8![1..=127]]] = a.as_i8().normalize();
@@ -192,7 +192,7 @@ mod tests {
 
     #[test]
     fn to_nonzero() {
-        use exactly::base::Set;
+        use sure::base::Set;
         let set_not_zero: SetI32![1, 2, 3] = Set::new(1).unwrap();
         let _real_non_zero: core::num::NonZeroI32 = set_not_zero.to_nonzero();
     }

@@ -3,8 +3,8 @@
 #[cfg(feature = "bench_compile_time")]
 fn main() {
     {
-        use exactly::SetU8;
-        use exactly::set_u8::Range;
+        use sure::SetU8;
+        use sure::set_u8::Range;
 
         let a: SetU8![Range![0..=127]] = SetU8::new(1).unwrap();
         let b: SetU8![Range![0..=127]] = SetU8::new(1).unwrap();
@@ -18,8 +18,8 @@ fn main() {
     }
 
     {
-        use exactly::SetI32;
-        use exactly::set_i32::Range;
+        use sure::SetI32;
+        use sure::set_i32::Range;
 
         let a: SetI32![Range![0..=50]] = SetI32::new(1).unwrap();
         let b: SetI32![Range![0..=50]] = SetI32::new(1).unwrap();

@@ -1,10 +1,10 @@
-## exactly
+## sure
 
 Numeric refinement types who's type automatically adjusts after operations.
 
 ## Example
 ```rust
-use exactly::SetU8;
+use sure::SetU8;
 
 fn main() {
   // `foo` is known to be in the set {1, 2, 3} 

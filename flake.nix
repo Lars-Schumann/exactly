@@ -37,11 +37,11 @@
         };
 
         shellHook = ''
-          export PS1="\[\e[1;33m\][exactly]\[\e[0m\] $PS1"
+          export PS1="\[\e[1;33m\][sure]\[\e[0m\] $PS1"
 
           alias msrv="cargo msrv find --linear -- cargo test"
 
-          alias bct="cargo clean && cargo bench --package exactly --features bench_compile_time --timings -- --no-capture"
+          alias bct="cargo clean && cargo bench --package sure --features bench_compile_time --timings -- --no-capture"
         '';
       };
     };
