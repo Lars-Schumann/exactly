@@ -189,4 +189,11 @@ mod tests {
         let c: SetU16![RangeU16![1..=5]] = Set::new(2).unwrap();
         let _d: SetI8![RangeI8![1..=5]] = c.to_i8();
     }
+
+    #[test]
+    fn to_nonzero() {
+        use exactly::base::Set;
+        let set_not_zero: SetI32![1, 2, 3] = Set::new(1).unwrap();
+        let _real_non_zero: core::num::NonZeroI32 = set_not_zero.to_nonzero();
+    }
 }

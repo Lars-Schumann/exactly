@@ -294,6 +294,16 @@ macro_rules! impl_ints {
             pub(super) const fn to_i64  (value: $num_t) -> i64   { i64  ::try_from(value).ok().expect("Unable to losslessly convert to a i64  ") }
             pub(super) const fn to_i128 (value: $num_t) -> i128  { i128 ::try_from(value).ok().expect("Unable to losslessly convert to a i128 ") }
             pub(super) const fn to_isize(value: $num_t) -> isize { isize::try_from(value).ok().expect("Unable to losslessly convert to a isize") }
+
+        }
+
+        impl<const SET: &'static [$num_t]> crate::base::Set<$num_t, SET> {
+            pub const fn to_nonzero(self) -> core::num::NonZero<$num_t> {
+                const { assert!(!Self::contains(&0), "Set containing a 0 cannot be converted to NonZero")}
+                let self_inner = self.inner();
+                // SAFETY: we just asserted that `self_inner` can never be 0
+                unsafe { core::num::NonZero::new_unchecked(self_inner) }
+            }
         }
 
         #[macro_export]
