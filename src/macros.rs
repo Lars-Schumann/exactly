@@ -282,17 +282,17 @@ macro_rules! impl_ints {
             pub(super) const fn as_i128 (value: $num_t) -> i128  { value as i128  }
             pub(super) const fn as_isize(value: $num_t) -> isize { value as isize }
 
-            pub(super) const fn to_u8   (value: $num_t) -> u8    { u8   ::try_from(value).ok().expect("Unable to losslessly convert to a u8   ") }
-            pub(super) const fn to_u16  (value: $num_t) -> u16   { u16  ::try_from(value).ok().expect("Unable to losslessly convert to a u16  ") }
-            pub(super) const fn to_u32  (value: $num_t) -> u32   { u32  ::try_from(value).ok().expect("Unable to losslessly convert to a u32  ") }
-            pub(super) const fn to_u64  (value: $num_t) -> u64   { u64  ::try_from(value).ok().expect("Unable to losslessly convert to a u64  ") }
-            pub(super) const fn to_u128 (value: $num_t) -> u128  { u128 ::try_from(value).ok().expect("Unable to losslessly convert to a u128 ") }
+            pub(super) const fn to_u8   (value: $num_t) -> u8    { u8   ::try_from(value).ok().expect("Unable to losslessly convert to a u8"   ) }
+            pub(super) const fn to_u16  (value: $num_t) -> u16   { u16  ::try_from(value).ok().expect("Unable to losslessly convert to a u16"  ) }
+            pub(super) const fn to_u32  (value: $num_t) -> u32   { u32  ::try_from(value).ok().expect("Unable to losslessly convert to a u32"  ) }
+            pub(super) const fn to_u64  (value: $num_t) -> u64   { u64  ::try_from(value).ok().expect("Unable to losslessly convert to a u64"  ) }
+            pub(super) const fn to_u128 (value: $num_t) -> u128  { u128 ::try_from(value).ok().expect("Unable to losslessly convert to a u128" ) }
             pub(super) const fn to_usize(value: $num_t) -> usize { usize::try_from(value).ok().expect("Unable to losslessly convert to a usize") }
-            pub(super) const fn to_i8   (value: $num_t) -> i8    { i8   ::try_from(value).ok().expect("Unable to losslessly convert to a i8   ") }
-            pub(super) const fn to_i16  (value: $num_t) -> i16   { i16  ::try_from(value).ok().expect("Unable to losslessly convert to a i16  ") }
-            pub(super) const fn to_i32  (value: $num_t) -> i32   { i32  ::try_from(value).ok().expect("Unable to losslessly convert to a i32  ") }
-            pub(super) const fn to_i64  (value: $num_t) -> i64   { i64  ::try_from(value).ok().expect("Unable to losslessly convert to a i64  ") }
-            pub(super) const fn to_i128 (value: $num_t) -> i128  { i128 ::try_from(value).ok().expect("Unable to losslessly convert to a i128 ") }
+            pub(super) const fn to_i8   (value: $num_t) -> i8    { i8   ::try_from(value).ok().expect("Unable to losslessly convert to a i8"   ) }
+            pub(super) const fn to_i16  (value: $num_t) -> i16   { i16  ::try_from(value).ok().expect("Unable to losslessly convert to a i16"  ) }
+            pub(super) const fn to_i32  (value: $num_t) -> i32   { i32  ::try_from(value).ok().expect("Unable to losslessly convert to a i32"  ) }
+            pub(super) const fn to_i64  (value: $num_t) -> i64   { i64  ::try_from(value).ok().expect("Unable to losslessly convert to a i64"  ) }
+            pub(super) const fn to_i128 (value: $num_t) -> i128  { i128 ::try_from(value).ok().expect("Unable to losslessly convert to a i128" ) }
             pub(super) const fn to_isize(value: $num_t) -> isize { isize::try_from(value).ok().expect("Unable to losslessly convert to a isize") }
 
         }
