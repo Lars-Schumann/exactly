@@ -1,5 +1,5 @@
 {
-  description = "rust dev shell for tablebased";
+  description = "rust dev shell for sure";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
