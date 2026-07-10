@@ -3,6 +3,13 @@ name = "sure"
 version = "0.1.0"
 edition = "2024"
 
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/lars-schumann/sure"
+# homepage = ""
+readme = "README.md"
+description = "Numeric refinement types"
+keywords = []
+
 [features]
 bench_compile_time = []
 
