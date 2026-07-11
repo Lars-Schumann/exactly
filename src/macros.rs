@@ -170,7 +170,7 @@ macro_rules! impl_unary_fns {
 pub(crate) use impl_unary_fns;
 
 macro_rules! impl_std_binary_fns {
-    ($([fn $fn_name:ident($lhs_t:ident, $rhs_t:ident) -> $codomain_t:ident, fn_path: $fn_path:path]),+ $(,)?) => {$(
+    ($([fn $fn_name:ident($lhs_t:ident, $rhs_t:ident) -> $codomain_t:ty, fn_path: $fn_path:path]),+ $(,)?) => {$(
 
         #[expect(non_snake_case)]
         mod ${concat(ඞඞ__,$lhs_t,_,$rhs_t,_,$fn_name)} {
@@ -319,7 +319,7 @@ macro_rules! impl_ints {
             };
         }
 
-        //~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~
+        //~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~STD~OPS~~~~~
 
         //~~~~~UNARY~~~~~~
 
@@ -349,147 +349,159 @@ macro_rules! impl_ints {
             [ inner_t: $num_t, trait_fn_name: shr    , op_trait: ::core::ops::Shr     , op: >> ],
         }
 
-        //~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~
+        //~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~STD~FNS~~~~~
 
         //~~~~~UNARY~~~~~~
 
         macros::if_signed!{ $num_t, {
         macros::impl_unary_fns! {
-            [ fn abs($num_t) -> $num_t                                  , fn_path: ::core::primitive::$num_t::abs                   , doc_macro_path: doc_unary_std ],
-            [ fn strict_abs($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::strict_abs            , doc_macro_path: doc_unary_std ],
-            [ fn unsigned_abs($num_t) -> $unsigned_num_t                , fn_path: ::core::primitive::$num_t::unsigned_abs          , doc_macro_path: doc_unary_std ],
+            [ fn abs($num_t) -> $num_t                                    , fn_path: ::core::primitive::$num_t::abs                   , doc_macro_path: doc_unary_std ],
+            [ fn strict_abs($num_t) -> $num_t                             , fn_path: ::core::primitive::$num_t::strict_abs            , doc_macro_path: doc_unary_std ],
+            [ fn unsigned_abs($num_t) -> $unsigned_num_t                  , fn_path: ::core::primitive::$num_t::unsigned_abs          , doc_macro_path: doc_unary_std ],
         }}}
 
         macros::if_unsigned!{ $num_t, {
         macros::impl_unary_fns! {
-            [ fn bit_width($num_t) -> u32                               , fn_path: ::core::primitive::$num_t::bit_width             , doc_macro_path: doc_unary_std ],
-            [ fn cast_signed($num_t) -> $signed_num_t                   , fn_path: ::core::primitive::$num_t::cast_signed           , doc_macro_path: doc_unary_std ],
+            [ fn bit_width($num_t) -> u32                                 , fn_path: ::core::primitive::$num_t::bit_width             , doc_macro_path: doc_unary_std ],
+            [ fn cast_signed($num_t) -> $signed_num_t                     , fn_path: ::core::primitive::$num_t::cast_signed           , doc_macro_path: doc_unary_std ],
 
-            [ fn is_power_of_two($num_t) -> bool                        , fn_path: ::core::primitive::$num_t::is_power_of_two       , doc_macro_path: doc_unary_std ],
-            [ fn next_power_of_two($num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::next_power_of_two     , doc_macro_path: doc_unary_std ],
+            [ fn is_power_of_two($num_t) -> bool                          , fn_path: ::core::primitive::$num_t::is_power_of_two       , doc_macro_path: doc_unary_std ],
+            [ fn next_power_of_two($num_t) -> $num_t                      , fn_path: ::core::primitive::$num_t::next_power_of_two     , doc_macro_path: doc_unary_std ],
         }}}
 
         macros::impl_unary_fns! {
-            [ fn count_ones($num_t) -> u32                              , fn_path: ::core::primitive::$num_t::count_ones            , doc_macro_path: doc_unary_std ],
-            [ fn count_zeros($num_t) -> u32                             , fn_path: ::core::primitive::$num_t::count_zeros           , doc_macro_path: doc_unary_std ],
+            [ fn count_ones($num_t) -> u32                                , fn_path: ::core::primitive::$num_t::count_ones            , doc_macro_path: doc_unary_std ],
+            [ fn count_zeros($num_t) -> u32                               , fn_path: ::core::primitive::$num_t::count_zeros           , doc_macro_path: doc_unary_std ],
 
-            [ fn ilog2($num_t) -> u32                                   , fn_path: ::core::primitive::$num_t::ilog2                 , doc_macro_path: doc_unary_std ],
-            [ fn ilog10($num_t) -> u32                                  , fn_path: ::core::primitive::$num_t::ilog10                , doc_macro_path: doc_unary_std ],
+            [ fn ilog2($num_t) -> u32                                     , fn_path: ::core::primitive::$num_t::ilog2                 , doc_macro_path: doc_unary_std ],
+            [ fn ilog10($num_t) -> u32                                    , fn_path: ::core::primitive::$num_t::ilog10                , doc_macro_path: doc_unary_std ],
 
-            [ fn isolate_highest_one($num_t) -> $num_t                  , fn_path: ::core::primitive::$num_t::isolate_highest_one   , doc_macro_path: doc_unary_std ],
-            [ fn isolate_lowest_one($num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::isolate_lowest_one    , doc_macro_path: doc_unary_std ],
+            [ fn isolate_highest_one($num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::isolate_highest_one   , doc_macro_path: doc_unary_std ],
+            [ fn isolate_lowest_one($num_t) -> $num_t                     , fn_path: ::core::primitive::$num_t::isolate_lowest_one    , doc_macro_path: doc_unary_std ],
 
-            [ fn isqrt($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::isqrt                 , doc_macro_path: doc_unary_std ],
+            [ fn isqrt($num_t) -> $num_t                                  , fn_path: ::core::primitive::$num_t::isqrt                 , doc_macro_path: doc_unary_std ],
 
-            [ fn leading_ones($num_t) -> u32                            , fn_path: ::core::primitive::$num_t::leading_ones          , doc_macro_path: doc_unary_std ],
-            [ fn leading_zeros($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::leading_zeros         , doc_macro_path: doc_unary_std ],
+            [ fn leading_ones($num_t) -> u32                              , fn_path: ::core::primitive::$num_t::leading_ones          , doc_macro_path: doc_unary_std ],
+            [ fn leading_zeros($num_t) -> u32                             , fn_path: ::core::primitive::$num_t::leading_zeros         , doc_macro_path: doc_unary_std ],
 
-            [ fn reverse_bits($num_t) -> $num_t                         , fn_path: ::core::primitive::$num_t::reverse_bits          , doc_macro_path: doc_unary_std ],
+            [ fn reverse_bits($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::reverse_bits          , doc_macro_path: doc_unary_std ],
 
-            [ fn strict_neg($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::strict_neg            , doc_macro_path: doc_unary_std ],
+            [ fn strict_neg($num_t) -> $num_t                             , fn_path: ::core::primitive::$num_t::strict_neg            , doc_macro_path: doc_unary_std ],
 
-            [ fn swap_bytes($num_t) -> $num_t                           , fn_path: ::core::primitive::$num_t::swap_bytes            , doc_macro_path: doc_unary_std ],
+            [ fn swap_bytes($num_t) -> $num_t                             , fn_path: ::core::primitive::$num_t::swap_bytes            , doc_macro_path: doc_unary_std ],
 
-            [ fn to_be($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::to_be                 , doc_macro_path: doc_unary_std ],
-            [ fn to_le($num_t) -> $num_t                                , fn_path: ::core::primitive::$num_t::to_le                 , doc_macro_path: doc_unary_std ],
+            [ fn to_be($num_t) -> $num_t                                  , fn_path: ::core::primitive::$num_t::to_be                 , doc_macro_path: doc_unary_std ],
+            [ fn to_le($num_t) -> $num_t                                  , fn_path: ::core::primitive::$num_t::to_le                 , doc_macro_path: doc_unary_std ],
 
-            [ fn trailing_ones($num_t) -> u32                           , fn_path: ::core::primitive::$num_t::trailing_ones         , doc_macro_path: doc_unary_std ],
-            [ fn trailing_zeros($num_t) -> u32                          , fn_path: ::core::primitive::$num_t::trailing_zeros        , doc_macro_path: doc_unary_std ],
+            [ fn trailing_ones($num_t) -> u32                             , fn_path: ::core::primitive::$num_t::trailing_ones         , doc_macro_path: doc_unary_std ],
+            [ fn trailing_zeros($num_t) -> u32                            , fn_path: ::core::primitive::$num_t::trailing_zeros        , doc_macro_path: doc_unary_std ],
         }
 
         //~~~~~BINARY~~~~~~
 
         macros::if_unsigned!{ $num_t, {
         macros::impl_std_binary_fns! {
-            [ fn div_ceil($num_t, $num_t) -> $num_t                     , fn_path: ::core::primitive::$num_t::div_ceil              ],
+            [ fn div_ceil($num_t, $num_t) -> $num_t                       , fn_path: ::core::primitive::$num_t::div_ceil               ],
 
-            [ fn is_multiple_of($num_t, $num_t) -> bool                 , fn_path: ::core::primitive::$num_t::is_multiple_of        ],
-            [ fn next_multiple_of($num_t, $num_t) -> $num_t             , fn_path: ::core::primitive::$num_t::next_multiple_of      ],
+            [ fn is_multiple_of($num_t, $num_t) -> bool                   , fn_path: ::core::primitive::$num_t::is_multiple_of         ],
+            [ fn next_multiple_of($num_t, $num_t) -> $num_t               , fn_path: ::core::primitive::$num_t::next_multiple_of       ],
 
-            [ fn saturating_add_signed($num_t, $signed_num_t) -> $num_t , fn_path: ::core::primitive::$num_t::saturating_add_signed ],
-            [ fn saturating_sub_signed($num_t, $signed_num_t) -> $num_t , fn_path: ::core::primitive::$num_t::saturating_sub_signed ],
+            [ fn saturating_add_signed($num_t, $signed_num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::saturating_add_signed  ],
+            [ fn saturating_sub_signed($num_t, $signed_num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::saturating_sub_signed  ],
 
-            [ fn strict_add_signed($num_t, $signed_num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_add_signed     ],
-            [ fn strict_sub_signed($num_t, $signed_num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::strict_sub_signed     ],
+            [ fn strict_add_signed($num_t, $signed_num_t) -> $num_t       , fn_path: ::core::primitive::$num_t::strict_add_signed      ],
+            [ fn strict_sub_signed($num_t, $signed_num_t) -> $num_t       , fn_path: ::core::primitive::$num_t::strict_sub_signed      ],
 
-            [ fn wrapping_add_signed($num_t, $signed_num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_add_signed   ],
-            [ fn wrapping_sub_signed($num_t, $signed_num_t) -> $num_t   , fn_path: ::core::primitive::$num_t::wrapping_sub_signed   ],
+            [ fn wrapping_add_signed($num_t, $signed_num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::wrapping_add_signed    ],
+            [ fn wrapping_sub_signed($num_t, $signed_num_t) -> $num_t     , fn_path: ::core::primitive::$num_t::wrapping_sub_signed    ],
         }}}
 
         macros::impl_std_binary_fns! {
-            [ fn abs_diff($num_t, $num_t) -> $unsigned_num_t            , fn_path: ::core::primitive::$num_t::abs_diff              ],
-            [ fn div_euclid($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::div_euclid            ],
-            [ fn ilog($num_t, $num_t) -> u32                            , fn_path: ::core::primitive::$num_t::ilog                  ],
-            [ fn midpoint($num_t, $num_t) -> $num_t                     , fn_path: ::core::primitive::$num_t::midpoint              ],
-            [ fn pow($num_t, u32) -> $num_t                             , fn_path: ::core::primitive::$num_t::pow                   ],
-            [ fn rem_euclid($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::rem_euclid            ],
-            [ fn rotate_left($num_t, u32) -> $num_t                     , fn_path: ::core::primitive::$num_t::rotate_left           ],
-            [ fn rotate_right($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::rotate_right          ],
+            [ fn abs_diff($num_t, $num_t) -> $unsigned_num_t              , fn_path: ::core::primitive::$num_t::abs_diff               ],
+            [ fn div_euclid($num_t, $num_t) -> $num_t                     , fn_path: ::core::primitive::$num_t::div_euclid             ],
+            [ fn ilog($num_t, $num_t) -> u32                              , fn_path: ::core::primitive::$num_t::ilog                   ],
+            [ fn midpoint($num_t, $num_t) -> $num_t                       , fn_path: ::core::primitive::$num_t::midpoint               ],
 
-            [ fn saturating_add($num_t, $num_t) -> $num_t               , fn_path: ::core::primitive::$num_t::saturating_add        ],
-            [ fn saturating_div($num_t, $num_t) -> $num_t               , fn_path: ::core::primitive::$num_t::saturating_div        ],
-            [ fn saturating_mul($num_t, $num_t) -> $num_t               , fn_path: ::core::primitive::$num_t::saturating_mul        ],
-            [ fn saturating_pow($num_t, u32) -> $num_t                  , fn_path: ::core::primitive::$num_t::saturating_pow        ],
-            [ fn saturating_sub($num_t, $num_t) -> $num_t               , fn_path: ::core::primitive::$num_t::saturating_sub        ],
+            [ fn overflowing_add($num_t, $num_t) -> ($num_t, bool)        , fn_path: ::core::primitive::$num_t::overflowing_add        ],
+            [ fn overflowing_div($num_t, $num_t) -> ($num_t, bool)        , fn_path: ::core::primitive::$num_t::overflowing_div        ],
+            [ fn overflowing_div_euclid($num_t, $num_t) -> ($num_t, bool) , fn_path: ::core::primitive::$num_t::overflowing_div_euclid ],
+            [ fn overflowing_mul($num_t, $num_t) -> ($num_t, bool)        , fn_path: ::core::primitive::$num_t::overflowing_mul        ],
+            [ fn overflowing_pow($num_t, u32) -> ($num_t, bool)           , fn_path: ::core::primitive::$num_t::overflowing_pow        ],
+            [ fn overflowing_rem($num_t, $num_t) -> ($num_t, bool)        , fn_path: ::core::primitive::$num_t::overflowing_rem        ],
+            [ fn overflowing_rem_euclid($num_t, $num_t) -> ($num_t, bool) , fn_path: ::core::primitive::$num_t::overflowing_rem_euclid ],
+            [ fn overflowing_shl($num_t, u32) -> ($num_t, bool)           , fn_path: ::core::primitive::$num_t::overflowing_shl        ],
+            [ fn overflowing_shr($num_t, u32) -> ($num_t, bool)           , fn_path: ::core::primitive::$num_t::overflowing_shr        ],
+            [ fn overflowing_sub($num_t, $num_t) -> ($num_t, bool)        , fn_path: ::core::primitive::$num_t::overflowing_sub        ],
 
-            [ fn strict_add($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_add            ],
-            [ fn strict_div($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_div            ],
-            [ fn strict_div_euclid($num_t, $num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::strict_div_euclid     ],
-            [ fn strict_mul($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_mul            ],
-            [ fn strict_pow($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::strict_pow            ],
-            [ fn strict_rem($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_rem            ],
-            [ fn strict_rem_euclid($num_t, $num_t) -> $num_t            , fn_path: ::core::primitive::$num_t::strict_rem_euclid     ],
-            [ fn strict_shl($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::strict_shl            ],
-            [ fn strict_shr($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::strict_shr            ],
-            [ fn strict_sub($num_t, $num_t) -> $num_t                   , fn_path: ::core::primitive::$num_t::strict_sub            ],
+            [ fn pow($num_t, u32) -> $num_t                               , fn_path: ::core::primitive::$num_t::pow                    ],
+            [ fn rem_euclid($num_t, $num_t) -> $num_t                     , fn_path: ::core::primitive::$num_t::rem_euclid             ],
+            [ fn rotate_left($num_t, u32) -> $num_t                       , fn_path: ::core::primitive::$num_t::rotate_left            ],
+            [ fn rotate_right($num_t, u32) -> $num_t                      , fn_path: ::core::primitive::$num_t::rotate_right           ],
 
-            [ fn unbounded_shl($num_t, u32) -> $num_t                   , fn_path: ::core::primitive::$num_t::unbounded_shl         ],
-            [ fn unbounded_shr($num_t, u32) -> $num_t                   , fn_path: ::core::primitive::$num_t::unbounded_shr         ],
+            [ fn saturating_add($num_t, $num_t) -> $num_t                , fn_path: ::core::primitive::$num_t::saturating_add          ],
+            [ fn saturating_div($num_t, $num_t) -> $num_t                , fn_path: ::core::primitive::$num_t::saturating_div          ],
+            [ fn saturating_mul($num_t, $num_t) -> $num_t                , fn_path: ::core::primitive::$num_t::saturating_mul          ],
+            [ fn saturating_pow($num_t, u32) -> $num_t                   , fn_path: ::core::primitive::$num_t::saturating_pow          ],
+            [ fn saturating_sub($num_t, $num_t) -> $num_t                , fn_path: ::core::primitive::$num_t::saturating_sub          ],
 
-            [ fn wrapping_add($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_add          ],
-            [ fn wrapping_div($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_div          ],
-            [ fn wrapping_div_euclid($num_t, $num_t) -> $num_t          , fn_path: ::core::primitive::$num_t::wrapping_div_euclid   ],
-            [ fn wrapping_mul($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_mul          ],
-            [ fn wrapping_pow($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::wrapping_pow          ],
-            [ fn wrapping_rem($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_rem          ],
-            [ fn wrapping_rem_euclid($num_t, $num_t) -> $num_t          , fn_path: ::core::primitive::$num_t::wrapping_rem_euclid   ],
-            [ fn wrapping_shl($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::wrapping_shl          ],
-            [ fn wrapping_shr($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::wrapping_shr          ],
-            [ fn wrapping_sub($num_t, $num_t) -> $num_t                 , fn_path: ::core::primitive::$num_t::wrapping_sub          ],
+            [ fn strict_add($num_t, $num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::strict_add              ],
+            [ fn strict_div($num_t, $num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::strict_div              ],
+            [ fn strict_div_euclid($num_t, $num_t) -> $num_t             , fn_path: ::core::primitive::$num_t::strict_div_euclid       ],
+            [ fn strict_mul($num_t, $num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::strict_mul              ],
+            [ fn strict_pow($num_t, u32) -> $num_t                       , fn_path: ::core::primitive::$num_t::strict_pow              ],
+            [ fn strict_rem($num_t, $num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::strict_rem              ],
+            [ fn strict_rem_euclid($num_t, $num_t) -> $num_t             , fn_path: ::core::primitive::$num_t::strict_rem_euclid       ],
+            [ fn strict_shl($num_t, u32) -> $num_t                       , fn_path: ::core::primitive::$num_t::strict_shl              ],
+            [ fn strict_shr($num_t, u32) -> $num_t                       , fn_path: ::core::primitive::$num_t::strict_shr              ],
+            [ fn strict_sub($num_t, $num_t) -> $num_t                    , fn_path: ::core::primitive::$num_t::strict_sub              ],
+
+            [ fn unbounded_shl($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::unbounded_shl           ],
+            [ fn unbounded_shr($num_t, u32) -> $num_t                    , fn_path: ::core::primitive::$num_t::unbounded_shr           ],
+
+            [ fn wrapping_add($num_t, $num_t) -> $num_t                  , fn_path: ::core::primitive::$num_t::wrapping_add            ],
+            [ fn wrapping_div($num_t, $num_t) -> $num_t                  , fn_path: ::core::primitive::$num_t::wrapping_div            ],
+            [ fn wrapping_div_euclid($num_t, $num_t) -> $num_t           , fn_path: ::core::primitive::$num_t::wrapping_div_euclid     ],
+            [ fn wrapping_mul($num_t, $num_t) -> $num_t                  , fn_path: ::core::primitive::$num_t::wrapping_mul            ],
+            [ fn wrapping_pow($num_t, u32) -> $num_t                     , fn_path: ::core::primitive::$num_t::wrapping_pow            ],
+            [ fn wrapping_rem($num_t, $num_t) -> $num_t                  , fn_path: ::core::primitive::$num_t::wrapping_rem            ],
+            [ fn wrapping_rem_euclid($num_t, $num_t) -> $num_t           , fn_path: ::core::primitive::$num_t::wrapping_rem_euclid     ],
+            [ fn wrapping_shl($num_t, u32) -> $num_t                     , fn_path: ::core::primitive::$num_t::wrapping_shl            ],
+            [ fn wrapping_shr($num_t, u32) -> $num_t                     , fn_path: ::core::primitive::$num_t::wrapping_shr            ],
+            [ fn wrapping_sub($num_t, $num_t) -> $num_t                  , fn_path: ::core::primitive::$num_t::wrapping_sub            ],
         }
 
-        //~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~
+        //~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~CUSTOM~FNS~~~~~
 
         //~~~~~UNARY~~~~~~
 
         macros::impl_unary_fns! {
-            [ fn as_u8($num_t) -> u8                                    , fn_path: crate::$extra_mod::as_u8                         , doc_macro_path: doc_unary_as ],
-            [ fn as_u16($num_t) -> u16                                  , fn_path: crate::$extra_mod::as_u16                        , doc_macro_path: doc_unary_as ],
-            [ fn as_u32($num_t) -> u32                                  , fn_path: crate::$extra_mod::as_u32                        , doc_macro_path: doc_unary_as ],
-            [ fn as_u64($num_t) -> u64                                  , fn_path: crate::$extra_mod::as_u64                        , doc_macro_path: doc_unary_as ],
-            [ fn as_u128($num_t) -> u128                                , fn_path: crate::$extra_mod::as_u128                       , doc_macro_path: doc_unary_as ],
-            [ fn as_usize($num_t) -> usize                              , fn_path: crate::$extra_mod::as_usize                      , doc_macro_path: doc_unary_as ],
+            [ fn as_u8($num_t) -> u8                                     , fn_path: crate::$extra_mod::as_u8                           , doc_macro_path: doc_unary_as ],
+            [ fn as_u16($num_t) -> u16                                   , fn_path: crate::$extra_mod::as_u16                          , doc_macro_path: doc_unary_as ],
+            [ fn as_u32($num_t) -> u32                                   , fn_path: crate::$extra_mod::as_u32                          , doc_macro_path: doc_unary_as ],
+            [ fn as_u64($num_t) -> u64                                   , fn_path: crate::$extra_mod::as_u64                          , doc_macro_path: doc_unary_as ],
+            [ fn as_u128($num_t) -> u128                                 , fn_path: crate::$extra_mod::as_u128                         , doc_macro_path: doc_unary_as ],
+            [ fn as_usize($num_t) -> usize                               , fn_path: crate::$extra_mod::as_usize                        , doc_macro_path: doc_unary_as ],
 
-            [ fn as_i8($num_t) -> i8                                    , fn_path: crate::$extra_mod::as_i8                         , doc_macro_path: doc_unary_as ],
-            [ fn as_i16($num_t) -> i16                                  , fn_path: crate::$extra_mod::as_i16                        , doc_macro_path: doc_unary_as ],
-            [ fn as_i32($num_t) -> i32                                  , fn_path: crate::$extra_mod::as_i32                        , doc_macro_path: doc_unary_as ],
-            [ fn as_i64($num_t) -> i64                                  , fn_path: crate::$extra_mod::as_i64                        , doc_macro_path: doc_unary_as ],
-            [ fn as_i128($num_t) -> i128                                , fn_path: crate::$extra_mod::as_i128                       , doc_macro_path: doc_unary_as ],
-            [ fn as_isize($num_t) -> isize                              , fn_path: crate::$extra_mod::as_isize                      , doc_macro_path: doc_unary_as ],
+            [ fn as_i8($num_t) -> i8                                     , fn_path: crate::$extra_mod::as_i8                           , doc_macro_path: doc_unary_as ],
+            [ fn as_i16($num_t) -> i16                                   , fn_path: crate::$extra_mod::as_i16                          , doc_macro_path: doc_unary_as ],
+            [ fn as_i32($num_t) -> i32                                   , fn_path: crate::$extra_mod::as_i32                          , doc_macro_path: doc_unary_as ],
+            [ fn as_i64($num_t) -> i64                                   , fn_path: crate::$extra_mod::as_i64                          , doc_macro_path: doc_unary_as ],
+            [ fn as_i128($num_t) -> i128                                 , fn_path: crate::$extra_mod::as_i128                         , doc_macro_path: doc_unary_as ],
+            [ fn as_isize($num_t) -> isize                               , fn_path: crate::$extra_mod::as_isize                        , doc_macro_path: doc_unary_as ],
 
-            [ fn to_u8($num_t) -> u8                                    , fn_path: crate::$extra_mod::to_u8                         , doc_macro_path: doc_unary_to ],
-            [ fn to_u16($num_t) -> u16                                  , fn_path: crate::$extra_mod::to_u16                        , doc_macro_path: doc_unary_to ],
-            [ fn to_u32($num_t) -> u32                                  , fn_path: crate::$extra_mod::to_u32                        , doc_macro_path: doc_unary_to ],
-            [ fn to_u64($num_t) -> u64                                  , fn_path: crate::$extra_mod::to_u64                        , doc_macro_path: doc_unary_to ],
-            [ fn to_u128($num_t) -> u128                                , fn_path: crate::$extra_mod::to_u128                       , doc_macro_path: doc_unary_to ],
-            [ fn to_usize($num_t) -> usize                              , fn_path: crate::$extra_mod::to_usize                      , doc_macro_path: doc_unary_to ],
+            [ fn to_u8($num_t) -> u8                                     , fn_path: crate::$extra_mod::to_u8                           , doc_macro_path: doc_unary_to ],
+            [ fn to_u16($num_t) -> u16                                   , fn_path: crate::$extra_mod::to_u16                          , doc_macro_path: doc_unary_to ],
+            [ fn to_u32($num_t) -> u32                                   , fn_path: crate::$extra_mod::to_u32                          , doc_macro_path: doc_unary_to ],
+            [ fn to_u64($num_t) -> u64                                   , fn_path: crate::$extra_mod::to_u64                          , doc_macro_path: doc_unary_to ],
+            [ fn to_u128($num_t) -> u128                                 , fn_path: crate::$extra_mod::to_u128                         , doc_macro_path: doc_unary_to ],
+            [ fn to_usize($num_t) -> usize                               , fn_path: crate::$extra_mod::to_usize                        , doc_macro_path: doc_unary_to ],
 
-            [ fn to_i8($num_t) -> i8                                    , fn_path: crate::$extra_mod::to_i8                         , doc_macro_path: doc_unary_to ],
-            [ fn to_i16($num_t) -> i16                                  , fn_path: crate::$extra_mod::to_i16                        , doc_macro_path: doc_unary_to ],
-            [ fn to_i32($num_t) -> i32                                  , fn_path: crate::$extra_mod::to_i32                        , doc_macro_path: doc_unary_to ],
-            [ fn to_i64($num_t) -> i64                                  , fn_path: crate::$extra_mod::to_i64                        , doc_macro_path: doc_unary_to ],
-            [ fn to_i128($num_t) -> i128                                , fn_path: crate::$extra_mod::to_i128                       , doc_macro_path: doc_unary_to ],
-            [ fn to_isize($num_t) -> isize                              , fn_path: crate::$extra_mod::to_isize                      , doc_macro_path: doc_unary_to ],
+            [ fn to_i8($num_t) -> i8                                     , fn_path: crate::$extra_mod::to_i8                           , doc_macro_path: doc_unary_to ],
+            [ fn to_i16($num_t) -> i16                                   , fn_path: crate::$extra_mod::to_i16                          , doc_macro_path: doc_unary_to ],
+            [ fn to_i32($num_t) -> i32                                   , fn_path: crate::$extra_mod::to_i32                          , doc_macro_path: doc_unary_to ],
+            [ fn to_i64($num_t) -> i64                                   , fn_path: crate::$extra_mod::to_i64                          , doc_macro_path: doc_unary_to ],
+            [ fn to_i128($num_t) -> i128                                 , fn_path: crate::$extra_mod::to_i128                         , doc_macro_path: doc_unary_to ],
+            [ fn to_isize($num_t) -> isize                               , fn_path: crate::$extra_mod::to_isize                        , doc_macro_path: doc_unary_to ],
         }
 
     )*}
