@@ -4,40 +4,53 @@ use core::marker::Freeze;
 
 use alloc::vec::Vec;
 
-pub(crate) const LENGTH<T: ConstParamTy_ + 'static, const SET: &'static[T]>: usize = const { SET.len()};
-pub(crate) const CARTESIAN_LENGTH<T: ConstParamTy_ + 'static, U: ConstParamTy_ + 'static, const A: &'static[T], const B: &'static[U]>: usize = const { A.len() * B.len() };
+pub(crate) const LENGTH<T: ConstParamTy_ + 'static, const SET: &'static [T]>: usize =
+    const { SET.len() };
+pub(crate) const CARTESIAN_LENGTH<
+    T: ConstParamTy_ + 'static,
+    U: ConstParamTy_ + 'static,
+    const A: &'static [T],
+    const B: &'static [U],
+>: usize = const { A.len() * B.len() };
 
-pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + 'static, const SET: &'static[T]>: &[T]= const {
+pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + 'static, const SET: &'static [T]>:
+    &[T] = const {
     let arr: [T; LENGTH::<T, SET>] = match SET.try_into() {
         Ok(arr) => arr,
-        Err(_) => unreachable!()
+        Err(_) => unreachable!(),
     };
     &crate::const_helpers::sort(arr)
 };
 
-pub const NORMALIZE<T: Copy + const Ord + ConstParamTy_ + Freeze + const Destruct + 'static, const SET: &'static[T]>: &[T] = const { 'out: {
-    let set_sorted = SORT::<T, SET>;
-    let mut normalized: Vec<T> = Vec::new();
+pub const NORMALIZE<
+    T: Copy + const Ord + ConstParamTy_ + Freeze + const Destruct + 'static,
+    const SET: &'static [T],
+>: &[T] = const {
+    'out: {
+        let set_sorted = SORT::<T, SET>;
+        let mut normalized: Vec<T> = Vec::new();
 
-    let [first, ..] = set_sorted else {
-        break 'out &[]
-    };
+        let [first, ..] = set_sorted else {
+            break 'out &[];
+        };
 
-    normalized.push(*first);
+        normalized.push(*first);
 
-    let mut i: usize = 1;
+        let mut i: usize = 1;
 
-    while i < set_sorted.len() {
-        let (previous, current) = (set_sorted[i - 1], set_sorted[i]);
-        if previous != current {
-            normalized.push(current)
+        while i < set_sorted.len() {
+            let (previous, current) = (set_sorted[i - 1], set_sorted[i]);
+            if previous != current {
+                normalized.push(current)
+            }
+            i += 1;
         }
-        i += 1;
+        normalized.const_make_global()
     }
-    normalized.const_make_global()
-}};
+};
 
-pub const UNION<T: Freeze  + 'static + ConstParamTy_  + Copy, const SETS: &'static [&'static [T]]>: &[T] = const {
+pub const UNION<T: Freeze + 'static + ConstParamTy_ + Copy, const SETS: &'static [&'static [T]]>:
+    &[T] = const {
     let mut onion: Vec<T> = Vec::new();
     let mut i: usize = 0;
 
@@ -53,34 +66,38 @@ pub const UNION<T: Freeze  + 'static + ConstParamTy_  + Copy, const SETS: &'stat
     onion.const_make_global()
 };
 
-pub const INTERSECTION<T: Freeze  + 'static + ConstParamTy_  + Copy  + const PartialEq  + const Destruct, const SETS: &'static [&'static [T]]>: &[T] = const { 'out: {
-    let [first_set, ..] = SETS else {
-        break 'out &[];
-    };
+pub const INTERSECTION<
+    T: Freeze + 'static + ConstParamTy_ + Copy + const PartialEq + const Destruct,
+    const SETS: &'static [&'static [T]],
+>: &[T] = const {
+    'out: {
+        let [first_set, ..] = SETS else {
+            break 'out &[];
+        };
 
-    let mut intersection: Vec<T> = Vec::with_capacity(first_set.len());
+        let mut intersection: Vec<T> = Vec::with_capacity(first_set.len());
 
-    let mut i: usize = 0;
-    while i < first_set.len() {
-        intersection.push(first_set[i]);
-        i += 1;
+        let mut i: usize = 0;
+        while i < first_set.len() {
+            intersection.push(first_set[i]);
+            i += 1;
+        }
+
+        let mut j: usize = 1;
+
+        while j < SETS.len() {
+            crate::const_helpers::ext_vec_reduce_to_intersection_with(&mut intersection, SETS[j]);
+            j += 1;
+        }
+
+        intersection.const_make_global()
     }
-
-    let mut j: usize = 1;
-
-    while j < SETS.len() {
-        crate::const_helpers::ext_vec_reduce_to_intersection_with(&mut intersection, SETS[j]);
-        j += 1;
-    }
-
-    intersection.const_make_global()
-}};
+};
 
 pub(crate) const EMPTY<T: 'static>: &[T] = &[];
 
-pub(crate) const SLICEINATOR<T: 'static + ConstParamTy_  + Freeze, const NUM: T>: &[T] = const {
-    &[NUM]
-};
+pub(crate) const SLICEINATOR<T: 'static + ConstParamTy_ + Freeze, const NUM: T>: &[T] =
+    const { &[NUM] };
 
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
@@ -90,7 +107,7 @@ impl<T> Set<T, { EMPTY::<T> }>
 where
     T: Copy + const Ord + Freeze + ConstParamTy_ + const Destruct + 'static,
 {
-    pub const NEW<const NUM: T>: Set<T, { SLICEINATOR::<T,NUM> }> = const {
+    pub const NEW<const NUM: T>: Set<T, { SLICEINATOR::<T, NUM> }> = const {
         const { Set::new(NUM).expect("This should be infallible, please file a bug report.") }
     };
 }

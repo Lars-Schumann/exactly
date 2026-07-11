@@ -1,5 +1,5 @@
-use ::alloc::vec::Vec;
-use ::core::marker::Destruct;
+use alloc::vec::Vec;
+use core::marker::Destruct;
 
 const fn not(value: bool) -> bool {
     match value {
