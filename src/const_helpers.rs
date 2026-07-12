@@ -37,6 +37,7 @@ where
     true
 }
 
+#[expect(clippy::used_underscore_binding)]
 const fn ext_vec_swap_remove<T>(_self: &mut Vec<T>, index: usize) -> T {
     const fn assert_failed(_index: usize, _len: usize) -> ! {
         panic!("swap_remove index should be < len but isn't");

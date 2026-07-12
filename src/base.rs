@@ -41,7 +41,7 @@ pub const NORMALIZE<
         while i < set_sorted.len() {
             let (previous, current) = (set_sorted[i - 1], set_sorted[i]);
             if previous != current {
-                normalized.push(current)
+                normalized.push(current);
             }
             i += 1;
         }
@@ -118,6 +118,7 @@ where
 {
     pub const SET: &'static [T] = SET;
 
+    #[must_use]
     pub const fn set(self) -> &'static [T] {
         SET
     }
@@ -141,18 +142,22 @@ where
         crate::const_helpers::ext_slice_contains(SET, value)
     }
 
+    #[must_use]
     pub const fn inner(self) -> T {
         self.0
     }
 
+    #[must_use]
     pub const fn sort(self) -> Set<T, { SORT::<T, SET> }> {
         unsafe { self.cast_unchecked() }
     }
 
+    #[must_use]
     pub const fn normalize(self) -> Set<T, { NORMALIZE::<T, SET> }> {
         unsafe { self.cast_unchecked() }
     }
 
+    #[must_use]
     pub const fn widen<const SUPER_SET: &'static [T]>(self) -> Set<T, SUPER_SET> {
         const {
             assert!(
@@ -163,6 +168,7 @@ where
         unsafe { self.cast_unchecked() }
     }
 
+    #[must_use]
     pub const fn cast<const NEW_SET: &'static [T]>(self) -> Option<Set<T, NEW_SET>> {
         match Set::<T, NEW_SET>::contains(&self.inner()) {
             true => Some(unsafe { self.cast_unchecked() }),
@@ -170,6 +176,7 @@ where
         }
     }
 
+    #[must_use]
     pub const unsafe fn cast_unchecked<const NEW_SET: &'static [T]>(self) -> Set<T, NEW_SET> {
         unsafe { Set::new_unchecked(self.inner()) }
     }

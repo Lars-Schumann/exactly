@@ -269,17 +269,29 @@ macro_rules! impl_ints {
             }
             pub use ${ concat($private_macro_prefix, intersection) } as Intersection;
 
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_u8   (value: $num_t) -> u8    { value as u8    }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_u16  (value: $num_t) -> u16   { value as u16   }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_u32  (value: $num_t) -> u32   { value as u32   }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_u64  (value: $num_t) -> u64   { value as u64   }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_u128 (value: $num_t) -> u128  { value as u128  }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_usize(value: $num_t) -> usize { value as usize }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_i8   (value: $num_t) -> i8    { value as i8    }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_i16  (value: $num_t) -> i16   { value as i16   }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_i32  (value: $num_t) -> i32   { value as i32   }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_i64  (value: $num_t) -> i64   { value as i64   }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_i128 (value: $num_t) -> i128  { value as i128  }
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss, clippy::cast_possible_wrap)]
             pub(super) const fn as_isize(value: $num_t) -> isize { value as isize }
 
             pub(super) const fn to_u8   (value: $num_t) -> u8    { u8   ::try_from(value).ok().expect("Unable to losslessly convert to a u8"   ) }

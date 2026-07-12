@@ -18,8 +18,8 @@
     min_generic_const_args,
     unsized_const_params
 )]
-#![allow(incomplete_features)]
-#![allow(long_running_const_eval)]
+#![deny(clippy::pedantic)]
+#![allow(long_running_const_eval, incomplete_features, clippy::match_bool)]
 //
 #![no_std]
 extern crate alloc;
