@@ -125,11 +125,21 @@ where
 
     pub const fn new(value: T) -> Option<Self> {
         match Self::contains(&value) {
-            true => Some(unsafe { Self::new_unchecked(value) }),
+            true => Some(
+                // SAFETY: we just checked precondition #1: `Self::contains(value)`
+                unsafe { Self::new_unchecked(value) },
+            ),
             false => None,
         }
     }
 
+    /// # Safety
+    ///
+    /// One of the following conditions must hold, they are all logically equivalent:
+    /// 1. `Self::contains(value)`
+    /// 2. `Self::new(value).is_some()`
+    /// 3. `Self::SET` contains `value`
+    #[must_use]
     pub const unsafe fn new_unchecked(value: T) -> Self {
         debug_assert!(
             Self::contains(&value),
@@ -149,11 +159,15 @@ where
 
     #[must_use]
     pub const fn sort(self) -> Set<T, { SORT::<T, SET> }> {
+        // SAFETY: `SORT` only sorts the elements in `SET`, so it's output will have identical elements.
         unsafe { self.cast_unchecked() }
     }
 
     #[must_use]
     pub const fn normalize(self) -> Set<T, { NORMALIZE::<T, SET> }> {
+        // SAFETY: `NORMALIZE` only sorts and deduplicates the elements in `SET`, so it's output will have identical elements.
+        // We rely on a sensible `Eq` impl for this, which currently isn't anywhere in any of the trait bounds.
+        // So this whole thing is technically unsound, but I'll fix that later.
         unsafe { self.cast_unchecked() }
     }
 
@@ -165,19 +179,29 @@ where
                 "Tried to widen a Set which failed because the target's SET isn't a superset of the original."
             );
         }
+        // SAFETY: We just asserted that `SET` is a subset of `SUPER_SET`
         unsafe { self.cast_unchecked() }
     }
 
     #[must_use]
     pub const fn cast<const NEW_SET: &'static [T]>(self) -> Option<Set<T, NEW_SET>> {
         match Set::<T, NEW_SET>::contains(&self.inner()) {
-            true => Some(unsafe { self.cast_unchecked() }),
+            true => Some(
+                // SAFETY: we just checked precondition #1: `Self::contains(value)`
+                unsafe { self.cast_unchecked() },
+            ),
             false => None,
         }
     }
 
+    /// # SAFETY
+    ///
+    /// This inherits the preconditions from `Set<T, NEW_SET>::new_unchecked(self.inner())`
+    /// The most common way to argue this is by making sure that `SET` has identical elements to `NEW_SET`,
+    /// or that it's elements are a subset of `NEW_SET`.  
     #[must_use]
     pub const unsafe fn cast_unchecked<const NEW_SET: &'static [T]>(self) -> Set<T, NEW_SET> {
+        // SAFETY: we pass the preconditions to the caller
         unsafe { Set::new_unchecked(self.inner()) }
     }
 }

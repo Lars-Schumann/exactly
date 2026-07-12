@@ -47,6 +47,7 @@ const fn ext_vec_swap_remove<T>(_self: &mut Vec<T>, index: usize) -> T {
     if index >= len {
         assert_failed(index, len);
     }
+    // SAFETY: std doesn't have a safety comment here, so idk its probably fine :tm:
     unsafe {
         // We replace self[index] with the last element. Note that if the
         // bounds check above succeeds there must be a last element (which

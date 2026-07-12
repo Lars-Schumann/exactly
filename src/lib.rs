@@ -18,7 +18,7 @@
     min_generic_const_args,
     unsized_const_params
 )]
-#![deny(clippy::pedantic)]
+#![deny(clippy::pedantic, clippy::missing_safety_doc, clippy::undocumented_unsafe_blocks)]
 #![allow(long_running_const_eval, incomplete_features, clippy::match_bool)]
 //
 #![no_std]

@@ -94,6 +94,7 @@ macro_rules! impl_simple_unary_ops {
             fn $trait_fn_name(self) -> Self::Output {
                     let self_inner: $inner_t = self.inner();
                     let res_inner: $inner_t = $op self_inner;
+                    // SAFETY: something something cartesian product and pure function... TODO: make this less bad.
                     unsafe { Set::new_unchecked(res_inner) }
                 }
             }
@@ -130,7 +131,7 @@ macro_rules! impl_simple_binary_ops {
                     let self_inner: $inner_t = self.inner();
                     let rhs_inner: $inner_t = rhs.inner();
                     let res_inner: $inner_t = self_inner $op rhs_inner;
-
+                    // SAFETY: something something cartesian product and pure function... TODO: make this less bad.
                     unsafe { Set::new_unchecked(res_inner) }
                 }
             }
@@ -160,6 +161,7 @@ macro_rules! impl_unary_fns {
                 pub const fn $fn_name(self) -> Set<$codomain_t, { CODOMAIN::<{ SET }> }> {
                     let input_inner: $input_t = self.inner();
                     let output_inner: $codomain_t = $fn_path(input_inner);
+                    // SAFETY: something something cartesian product and pure function... TODO: make this less bad.
                     unsafe { Set::new_unchecked(output_inner) }
                 }
             }
@@ -196,6 +198,7 @@ macro_rules! impl_std_binary_fns {
                     let lhs_inner: $lhs_t = self.inner();
                     let rhs_inner: $rhs_t = rhs.inner();
                     let output_inner: $codomain_t = $fn_path(lhs_inner, rhs_inner);
+                    // SAFETY: something something cartesian product and pure function... TODO: make this less bad.
                     unsafe { Set::new_unchecked(output_inner) }
                 }
             }
