@@ -135,9 +135,9 @@ where
 
     /// # Safety
     ///
-    /// One of the following conditions must hold, they are all logically equivalent:
-    /// 1. `Self::contains(value)`
-    /// 2. `Self::new(value).is_some()`
+    /// One of the following conditions must hold, they are all logically equivalent:\
+    /// 1. `Self::contains(value)`\
+    /// 2. `Self::new(value).is_some()`\
     /// 3. `Self::SET` contains `value`
     #[must_use]
     pub const unsafe fn new_unchecked(value: T) -> Self {
@@ -196,9 +196,9 @@ where
 
     /// # SAFETY
     ///
-    /// This inherits the preconditions from `Set<T, NEW_SET>::new_unchecked(self.inner())`
-    /// The most common way to argue this is by making sure that `SET` has identical elements to `NEW_SET`,
-    /// or that it's elements are a subset of `NEW_SET`.  
+    /// This inherits the preconditions from `Set<T, NEW_SET>::new_unchecked(self.inner())`.\
+    /// The most common way to argue this is by making sure that `SET` has identical elements to `NEW_SET`,\
+    /// or that it's elements are a subset of `NEW_SET`.
     #[must_use]
     pub const unsafe fn cast_unchecked<const NEW_SET: &'static [T]>(self) -> Set<T, NEW_SET> {
         // SAFETY: we pass the preconditions to the caller
