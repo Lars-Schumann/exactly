@@ -30,6 +30,7 @@ extern crate alloc;
 
 pub mod base;
 mod const_helpers;
+pub mod sure_eq;
 
 mod macros;
 

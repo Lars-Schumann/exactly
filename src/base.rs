@@ -4,8 +4,11 @@ use core::marker::Freeze;
 
 use alloc::vec::Vec;
 
+use crate::sure_eq::SureEq;
+
 pub(crate) const LENGTH<T: ConstParamTy_ + 'static, const SET: &'static [T]>: usize =
     const { SET.len() };
+
 pub(crate) const CARTESIAN_LENGTH<
     T: ConstParamTy_ + 'static,
     U: ConstParamTy_ + 'static,
@@ -23,7 +26,7 @@ pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + 'static, const SET
 };
 
 pub const NORMALIZE<
-    T: Copy + const Ord + ConstParamTy_ + Freeze + const Destruct + 'static,
+    T: Copy + const Ord + SureEq + Freeze + const Destruct + 'static,
     const SET: &'static [T],
 >: &[T] = const {
     'out: {
@@ -101,11 +104,11 @@ pub(crate) const SLICEINATOR<T: 'static + ConstParamTy_ + Freeze, const NUM: T>:
 
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
-pub struct Sure<T: ConstParamTy_ + 'static, const SET: &'static [T]>(T);
+pub struct Sure<T: SureEq + 'static, const SET: &'static [T]>(T);
 
 impl<T> Sure<T, { EMPTY::<T> }>
 where
-    T: Copy + const Ord + Freeze + ConstParamTy_ + const Destruct + 'static,
+    T: Copy + const Ord + Freeze + SureEq + const Destruct + 'static,
 {
     pub const NEW<const NUM: T>: Sure<T, { SLICEINATOR::<T, NUM> }> = const {
         const { Sure::new(NUM).expect("This should be infallible, please file a bug report.") }
@@ -114,7 +117,7 @@ where
 
 impl<T, const SET: &'static [T]> Sure<T, SET>
 where
-    T: Copy + const Ord + Freeze + ConstParamTy_ + const Destruct + 'static,
+    T: Copy + const Destruct + Freeze + SureEq + const Ord + 'static,
 {
     pub const SET: &'static [T] = SET;
 
