@@ -1,6 +1,7 @@
 ## sure
 
-Numeric refinement types who's type automatically adjusts after operations.
+Refinement types that track their set of possible values and and propagate them through operations.\
+Implemented using const generics at no extra runtime cost.
 
 ## Example
 ```rust
