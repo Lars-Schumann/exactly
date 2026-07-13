@@ -3,6 +3,8 @@
 Refinement types that track their set of possible values and and propagate them through operations.\
 Implemented using const generics at no extra runtime cost.
 
+This crate is in early development, expect many breaking changes.
+
 ## Example
 ```rust
 use sure::SetU8;
