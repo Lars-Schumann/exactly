@@ -101,18 +101,18 @@ pub(crate) const SLICEINATOR<T: 'static + ConstParamTy_ + Freeze, const NUM: T>:
 
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
-pub struct Set<T: ConstParamTy_ + 'static, const SET: &'static [T]>(T);
+pub struct Sure<T: ConstParamTy_ + 'static, const SET: &'static [T]>(T);
 
-impl<T> Set<T, { EMPTY::<T> }>
+impl<T> Sure<T, { EMPTY::<T> }>
 where
     T: Copy + const Ord + Freeze + ConstParamTy_ + const Destruct + 'static,
 {
-    pub const NEW<const NUM: T>: Set<T, { SLICEINATOR::<T, NUM> }> = const {
-        const { Set::new(NUM).expect("This should be infallible, please file a bug report.") }
+    pub const NEW<const NUM: T>: Sure<T, { SLICEINATOR::<T, NUM> }> = const {
+        const { Sure::new(NUM).expect("This should be infallible, please file a bug report.") }
     };
 }
 
-impl<T, const SET: &'static [T]> Set<T, SET>
+impl<T, const SET: &'static [T]> Sure<T, SET>
 where
     T: Copy + const Ord + Freeze + ConstParamTy_ + const Destruct + 'static,
 {
@@ -143,7 +143,7 @@ where
     pub const unsafe fn new_unchecked(value: T) -> Self {
         debug_assert!(
             Self::contains(&value),
-            "Tried to create a Set with a value thats not contained in its SET, this is UB."
+            "Tried to create a Sure with a value thats not contained in its SET, this is UB."
         );
         Self(value)
     }
@@ -158,13 +158,13 @@ where
     }
 
     #[must_use]
-    pub const fn sort(self) -> Set<T, { SORT::<T, SET> }> {
+    pub const fn sort(self) -> Sure<T, { SORT::<T, SET> }> {
         // SAFETY: `SORT` only sorts the elements in `SET`, so it's output will have identical elements.
         unsafe { self.cast_unchecked() }
     }
 
     #[must_use]
-    pub const fn normalize(self) -> Set<T, { NORMALIZE::<T, SET> }> {
+    pub const fn normalize(self) -> Sure<T, { NORMALIZE::<T, SET> }> {
         // SAFETY: `NORMALIZE` only sorts and deduplicates the elements in `SET`, so it's output will have identical elements.
         // We rely on a sensible `Eq` impl for this, which currently isn't anywhere in any of the trait bounds.
         // So this whole thing is technically unsound, but I'll fix that later.
@@ -172,11 +172,11 @@ where
     }
 
     #[must_use]
-    pub const fn widen<const SUPER_SET: &'static [T]>(self) -> Set<T, SUPER_SET> {
+    pub const fn widen<const SUPER_SET: &'static [T]>(self) -> Sure<T, SUPER_SET> {
         const {
             assert!(
                 crate::const_helpers::ext_slice_is_subset(SET, SUPER_SET),
-                "Tried to widen a Set which failed because the target's SET isn't a superset of the original."
+                "Tried to widen a Sure which failed because the target's SET isn't a superset of the original."
             );
         }
         // SAFETY: We just asserted that `SET` is a subset of `SUPER_SET`
@@ -184,8 +184,8 @@ where
     }
 
     #[must_use]
-    pub const fn cast<const NEW_SET: &'static [T]>(self) -> Option<Set<T, NEW_SET>> {
-        match Set::<T, NEW_SET>::contains(&self.inner()) {
+    pub const fn cast<const NEW_SET: &'static [T]>(self) -> Option<Sure<T, NEW_SET>> {
+        match Sure::<T, NEW_SET>::contains(&self.inner()) {
             true => Some(
                 // SAFETY: we just checked precondition #1: `Self::contains(value)`
                 unsafe { self.cast_unchecked() },
@@ -196,12 +196,12 @@ where
 
     /// # SAFETY
     ///
-    /// This inherits the preconditions from `Set<T, NEW_SET>::new_unchecked(self.inner())`.\
+    /// This inherits the preconditions from `Sure<T, NEW_SET>::new_unchecked(self.inner())`.\
     /// The most common way to argue this is by making sure that `SET` has identical elements to `NEW_SET`,\
     /// or that it's elements are a subset of `NEW_SET`.
     #[must_use]
-    pub const unsafe fn cast_unchecked<const NEW_SET: &'static [T]>(self) -> Set<T, NEW_SET> {
+    pub const unsafe fn cast_unchecked<const NEW_SET: &'static [T]>(self) -> Sure<T, NEW_SET> {
         // SAFETY: we pass the preconditions to the caller
-        unsafe { Set::new_unchecked(self.inner()) }
+        unsafe { Sure::new_unchecked(self.inner()) }
     }
 }
