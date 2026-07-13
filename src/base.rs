@@ -1,10 +1,8 @@
 use core::marker::Destruct;
 use core::marker::Freeze;
 
-use crate::sure_eq::SureEq;
-
 use crate::set;
-
+use crate::sure_eq::SureEq;
 
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
