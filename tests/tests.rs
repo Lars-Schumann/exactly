@@ -91,7 +91,7 @@ mod tests {
 
     #[test]
     fn intersections() {
-        use base::SORT;
+        use set::SORT;
         use sure_i8::Intersection;
         use sure_i8::Range;
 

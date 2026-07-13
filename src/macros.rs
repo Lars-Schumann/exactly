@@ -258,7 +258,7 @@ macro_rules! impl_ints {
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, union) } {
                 ($d($set:expr),+ $d(,)?) => {
-                    $d crate::base::UNION::<$num_t, { &[$d($set, )+] }>
+                    $d crate::set::UNION::<$num_t, { &[$d($set, )+] }>
                 };
             }
             pub use ${ concat($private_macro_prefix, union) } as Union;
@@ -267,7 +267,7 @@ macro_rules! impl_ints {
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, intersection) } {
                 ($d($set:expr),+ $d(,)?) => {
-                    $d crate::base::INTERSECTION::<$num_t, { &[$d($set, )+] }>
+                    $d crate::set::INTERSECTION::<$num_t, { &[$d($set, )+] }>
                 };
             }
             pub use ${ concat($private_macro_prefix, intersection) } as Intersection;
