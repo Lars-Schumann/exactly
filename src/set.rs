@@ -16,7 +16,7 @@ pub(crate) const CARTESIAN_LENGTH<
     const B: &'static [U],
 >: usize = const { A.len() * B.len() };
 
-pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + const Destruct + 'static, const SET: &'static [T]>:
+pub const SORT<T: const Ord + ConstParamTy_ + Copy + const Destruct + Freeze + 'static, const SET: &'static [T]>:
     &[T] = const {
     #[expect(clippy::ok_expect)]
     let arr: [T; LENGTH::<T, SET>] = SET.try_into().ok().expect("this is infallible");
@@ -24,7 +24,7 @@ pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + const Destruct + '
 };
 
 pub const NORMALIZE<
-    T: Copy + const Ord + SureEq + Freeze + const Destruct + 'static,
+    T: SureEq + const Ord + Copy + const Destruct + 'static,
     const SET: &'static [T],
 >: &[T] = const {
     'out: {
@@ -38,7 +38,6 @@ pub const NORMALIZE<
         normalized.push(*first);
 
         let mut i: usize = 1;
-
         while i < set_sorted.len() {
             let (previous, current) = (set_sorted[i - 1], set_sorted[i]);
             if previous != current {
@@ -46,11 +45,12 @@ pub const NORMALIZE<
             }
             i += 1;
         }
+
         normalized.const_make_global()
     }
 };
 
-pub const UNION<T: Freeze + 'static + ConstParamTy_ + Copy, const SETS: &'static [&'static [T]]>:
+pub const UNION<T: ConstParamTy_ + Copy + Freeze + 'static , const SETS: &'static [&'static [T]]>:
     &[T] = const {
     let mut onion: Vec<T> = Vec::new();
     let mut i: usize = 0;
@@ -68,7 +68,7 @@ pub const UNION<T: Freeze + 'static + ConstParamTy_ + Copy, const SETS: &'static
 };
 
 pub const INTERSECTION<
-    T: Freeze + 'static + ConstParamTy_ + Copy + const PartialEq + const Destruct,
+    T: SureEq + Copy + const Destruct + 'static ,
     const SETS: &'static [&'static [T]],
 >: &[T] = const {
     'out: {

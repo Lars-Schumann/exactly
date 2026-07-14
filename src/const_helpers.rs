@@ -1,6 +1,8 @@
 use alloc::vec::Vec;
 use core::marker::Destruct;
 
+use crate::sure_eq::SureEq;
+
 const fn not(value: bool) -> bool {
     match value {
         true => false,
@@ -10,7 +12,7 @@ const fn not(value: bool) -> bool {
 
 pub(crate) const fn slice_contains<T>(slice: &[T], elem: &T) -> bool
 where
-    T: [const] PartialEq + [const] Destruct,
+    T: SureEq + [const] Destruct,
 {
     let mut i: usize = 0;
     while i < slice.len() {
@@ -24,7 +26,7 @@ where
 
 pub(crate) const fn slice_is_subset<T>(sub: &[T], sup: &[T]) -> bool
 where
-    T: [const] PartialEq + [const] Destruct,
+    T: SureEq + [const] Destruct,
 {
     let mut i: usize = 0;
 
@@ -62,7 +64,7 @@ const fn vec_swap_remove<T>(_self: &mut Vec<T>, index: usize) -> T {
 
 pub(crate) const fn vec_reduce_to_intersection_with<T>(running_intersection: &mut Vec<T>, set: &[T])
 where
-    T: [const] PartialEq + [const] Destruct,
+    T: SureEq + [const] Destruct,
 {
     let mut i: usize = 0;
 
