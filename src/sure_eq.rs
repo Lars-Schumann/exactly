@@ -37,10 +37,6 @@ unsafe impl SureEq for u128 {}
 unsafe impl SureEq for usize {}
 
 // SAFETY: we trust std
-unsafe impl<T: SureEq> SureEq for &T {}
-// SAFETY: we trust std
-unsafe impl<T: SureEq> SureEq for [T] {}
-// SAFETY: we trust std
 unsafe impl<T: SureEq, const N: usize> SureEq for [T; N] {}
 
 macro_rules! unsafe_impl_sure_eq_for_tuples {
