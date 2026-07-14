@@ -6,6 +6,17 @@
 /// 3. This types [`PartialEq`] impl must be equivalent to bytewise comparing all non-padding bytes of the data.
 ///
 /// If the type fails to meet any one of these, implementing this trait is considered to be UB.
+///
+/// # How to implement this trait
+///
+/// The easiest and recommended way to argue that the implementation of this trait is safe is to ensure:
+///
+/// 1. All of the types fields or variants (if it has any) implement [`SureEq`].
+/// 2. Use the `std` derive macros, namely `#[derive(PartialEq, Eq)]` to derive [`PartialEq`] and [`Eq`]
+///
+/// (FIXME: the above doesn't account for the fact that this wouldn't make the `Eq` impl `const`).
+///
+/// If these conditions are fulfilled, this is sufficient to argue that the 3 required preconditions are followed.
 pub unsafe trait SureEq: core::marker::ConstParamTy_ + const Eq {}
 
 // SAFETY:
