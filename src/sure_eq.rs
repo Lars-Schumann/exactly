@@ -1,3 +1,6 @@
+use core::marker::ConstParamTy_;
+use core::marker::Freeze;
+
 /// # Safety
 ///
 /// You may only implement this trait for a type if it meets all of the following conditions:
@@ -17,7 +20,7 @@
 /// (FIXME: the above doesn't account for the fact that this wouldn't make the `Eq` impl `const`).
 ///
 /// If these conditions are fulfilled, this is sufficient to argue that the 3 required preconditions are followed.
-pub unsafe trait SureEq: core::marker::ConstParamTy_ + const Eq {}
+pub unsafe trait SureEq: const Eq + Freeze + ConstParamTy_ {}
 
 // SAFETY:
 // For the primitives below, these are the reasons why each required condition is satisfied.
