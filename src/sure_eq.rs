@@ -28,8 +28,6 @@ unsafe impl SureEq for i128 {}
 // SAFETY: we trust std
 unsafe impl SureEq for isize {}
 // SAFETY: we trust std
-unsafe impl SureEq for str {}
-// SAFETY: we trust std
 unsafe impl SureEq for u8 {}
 // SAFETY: we trust std
 unsafe impl SureEq for u16 {}
