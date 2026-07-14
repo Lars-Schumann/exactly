@@ -1,3 +1,4 @@
+use alloc::vec;
 use alloc::vec::Vec;
 use core::marker::ConstParamTy_;
 use core::marker::Destruct;
@@ -29,7 +30,7 @@ pub const NORMALIZE<
 >: &[T] = const {
     'out: {
         let set_sorted = SORT::<T, SET>;
-        let mut normalized: Vec<T> = Vec::new();
+        let mut normalized: Vec<T> = vec![];
 
         let [first, ..] = set_sorted else {
             break 'out &[];
@@ -52,7 +53,7 @@ pub const NORMALIZE<
 
 pub const UNION<T: ConstParamTy_ + Copy + Freeze + 'static , const SETS: &'static [&'static [T]]>:
     &[T] = const {
-    let mut onion: Vec<T> = Vec::new();
+    let mut onion: Vec<T> = vec![];
     let mut i: usize = 0;
 
     while i < SETS.len() {
