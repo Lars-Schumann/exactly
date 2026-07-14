@@ -1,6 +1,7 @@
 use core::marker::Destruct;
 use core::marker::Freeze;
 
+use crate::const_helpers;
 use crate::set;
 use crate::sure_eq::SureEq;
 
@@ -54,7 +55,7 @@ where
     }
 
     pub const fn contains(value: &T) -> bool {
-        crate::const_helpers::ext_slice_contains(SET, value)
+        const_helpers::slice_contains(SET, value)
     }
 
     #[must_use]
@@ -80,7 +81,7 @@ where
     pub const fn widen<const SUPER_SET: &'static [T]>(self) -> Sure<T, SUPER_SET> {
         const {
             assert!(
-                crate::const_helpers::ext_slice_is_subset(SET, SUPER_SET),
+                const_helpers::slice_is_subset(SET, SUPER_SET),
                 "Tried to widen a Sure which failed because the target's SET isn't a superset of the original."
             );
         }

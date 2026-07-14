@@ -1,9 +1,9 @@
+use alloc::vec::Vec;
 use core::marker::ConstParamTy_;
 use core::marker::Destruct;
 use core::marker::Freeze;
 
-use alloc::vec::Vec;
-
+use crate::const_helpers;
 use crate::sure_eq::SureEq;
 
 pub(crate) const LENGTH<T: ConstParamTy_ + 'static, const SET: &'static [T]>: usize =
@@ -22,7 +22,7 @@ pub const SORT<T: Copy + const Ord + Freeze + ConstParamTy_ + 'static, const SET
         Ok(arr) => arr,
         Err(_) => unreachable!(),
     };
-    &crate::const_helpers::sort(arr)
+    &const_helpers::sort(arr)
 };
 
 pub const NORMALIZE<
@@ -77,20 +77,12 @@ pub const INTERSECTION<
         let [first_set, ..] = SETS else {
             break 'out &[];
         };
+        let mut intersection: Vec<T> = const_helpers::slice_to_vec(first_set);
 
-        let mut intersection: Vec<T> = Vec::with_capacity(first_set.len());
-
-        let mut i: usize = 0;
-        while i < first_set.len() {
-            intersection.push(first_set[i]);
+        let mut i: usize = 1;
+        while i < SETS.len() {
+            const_helpers::vec_reduce_to_intersection_with(&mut intersection, SETS[i]);
             i += 1;
-        }
-
-        let mut j: usize = 1;
-
-        while j < SETS.len() {
-            crate::const_helpers::ext_vec_reduce_to_intersection_with(&mut intersection, SETS[j]);
-            j += 1;
         }
 
         intersection.const_make_global()

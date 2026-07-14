@@ -8,7 +8,7 @@ const fn not(value: bool) -> bool {
     }
 }
 
-pub(crate) const fn ext_slice_contains<T>(slice: &[T], elem: &T) -> bool
+pub(crate) const fn slice_contains<T>(slice: &[T], elem: &T) -> bool
 where
     T: [const] PartialEq + [const] Destruct,
 {
@@ -22,14 +22,14 @@ where
     false
 }
 
-pub(crate) const fn ext_slice_is_subset<T>(sub: &[T], sup: &[T]) -> bool
+pub(crate) const fn slice_is_subset<T>(sub: &[T], sup: &[T]) -> bool
 where
     T: [const] PartialEq + [const] Destruct,
 {
     let mut i: usize = 0;
 
     while i < sub.len() {
-        if not(ext_slice_contains(sup, &sub[i])) {
+        if not(slice_contains(sup, &sub[i])) {
             return false;
         }
         i += 1;
@@ -38,7 +38,7 @@ where
 }
 
 #[expect(clippy::used_underscore_binding)]
-const fn ext_vec_swap_remove<T>(_self: &mut Vec<T>, index: usize) -> T {
+const fn vec_swap_remove<T>(_self: &mut Vec<T>, index: usize) -> T {
     const fn assert_failed(_index: usize, _len: usize) -> ! {
         panic!("swap_remove index should be < len but isn't");
     }
@@ -60,10 +60,8 @@ const fn ext_vec_swap_remove<T>(_self: &mut Vec<T>, index: usize) -> T {
     }
 }
 
-pub(crate) const fn ext_vec_reduce_to_intersection_with<T>(
-    running_intersection: &mut Vec<T>,
-    set: &[T],
-) where
+pub(crate) const fn vec_reduce_to_intersection_with<T>(running_intersection: &mut Vec<T>, set: &[T])
+where
     T: [const] PartialEq + [const] Destruct,
 {
     let mut i: usize = 0;
@@ -77,7 +75,7 @@ pub(crate) const fn ext_vec_reduce_to_intersection_with<T>(
             }
             j += 1;
         }
-        ext_vec_swap_remove(running_intersection, i);
+        vec_swap_remove(running_intersection, i);
     }
 }
 
@@ -136,4 +134,16 @@ pub(crate) const fn sort<T: [const] Ord, const N: usize>(mut a: [T; N]) -> [T; N
     }
 
     a
+}
+
+pub(crate) const fn slice_to_vec<T: Copy>(slice: &[T]) -> Vec<T> {
+    let mut vec: Vec<T> = Vec::with_capacity(slice.len());
+
+    let mut i: usize = 0;
+    while i < slice.len() {
+        vec.push(slice[i]);
+        i += 1;
+    }
+
+    vec
 }
