@@ -1,10 +1,9 @@
 /// # Safety
 ///
 /// You may only implement this trait on a type if it meets all of the following conditions:
-/// 1. This type must not be a union.
-/// 2. None of this types fields or variants can be a pointer or reference.
-/// 3. Conditions #1 and #2 must hold recursively for this types fields or variants.
-/// 4. This types [`PartialEq`] impl must be equivalent to bytewise comparing all non-padding bytes of the data.
+/// 1. This type must not be a union, pointer, or reference.
+/// 2. Condition #1 must hold recursively for this types fields or variants (if it has any).
+/// 3. This types [`PartialEq`] impl must be equivalent to bytewise comparing all non-padding bytes of the data.
 ///
 /// If the type fails to meet any one of these, implementing this trait is considered to be UB.
 pub unsafe trait SureEq: core::marker::ConstParamTy_ + const Eq {}
