@@ -1,39 +1,40 @@
-#![feature(
-    adt_const_params,
-    const_array,
-    const_closures,
-    const_cmp,
-    const_convert,
-    const_destruct,
-    const_heap,
-    const_index,
-    const_ops,
-    const_result_trait_fn,
-    const_trait_impl,
-    freeze,
-    generic_const_args,
-    generic_const_items,
-    generic_const_parameter_types,
-    macro_metavar_expr_concat,
-    min_generic_const_args,
-    unsized_const_params
-)]
-#![deny(
-    clippy::pedantic,
-    clippy::missing_safety_doc,
-    clippy::undocumented_unsafe_blocks
-)]
-#![allow(long_running_const_eval, incomplete_features, clippy::match_bool)]
+#![feature(adt_const_params)]
+#![feature(const_array)]
+#![feature(const_closures)]
+#![feature(const_cmp)]
+#![feature(const_convert)]
+#![feature(const_destruct)]
+#![feature(const_heap)]
+#![feature(const_index)]
+#![feature(const_ops)]
+#![feature(const_result_trait_fn)]
+#![feature(const_trait_impl)]
+#![feature(freeze)]
+#![feature(generic_const_args)]
+#![feature(generic_const_items)]
+#![feature(generic_const_parameter_types)]
+#![feature(macro_metavar_expr_concat)]
+#![feature(min_generic_const_args)]
+#![feature(unsized_const_params)]
+//
+#![deny(clippy::missing_safety_doc)]
+#![deny(clippy::pedantic)]
+#![deny(clippy::undocumented_unsafe_blocks)]
+//
+#![allow(clippy::match_bool)]
+#![allow(incomplete_features)]
+#![allow(long_running_const_eval)]
 //
 #![no_std]
+//
 extern crate alloc;
 
-pub mod base;
 mod const_helpers;
+mod macros;
+
+pub mod base;
 pub mod set;
 pub mod sure_eq;
-
-mod macros;
 
 macros::impl_ints! {
     the_dolla: $,
