@@ -5,7 +5,7 @@ use core::marker::Freeze;
 ///
 /// You may only implement this trait for a type if it meets all of the following conditions:
 /// 1. This type must not be a union, pointer, or reference.
-/// 2. Condition #1 must hold recursively for this types fields or variants (if it has any).
+/// 2. Condition #1 must hold recursively for this types fields, variants, or elements (if it has any).
 /// 3. This types [`PartialEq`] impl must be equivalent to bytewise comparing all non-padding bytes of the data.
 ///
 /// If the type fails to meet any one of these, implementing this trait is considered to be UB.
