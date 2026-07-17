@@ -28,27 +28,10 @@ pub const NORMALIZE<
     T: SureEq + const Ord + Copy + const Destruct + 'static,
     const SET: &'static [T],
 >: &[T] = const {
-    'out: {
-        let set_sorted = SORT::<T, SET>;
-        let mut normalized: Vec<T> = vec![];
+    let set_sorted = SORT::<T, SET>;
+    let normalized: Vec<T> = deduped(set_sorted); 
 
-        let [first, ..] = set_sorted else {
-            break 'out &[];
-        };
-
-        normalized.push(*first);
-
-        let mut i: usize = 1;
-        while i < set_sorted.len() {
-            let (previous, current) = (set_sorted[i - 1], set_sorted[i]);
-            if previous != current {
-                normalized.push(current);
-            }
-            i += 1;
-        }
-
-        normalized.const_make_global()
-    }
+    normalized.const_make_global()
 };
 
 pub const UNION<T: ConstParamTy_ + Copy + Freeze + 'static , const SETS: &'static [&'static [T]]>:
@@ -92,3 +75,21 @@ pub(crate) const EMPTY<T: 'static>: &[T] = &[];
 
 pub(crate) const SLICEINATOR<T: 'static + ConstParamTy_ + Freeze, const NUM: T>: &[T] =
     const { &[NUM] };
+
+const fn deduped<T: SureEq + Copy>(slice: &[T]) -> Vec<T> {
+    let [first, ..] = slice else { return vec![] };
+
+    // FIXME: make this `vec![first]` once possible in const
+    let mut deduped: Vec<T> = vec![];
+    deduped.push(*first);
+
+    let mut i = 1; // starting at the 2nd element, since the first one is always unique
+    while i < slice.len() {
+        let (previous, current) = (slice[i - 1], slice[i]);
+        if previous != current {
+            deduped.push(current);
+        }
+        i += 1;
+    }
+    deduped
+}
