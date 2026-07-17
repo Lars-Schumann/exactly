@@ -3,7 +3,7 @@
 Refinement types that track their set of possible values and and propagate them through operations.\
 Implemented using const generics at no extra runtime cost.
 
-This crate is in early development, expect many breaking changes.
+This crate makes use of several unstable features, so it can currently only be used on a nightly toolchain.
 
 ## Example
 ```rust
