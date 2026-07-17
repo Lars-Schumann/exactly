@@ -17,9 +17,11 @@ pub(crate) const CARTESIAN_LENGTH<
     const B: &'static [U],
 >: usize = const { A.len() * B.len() };
 
-pub const SORT<T: const Ord + ConstParamTy_ + Copy + const Destruct + Freeze + 'static, const SET: &'static [T]>:
-    &[T] = const {
-    #[expect(clippy::ok_expect)]
+#[expect(clippy::ok_expect)]
+pub const SORT<
+    T: const Ord + ConstParamTy_ + Copy + const Destruct + Freeze + 'static,
+    const SET: &'static [T]
+>: &[T] = const {
     let arr: [T; LENGTH::<T, SET>] = SET.try_into().ok().expect("this is infallible");
     &const_helpers::sort(arr)
 };
