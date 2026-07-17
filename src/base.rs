@@ -72,8 +72,7 @@ where
     #[must_use]
     pub const fn normalize(self) -> Sure<T, { set::NORMALIZE::<T, SET> }> {
         // SAFETY: `NORMALIZE` only sorts and deduplicates the elements in `SET`, so it's output will have identical elements.
-        // We rely on a sensible `Eq` impl for this, which currently isn't anywhere in any of the trait bounds.
-        // So this whole thing is technically unsound, but I'll fix that later.
+        // We rely on the unsafe `SureEq` trait to guarantee that we don't delete any unique elements.
         unsafe { self.cast_unchecked() }
     }
 
@@ -100,7 +99,7 @@ where
         }
     }
 
-    /// # SAFETY
+    /// # Safety
     ///
     /// This inherits the preconditions from `Sure<T, NEW_SET>::new_unchecked(self.inner())`.\
     /// The most common way to argue this is by making sure that `SET` has identical elements to `NEW_SET`,\
