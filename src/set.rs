@@ -38,19 +38,7 @@ pub const NORMALIZE<
 
 pub const UNION<T: ConstParamTy_ + Copy + Freeze + 'static , const SETS: &'static [&'static [T]]>:
     &[T] = const {
-    let mut onion: Vec<T> = vec![];
-    let mut i: usize = 0;
-
-    while i < SETS.len() {
-        let mut j: usize = 0;
-        while j < SETS[i].len() {
-            onion.push(SETS[i][j]);
-            j += 1;
-        }
-        i += 1;
-    }
-
-    onion.const_make_global()
+    union_(SETS).const_make_global()
 };
 
 pub const INTERSECTION<
@@ -89,4 +77,20 @@ const fn deduped<T: SureEq + Copy>(slice: &[T]) -> Vec<T> {
         i += 1;
     }
     deduped
+}
+
+const fn union_<T: Copy>(sets: &[&[T]]) -> Vec<T> {
+    let mut union_: Vec<T> = vec![];
+    let mut i: usize = 0;
+
+    while i < sets.len() {
+        let mut j: usize = 0;
+        while j < sets[i].len() {
+            union_.push(sets[i][j]);
+            j += 1;
+        }
+        i += 1;
+    }
+
+    union_
 }
