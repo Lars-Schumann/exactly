@@ -32,6 +32,17 @@ fn main() {
         assert_eq!(z.inner(), 1);
     }
 
+    {
+        use sure::SureI32;
+        use sure::sure_i32::Range;
+        use sure::sure_i32::Union;
+
+        let a: SureI32![Union![Range![0..=45_000], Range![45_001..90_000]]] =
+            SureI32::new(1).unwrap();
+
+        assert_eq!(a.inner(), 1);
+    }
+
     println!("bench done!");
 }
 
@@ -44,3 +55,4 @@ fn main() {
 // 25.0s
 // 26.7s
 // 40.2s
+// 49.4s
