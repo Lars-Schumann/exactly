@@ -59,12 +59,18 @@ unsafe impl SureEq for u128 {}
 // SAFETY: see above
 unsafe impl SureEq for usize {}
 
-// SAFETY: TODO
+// SAFETY:
+// #1 Because this is an array, not any of union, pointer, or reference.
+// #2 Because the elements of this array implement `SureEq`.
+// #3 Because when the elements implement `SureEq`, we `std`'s blanket `PartialEq` impl to be equivalent to this requirement.
 unsafe impl<T: SureEq, const N: usize> SureEq for [T; N] {}
 
 macro_rules! unsafe_impl_sure_eq_for_tuples {
     ($(($($T:ident),+)),+,) => {
-        // SAFETY: TODO
+        // SAFETY:
+        // #1 Because this is a tuple, not any of union, pointer, or reference.
+        // #2 Because the fields of this tuple implement `SureEq`.
+        // #3 Because when the fields implement `SureEq`, we `std`'s blanket `PartialEq` impl to be equivalent to this requirement.
         $(unsafe impl<$($T: SureEq),+> SureEq for ($($T),+,) {})+
     };
 }
