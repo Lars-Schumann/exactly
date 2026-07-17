@@ -26,7 +26,7 @@ pub unsafe trait SureEq: const Eq + Freeze + ConstParamTy_ {}
 // For the primitives below, these are the reasons why each required condition is satisfied.
 // #1 Because this is a primitive type that is not any of union, pointer, or reference.
 // #2 Because this is a primitive type without any fields or variants.
-// #3 Because we trust `std` to have a `PartialEq` implementation that is equivalent to this requirement.
+// #3 Because we trust `std`'s `PartialEq` impl to be equivalent to this requirement.
 
 // SAFETY: see above
 unsafe impl SureEq for () {}
@@ -62,7 +62,7 @@ unsafe impl SureEq for usize {}
 // SAFETY:
 // #1 Because this is an array, not any of union, pointer, or reference.
 // #2 Because the elements of this array implement `SureEq`.
-// #3 Because when the elements implement `SureEq`, we `std`'s blanket `PartialEq` impl to be equivalent to this requirement.
+// #3 Because when the elements implement `SureEq`, we trust `std`'s blanket `PartialEq` impl to be equivalent to this requirement.
 unsafe impl<T: SureEq, const N: usize> SureEq for [T; N] {}
 
 macro_rules! unsafe_impl_sure_eq_for_tuples {
@@ -70,7 +70,7 @@ macro_rules! unsafe_impl_sure_eq_for_tuples {
         // SAFETY:
         // #1 Because this is a tuple, not any of union, pointer, or reference.
         // #2 Because the fields of this tuple implement `SureEq`.
-        // #3 Because when the fields implement `SureEq`, we `std`'s blanket `PartialEq` impl to be equivalent to this requirement.
+        // #3 Because when the fields implement `SureEq`, we trust `std`'s blanket `PartialEq` impl to be equivalent to this requirement.
         $(unsafe impl<$($T: SureEq),+> SureEq for ($($T),+,) {})+
     };
 }
