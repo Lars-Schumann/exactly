@@ -31,7 +31,7 @@ pub const NORMALIZE<
     const SET: &'static [T],
 >: &[T] = const {
     let set_sorted = SORT::<T, SET>;
-    let normalized: Vec<T> = deduped(set_sorted); 
+    let normalized: Vec<T> = deduped(set_sorted);
 
     normalized.const_make_global()
 };
@@ -45,20 +45,7 @@ pub const INTERSECTION<
     T: SureEq + Copy + const Destruct + 'static ,
     const SETS: &'static [&'static [T]],
 >: &[T] = const {
-    'out: {
-        let [first_set, ..] = SETS else {
-            break 'out &[];
-        };
-        let mut intersection: Vec<T> = const_helpers::slice_to_vec(first_set);
-
-        let mut i: usize = 1;
-        while i < SETS.len() {
-            const_helpers::vec_reduce_to_intersection_with(&mut intersection, SETS[i]);
-            i += 1;
-        }
-
-        intersection.const_make_global()
-    }
+    intersection(SETS).const_make_global()
 };
 
 const fn deduped<T: SureEq + Copy>(slice: &[T]) -> Vec<T> {
@@ -93,4 +80,19 @@ const fn union_<T: Copy>(sets: &[&[T]]) -> Vec<T> {
     }
 
     union_
+}
+
+const fn intersection<T: SureEq + Copy + [const] Destruct>(sets: &[&[T]]) -> Vec<T> {
+    let [first_set, ..] = sets else {
+        return vec![];
+    };
+    let mut intersection: Vec<T> = const_helpers::slice_to_vec(first_set);
+
+    let mut i: usize = 1; // starting at the 2nd element, since the first is already part of the intersection
+    while i < sets.len() {
+        const_helpers::vec_reduce_to_intersection_with(&mut intersection, sets[i]);
+        i += 1;
+    }
+
+    intersection
 }
