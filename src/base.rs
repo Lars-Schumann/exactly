@@ -21,9 +21,9 @@ where
     }
 
     pub const fn new(value: T) -> Option<Self> {
-        match Self::contains(&value) {
+        match Self::set_contains(&value) {
             true => Some(
-                // SAFETY: we just checked precondition #1: `Self::contains(value)`
+                // SAFETY: we just checked precondition #1: `Self::set_contains(value)`
                 unsafe { Self::new_unchecked(value) },
             ),
             false => None,
@@ -33,19 +33,19 @@ where
     /// # Safety
     ///
     /// One of the following conditions must hold, they are all logically equivalent:\
-    /// 1. `Self::contains(value)`\
+    /// 1. `Self::set_contains(value)`\
     /// 2. `Self::new(value).is_some()`\
     /// 3. `Self::SET` contains `value`
     #[must_use]
     pub const unsafe fn new_unchecked(value: T) -> Self {
         debug_assert!(
-            Self::contains(&value),
+            Self::set_contains(&value),
             "Tried to create a Sure with a value thats not contained in its SET, this is UB."
         );
         Self(value)
     }
 
-    pub const fn contains(value: &T) -> bool {
+    pub const fn set_contains(value: &T) -> bool {
         const_helpers::slice_contains(SET, value)
     }
 
@@ -81,9 +81,9 @@ where
 
     #[must_use]
     pub const fn cast<const NEW_SET: &'static [T]>(self) -> Option<Sure<T, NEW_SET>> {
-        match Sure::<T, NEW_SET>::contains(&self.inner()) {
+        match Sure::<T, NEW_SET>::set_contains(&self.inner()) {
             true => Some(
-                // SAFETY: we just checked precondition #1: `Self::contains(value)`
+                // SAFETY: we just checked precondition #1: `Self::set_contains(value)`
                 unsafe { self.cast_unchecked() },
             ),
             false => None,

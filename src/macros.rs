@@ -314,7 +314,7 @@ macro_rules! impl_ints {
 
         impl<const SET: &'static [$num_t]> crate::base::Sure<$num_t, SET> {
             pub const fn to_nonzero(self) -> core::num::NonZero<$num_t> {
-                const { assert!(!Self::contains(&0), "Sure containing a 0 cannot be converted to NonZero")}
+                const { assert!(!Self::set_contains(&0), "Sure containing a 0 cannot be converted to NonZero")}
                 let self_inner = self.inner();
                 // SAFETY: we just asserted that `self_inner` can never be 0
                 unsafe { core::num::NonZero::new_unchecked(self_inner) }
