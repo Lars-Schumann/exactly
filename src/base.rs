@@ -9,15 +9,6 @@ use crate::sure_eq::SureEq;
 #[repr(transparent)]
 pub struct Sure<T: SureEq + 'static, const SET: &'static [T]>(T);
 
-impl<T> Sure<T, { set::EMPTY::<T> }>
-where
-    T: Copy + const Ord + Freeze + SureEq + const Destruct + 'static,
-{
-    pub const NEW<const NUM: T>: Sure<T, { set::SLICEINATOR::<T, NUM> }> = const {
-        const { Sure::new(NUM).expect("This should be infallible, please file a bug report.") }
-    };
-}
-
 impl<T, const SET: &'static [T]> Sure<T, SET>
 where
     T: Copy + const Destruct + Freeze + SureEq + const Ord + 'static,

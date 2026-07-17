@@ -71,11 +71,6 @@ pub const INTERSECTION<
     }
 };
 
-pub(crate) const EMPTY<T: 'static>: &[T] = &[];
-
-pub(crate) const SLICEINATOR<T: 'static + ConstParamTy_ + Freeze, const NUM: T>: &[T] =
-    const { &[NUM] };
-
 const fn deduped<T: SureEq + Copy>(slice: &[T]) -> Vec<T> {
     let [first, ..] = slice else { return vec![] };
 
