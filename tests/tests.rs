@@ -1,3 +1,5 @@
+#![feature(const_result_trait_fn, const_trait_impl)]
+
 #[cfg(not(feature = "bench_compile_time"))]
 mod tests {
 
@@ -168,8 +170,8 @@ mod tests {
         use sure::sure_u16::Range;
 
         const {
-            let a: Sure<u16, { Range![1..=4] }> = Sure::new(4).unwrap();
-            let b: Sure<u16, { Range![2..=6] }> = Sure::new(2).unwrap();
+            let a: Sure<u16, { Range![1..=4] }> = Sure::new(4).ok().unwrap();
+            let b: Sure<u16, { Range![2..=6] }> = Sure::new(2).ok().unwrap();
 
             let _c: Sure<u16, { Range![3..=10] }> = a.wrapping_add(b).normalize();
             let _d = a.isqrt();
@@ -194,6 +196,6 @@ mod tests {
     fn to_nonzero() {
         use sure::base::Sure;
         let set_not_zero: SureI32![1, 2, 3] = Sure::new(1).unwrap();
-        let _real_non_zero: core::num::NonZeroI32 = set_not_zero.to_nonzero();
+        let _real_non_zero: core::num::NonZeroI32 = set_not_zero.to_non_zero();
     }
 }

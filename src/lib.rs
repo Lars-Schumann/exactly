@@ -1,3 +1,5 @@
+//! Refinement types.
+
 #![feature(adt_const_params)]
 #![feature(const_array)]
 #![feature(const_closures)]
@@ -17,6 +19,7 @@
 #![feature(min_generic_const_args)]
 #![feature(unsized_const_params)]
 //
+#![deny(missing_docs)]
 #![deny(clippy::missing_safety_doc)]
 #![deny(clippy::pedantic)]
 #![deny(clippy::undocumented_unsafe_blocks)]
@@ -33,8 +36,13 @@ mod const_helpers;
 mod macros;
 mod spec;
 
+/// Defines the `Sure` type and its methods.
 pub mod base;
+
+/// Helpers for common set operations.
 pub mod set;
+
+/// The `SureEq` trait and it's implementations which this crate relies on to make some operations sound.
 pub mod sure_eq;
 
 macros::impl_ints! {

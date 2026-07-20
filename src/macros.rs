@@ -211,8 +211,10 @@ pub(crate) use impl_std_binary_fns;
 macro_rules! impl_ints {
     (the_dolla: $d:tt, $([num_t: $num_t:ident, unsigned_num_t: $unsigned_num_t:ident, signed_num_t: $signed_num_t:ident, t_alias: $t_alias:ident, wide_num_t: $wide_num_t:ident, private_macro_prefix: $private_macro_prefix:ident, extra_mod: $extra_mod:ident],)*) => {$(
 
+        #[doc = concat!("A type alias for `Sure<",stringify!($num_t),", _>`.")]
         pub type $t_alias<const SET: &'static [$num_t]> = base::Sure<$num_t, SET>;
 
+        #[doc = concat!("A module TODO blegh.")]
         pub mod $extra_mod {
 
             const RANGE_LENGTH_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: usize = const {
@@ -224,7 +226,7 @@ macro_rules! impl_ints {
                 exclusive_length.strict_add(inclusive_addition)
             };
 
-            pub const RANGE_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: &[$num_t] = const {
+            const RANGE_HELPER<const MIN: $num_t, const MAX: $num_t, const IS_INCLUSIVE: bool>: &[$num_t] = const {
                 let wide_min = $wide_num_t::from(MIN);
 
                 &core::array::from_fn::<$num_t, { RANGE_LENGTH_HELPER::<MIN, MAX, IS_INCLUSIVE> }, _>(
@@ -235,13 +237,19 @@ macro_rules! impl_ints {
                 )
             };
 
+            #[doc = concat!("Creates a slice of`", stringify!($num_t), "`'s containing the numbers in `MIN..MAX`.")]
             pub const RANGE             <const MIN: $num_t, const MAX: $num_t>: &[$num_t] = RANGE_HELPER::<                MIN ,                 MAX   , false >;
+            #[doc = concat!("Creates a slice of`", stringify!($num_t), "`'s containing the numbers in `MIN..`.")]
             pub const RANGE_FROM        <const MIN: $num_t                   >: &[$num_t] = RANGE_HELPER::<                MIN ,{const { $num_t::MAX }}, true  >;
             // RANGE_FULL omitted
+            #[doc = concat!("Creates a slice of`", stringify!($num_t), "`'s containing the numbers in `MIN..=MAX`.")]
             pub const RANGE_INCLUSIVE   <const MIN: $num_t, const MAX: $num_t>: &[$num_t] = RANGE_HELPER::<                MIN ,                 MAX   , true  >;
+            #[doc = concat!("Creates a slice of`", stringify!($num_t), "`'s containing the numbers in `..=MAX`.")]
             pub const RANGE_TO          <                   const MAX: $num_t>: &[$num_t] = RANGE_HELPER::<{const{ $num_t::MIN }},               MAX   , false >;
+            #[doc = concat!("Creates a slice of`", stringify!($num_t), "`'s containing the numbers in `..=MAX`.")]
             pub const RANGE_TO_INCLUSIVE<                   const MAX: $num_t>: &[$num_t] = RANGE_HELPER::<{const{ $num_t::MIN }},               MAX   , true  >;
 
+            #[doc = concat!("A convenience macro that can be used to create a slice of`", stringify!($num_t), "`'s using the familiar Range syntaxes.")]
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, range) } {
@@ -254,6 +262,7 @@ macro_rules! impl_ints {
             }
             pub use ${ concat($private_macro_prefix, range) } as Range;
 
+            /// This is `doc(hidden)`
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, union) } {
@@ -263,6 +272,7 @@ macro_rules! impl_ints {
             }
             pub use ${ concat($private_macro_prefix, union) } as Union;
 
+            /// This is `doc(hidden)`
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, intersection) } {
@@ -313,7 +323,8 @@ macro_rules! impl_ints {
         }
 
         impl<const SET: &'static [$num_t]> crate::base::Sure<$num_t, SET> {
-            pub const fn to_nonzero(self) -> core::num::NonZero<$num_t> {
+            #[doc = concat!("Creates a `NonZero<",stringify!($num_t),">`, or fails to compile if this could fail.")]
+            pub const fn to_non_zero(self) -> core::num::NonZero<$num_t> {
                 const { assert!(!Self::set_contains(&0), "Sure containing a 0 cannot be converted to NonZero")}
                 let self_inner = self.inner();
                 // SAFETY: we just asserted that `self_inner` can never be 0
@@ -321,6 +332,7 @@ macro_rules! impl_ints {
             }
         }
 
+        #[doc = concat!("A convenience macro to macro writing types take fewer `<{[]}>` brackets.")]
         #[macro_export]
         macro_rules! $t_alias {
             ($elem:literal) => {

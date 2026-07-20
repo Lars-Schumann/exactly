@@ -5,6 +5,10 @@ use crate::const_helpers;
 use crate::set;
 use crate::sure_eq::SureEq;
 
+/// A wrapper type with the invariant:\
+/// The contained value will always be contained in `SET`.
+///
+/// This invariant may be relied upon for the purposes of `unsafe` code and any safe mechanism to break this invariant are considered to be UB.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct Sure<T: SureEq + 'static, const SET: &'static [T]>(T);
@@ -13,23 +17,34 @@ impl<T, const SET: &'static [T]> Sure<T, SET>
 where
     T: Copy + const Destruct + Freeze + SureEq + const Ord + 'static,
 {
+    /// The exhaustive set of values that could be stored in this type.
     pub const SET: &'static [T] = SET;
 
+    /// Returns the SET of this type.
+    ///
+    /// This is the same as `Self::SET`, but can be used where the type of a variable is not easily available.
     #[must_use]
-    pub const fn set(self) -> &'static [T] {
+    pub const fn set(&self) -> &'static [T] {
         SET
     }
 
-    pub const fn new(value: T) -> Option<Self> {
+    /// Creates a `Sure` if the given value is contained in `SET`.
+    ///
+    /// # Errors
+    ///
+    /// Will return `Err(value)` if the given value is not contained in `SET`.
+    pub const fn new(value: T) -> Result<Self, T> {
         match Self::set_contains(&value) {
-            true => Some(
+            true => Ok(
                 // SAFETY: we just checked precondition #1: `Self::set_contains(value)`
                 unsafe { Self::new_unchecked(value) },
             ),
-            false => None,
+            false => Err(value),
         }
     }
 
+    /// Creates a `Sure` without checking whether the value is contained in `SET`. This results in undefined behavior if the value is not contained in `SET`.
+    ///
     /// # Safety
     ///
     /// One of the following conditions must hold, they are all logically equivalent:\
@@ -45,21 +60,30 @@ where
         Self(value)
     }
 
+    /// Checks if the given value is contained in `SET`.
+    #[must_use]
     pub const fn set_contains(value: &T) -> bool {
         const_helpers::slice_contains(SET, value)
     }
 
+    /// Returns the value stored in this `Sure`.
     #[must_use]
     pub const fn inner(self) -> T {
         self.0
     }
 
+    /// This is a no-op on the contained value.
+    ///
+    /// It only sorts the values stored in `SET`.
     #[must_use]
     pub const fn sort(self) -> Sure<T, { set::SORT::<T, SET> }> {
         // SAFETY: `SORT` only sorts the elements in `SET`, so it's output will have identical elements.
         unsafe { self.cast_unchecked() }
     }
 
+    /// This is a no-op on the contained value.
+    ///
+    /// It only sorts and deduplicates the values stored in `SET`.
     #[must_use]
     pub const fn normalize(self) -> Sure<T, { set::NORMALIZE::<T, SET> }> {
         // SAFETY: `NORMALIZE` only sorts and deduplicates the elements in `SET`, so it's output will have identical elements.
@@ -67,6 +91,9 @@ where
         unsafe { self.cast_unchecked() }
     }
 
+    /// This is a no-op on the contained value.
+    ///
+    /// It only changes `SET` to `SUPER_SET`, or fails to compile if `SET` isn't a subset of `SUPER_SET`.
     #[must_use]
     pub const fn widen<const SUPER_SET: &'static [T]>(self) -> Sure<T, SUPER_SET> {
         const {
@@ -79,14 +106,18 @@ where
         unsafe { self.cast_unchecked() }
     }
 
-    #[must_use]
-    pub const fn cast<const NEW_SET: &'static [T]>(self) -> Option<Sure<T, NEW_SET>> {
+    /// Creates a `Sure<T, NEW_SET>` if `self` currently stores a value that is contained in `NEW_SET`.
+    ///
+    /// # Errors
+    ///
+    /// Will return `Err(self)` if the given value is not contained in `SET`.
+    pub const fn cast<const NEW_SET: &'static [T]>(self) -> Result<Sure<T, NEW_SET>, Self> {
         match Sure::<T, NEW_SET>::set_contains(&self.inner()) {
-            true => Some(
+            true => Ok(
                 // SAFETY: we just checked precondition #1: `Self::set_contains(value)`
                 unsafe { self.cast_unchecked() },
             ),
-            false => None,
+            false => Err(self),
         }
     }
 

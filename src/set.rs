@@ -18,6 +18,7 @@ pub(crate) const CARTESIAN_LENGTH<
     const B: &'static [U],
 >: usize = const { A.len() * B.len() };
 
+/// Returns the input slice but sorted.
 #[expect(clippy::ok_expect)]
 pub const SORT<
     T: const Ord + ConstParamTy_ + Copy + const Destruct + Freeze + 'static,
@@ -27,6 +28,7 @@ pub const SORT<
     &const_helpers::sort(arr)
 };
 
+/// Returns the input slice but normalized(sorted + deduplicated).
 pub const NORMALIZE<
     T: SureEq + const Ord + Copy + const Destruct + 'static,
     const SET: &'static [T],
@@ -34,11 +36,13 @@ pub const NORMALIZE<
     normalize::<T, {LENGTH::<T, SET>}>(SET).const_make_global()
 };
 
+/// Returns the input slices concatenated with each other.
 pub const UNION<T: ConstParamTy_ + Copy + Freeze + 'static , const SETS: &'static [&'static [T]]>:
     &[T] = const {
     union_(SETS).const_make_global()
 };
 
+/// Returns the intersection of all input slices.
 pub const INTERSECTION<
     T: SureEq + Copy + const Destruct + 'static ,
     const SETS: &'static [&'static [T]],
