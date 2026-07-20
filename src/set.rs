@@ -102,8 +102,8 @@ const fn normalize<
 >(
     slice: &[T],
 ) -> Vec<T> {
-    use crate::spec_at_home::Type;
-    use crate::spec_at_home::type_of;
+    use crate::spec::Type;
+    use crate::spec::type_of;
     use core::mem::transmute;
 
     match type_of::<T>() {
@@ -117,7 +117,7 @@ const fn normalize<
             let concrete_vec_normalized: Vec<u16> = normalize_u16(concrete_slice);
             unsafe { transmute::<Vec<u16>, Vec<T>>(concrete_vec_normalized) }
         }
-        Some(Type::i8 | Type::i16) | None => {
+        Some(_) | None => {
             let arr: [T; LEN] = slice.try_into().ok().expect("this is infallible");
             let sorted = sort(arr);
             deduped(&sorted)
