@@ -247,7 +247,7 @@ macro_rules! impl_ints {
             #[doc = concat!("Creates a slice of`", stringify!($num_t), "`'s containing the numbers in `..=MAX`.")]
             pub const RANGE_TO_INCLUSIVE<                   const MAX: $num_t>: &[$num_t] = RANGE_HELPER::<{const{ $num_t::MIN }},               MAX   , true  >;
 
-            #[doc = concat!("A convenience macro that can be used to create a slice of`", stringify!($num_t), "`'s using the familiar Range syntaxes.")]
+            #[doc = concat!("A macro to make a slice of`", stringify!($num_t), "`'s using the familiar Range syntaxes.")]
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, range) } {
@@ -260,7 +260,7 @@ macro_rules! impl_ints {
             }
             pub use ${ concat($private_macro_prefix, range) } as Range;
 
-            /// This is `doc(hidden)`
+            #[doc = concat!("A macro to make a union over of slices of`", stringify!($num_t), "`'s.")]
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, union) } {
@@ -270,7 +270,7 @@ macro_rules! impl_ints {
             }
             pub use ${ concat($private_macro_prefix, union) } as Union;
 
-            /// This is `doc(hidden)`
+            #[doc = concat!("A macro to make a intersection over of slices of`", stringify!($num_t), "`'s.")]
             #[cfg_attr(doc, doc(hidden))]
             #[macro_export]
             macro_rules! ${ concat($private_macro_prefix, intersection) } {
