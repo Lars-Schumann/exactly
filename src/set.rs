@@ -145,9 +145,10 @@ const fn normalize_u8(slice: &[u8]) -> Vec<u8> {
         if set[i as usize] {
             normalized.push(i);
         }
-        match i.checked_add(1) {
-            Some(next) => i = next,
-            None => break,
+
+        i = i.wrapping_add(1);
+        if i == 0 {
+            break;
         }
     }
 
@@ -159,7 +160,7 @@ const fn normalize_u16(slice: &[u16]) -> Vec<u16> {
     const LEN: usize = u16::MAX as usize + 1;
     let mut set: [bool; LEN] = [false; LEN];
 
-    // for elem in slice: set[usize::from(elem)] = true
+    // for elem in slice: set[usize::from(elem)] = trues
     let mut i: usize = 0;
     while i < slice.len() {
         set[usize::from(slice[i])] = true;
@@ -174,9 +175,9 @@ const fn normalize_u16(slice: &[u16]) -> Vec<u16> {
         if set[i as usize] {
             normalized.push(i);
         }
-        match i.checked_add(1) {
-            Some(next) => i = next,
-            None => break,
+        i = i.wrapping_add(1);
+        if i == 0 {
+            break;
         }
     }
 
