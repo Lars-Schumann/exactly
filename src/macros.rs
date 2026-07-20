@@ -155,6 +155,7 @@ macro_rules! impl_unary_fns {
 
             impl<const SET: &'static [$input_t]> Sure<$input_t, SET> {
                 #[doc = crate::macros::$doc_macro_path!(fn_name: $fn_name, input_t: $input_t, codomain_t: $codomain_t)]
+                #[must_use]
                 pub const fn $fn_name(self) -> Sure<$codomain_t, { CODOMAIN::<{ SET }> }> {
                     let input_inner: $input_t = self.inner();
                     let output_inner: $codomain_t = $fn_path(input_inner);
@@ -190,6 +191,7 @@ macro_rules! impl_std_binary_fns {
 
             impl<const LHS_SET: &'static [$lhs_t]> Sure<$lhs_t, LHS_SET> {
                 #[doc = concat!("This method is the equivalent of [`",stringify!($lhs_t),"::",stringify!($fn_name),"`].")]
+                #[must_use]
                 pub const fn $fn_name<const RHS_SET: &'static [$rhs_t]>(self, rhs: Sure<$rhs_t, RHS_SET>) -> Sure<$codomain_t, { CODOMAIN::<{ LHS_SET }, { RHS_SET }> }> {
                     let lhs_inner: $lhs_t = self.inner();
                     let rhs_inner: $rhs_t = rhs.inner();
