@@ -31,6 +31,7 @@ extern crate alloc;
 
 mod const_helpers;
 mod macros;
+mod spec_at_home;
 
 pub mod base;
 pub mod set;

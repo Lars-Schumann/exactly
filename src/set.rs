@@ -5,6 +5,7 @@ use core::marker::Destruct;
 use core::marker::Freeze;
 
 use crate::const_helpers;
+use crate::const_helpers::sort;
 use crate::sure_eq::SureEq;
 
 pub(crate) const LENGTH<T: ConstParamTy_ + 'static, const SET: &'static [T]>: usize =
@@ -30,10 +31,7 @@ pub const NORMALIZE<
     T: SureEq + const Ord + Copy + const Destruct + 'static,
     const SET: &'static [T],
 >: &[T] = const {
-    let set_sorted = SORT::<T, SET>;
-    let normalized: Vec<T> = deduped(set_sorted);
-
-    normalized.const_make_global()
+    normalize::<T, {LENGTH::<T, SET>}>(SET).const_make_global()
 };
 
 pub const UNION<T: ConstParamTy_ + Copy + Freeze + 'static , const SETS: &'static [&'static [T]]>:
@@ -95,4 +93,92 @@ const fn intersection<T: SureEq + Copy + [const] Destruct>(sets: &[&[T]]) -> Vec
     }
 
     intersection
+}
+
+#[expect(clippy::undocumented_unsafe_blocks, clippy::ok_expect)]
+const fn normalize<
+    T: SureEq + [const] Ord + Copy + [const] Destruct + 'static,
+    const LEN: usize,
+>(
+    slice: &[T],
+) -> Vec<T> {
+    use crate::spec_at_home::Type;
+    use crate::spec_at_home::type_of;
+    use core::mem::transmute;
+
+    match type_of::<T>() {
+        Some(Type::u8) => {
+            let concrete_slice: &[u8] = unsafe { transmute(slice) };
+            let concrete_vec_normalized: Vec<u8> = normalize_u8(concrete_slice);
+            unsafe { transmute::<Vec<u8>, Vec<T>>(concrete_vec_normalized) }
+        }
+        Some(Type::u16) => {
+            let concrete_slice: &[u16] = unsafe { transmute(slice) };
+            let concrete_vec_normalized: Vec<u16> = normalize_u16(concrete_slice);
+            unsafe { transmute::<Vec<u16>, Vec<T>>(concrete_vec_normalized) }
+        }
+        Some(Type::i8 | Type::i16) | None => {
+            let arr: [T; LEN] = slice.try_into().ok().expect("this is infallible");
+            let sorted = sort(arr);
+            deduped(&sorted)
+        }
+    }
+}
+
+// FIXME: this would be way less ugly with const Range Iterators
+const fn normalize_u8(slice: &[u8]) -> Vec<u8> {
+    const LEN: usize = u8::MAX as usize + 1;
+    let mut set: [bool; LEN] = [false; LEN];
+
+    // for elem in slice: set[usize::from(elem)] = true
+    let mut i: usize = 0;
+    while i < slice.len() {
+        set[usize::from(slice[i])] = true;
+        i += 1;
+    }
+
+    let mut normalized: Vec<u8> = Vec::with_capacity(LEN);
+
+    // for i in 0..=u8::MAX: if set[usize::from(i)]: normalized.push(i)
+    let mut i: u8 = 0;
+    loop {
+        if set[i as usize] {
+            normalized.push(i);
+        }
+        match i.checked_add(1) {
+            Some(next) => i = next,
+            None => break,
+        }
+    }
+
+    normalized
+}
+
+#[expect(clippy::large_stack_arrays)]
+const fn normalize_u16(slice: &[u16]) -> Vec<u16> {
+    const LEN: usize = u16::MAX as usize + 1;
+    let mut set: [bool; LEN] = [false; LEN];
+
+    // for elem in slice: set[usize::from(elem)] = true
+    let mut i: usize = 0;
+    while i < slice.len() {
+        set[usize::from(slice[i])] = true;
+        i += 1;
+    }
+
+    let mut normalized: Vec<u16> = Vec::with_capacity(LEN);
+
+    // for i in 0..=u16::MAX: if set[usize::from(i)]: normalized.push(i)
+    let mut i: u16 = 0;
+    loop {
+        if set[i as usize] {
+            normalized.push(i);
+        }
+        match i.checked_add(1) {
+            Some(next) => i = next,
+            None => break,
+        }
+    }
+
+    normalized
 }
