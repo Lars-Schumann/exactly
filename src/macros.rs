@@ -41,10 +41,7 @@ macro_rules! _doc_unary_debug {
 #[rustfmt::skip]
 macro_rules! doc_unary_std {
     (fn_name: $fn_name:ident, input_t: $input_t:ident, codomain_t: $codomain_t:ident) => {
-        concat!(
-            "This method is the equivalent of:\n",
-            "https://doc.rust-lang.org/std/primitive.",stringify!($input_t),".html#method.",stringify!($fn_name)
-        )
+        concat!("This method is the equivalent of [`",stringify!($input_t),"::",stringify!($fn_name),"`].")
     };
 }
 pub(crate) use doc_unary_std;
@@ -192,8 +189,7 @@ macro_rules! impl_std_binary_fns {
             };
 
             impl<const LHS_SET: &'static [$lhs_t]> Sure<$lhs_t, LHS_SET> {
-                #[doc = "This method is the equivalent of:\n"]
-                #[doc = concat!("https://doc.rust-lang.org/std/primitive.",stringify!($lhs_t),".html#method.",stringify!($fn_name))]
+                #[doc = concat!("This method is the equivalent of [`",stringify!($lhs_t),"::",stringify!($fn_name),"`].")]
                 pub const fn $fn_name<const RHS_SET: &'static [$rhs_t]>(self, rhs: Sure<$rhs_t, RHS_SET>) -> Sure<$codomain_t, { CODOMAIN::<{ LHS_SET }, { RHS_SET }> }> {
                     let lhs_inner: $lhs_t = self.inner();
                     let rhs_inner: $rhs_t = rhs.inner();
