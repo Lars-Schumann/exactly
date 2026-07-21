@@ -43,6 +43,21 @@ where
         }
     }
 
+    /// Creates a `Sure` if the given value is found in `SET` using the [`Self::set_contains_via_binary_search`] method.
+    ///
+    /// # Errors
+    ///
+    /// Will return `Err(value)` if the given value is not found in `SET` as explained above.
+    pub const fn new_via_binary_search(value: T) -> Result<Self, T> {
+        match Self::set_contains_via_binary_search(&value) {
+            true => Ok(
+                // SAFETY: we just checked precondition #1: `Self::set_contains(value)`, since the binary search is strictly more conservative.
+                unsafe { Self::new_unchecked(value) },
+            ),
+            false => Err(value),
+        }
+    }
+
     /// Creates a `Sure` without checking whether the value is contained in `SET`. This results in undefined behavior if the value is not contained in `SET`.
     ///
     /// # Safety
@@ -64,6 +79,16 @@ where
     #[must_use]
     pub const fn set_contains(value: &T) -> bool {
         const_helpers::slice_contains(SET, value)
+    }
+
+    /// Checks if the given value is contained in `SET` using a binary search.
+    ///
+    /// If the `SET` is not sorted in ascending order this may return `false`, even when the value is actually contained.
+    ///
+    /// In that sense this function is more conservative than `set_contains`, only returning `true` when `set_contains` would also return `true`.
+    #[must_use]
+    pub const fn set_contains_via_binary_search(value: &T) -> bool {
+        SET.binary_search(value).is_ok()
     }
 
     /// Returns the value stored in this `Sure`.
